@@ -8,13 +8,13 @@ import { generateInviteCode } from "../utils/inviteCode.js";
 
 export const createServer = async (req, res) => {
   try {
-    const { name, email, description, isPublic } = req.body;
+    const { name, description, isPublic } = req.body;
     if (!name) {
       throw new ApiError(400, "Name required for server creation");
     }
 
-    const icon = req.files.icon;
-    const banner = req.files.banner;
+    const icon = req.files?.icon;
+    const banner = req.files?.banner;
 
     let uploadIcon = null;
     if (icon) {
@@ -31,13 +31,12 @@ export const createServer = async (req, res) => {
     const server = await serverModel.create({
       name,
       description,
-      email,
+      email: req.user.id,
       icon: uploadIcon?.url || "",
       banner: uploadBanner?.url || "",
       isPublic,
       inviteCode,
     });
-
     return res
       .status(201)
       .json(new ApiResponse(201, server, "Server created Succesfully"));
@@ -141,7 +140,7 @@ export const joinServer = async (req, res) => {
     const user = await userModel.findById(req.user.id);
 
     const alreadyExists = user.server.some((serverId) => {
-     serverId.toString() === server._id.toString();
+      serverId.toString() === server._id.toString();
     });
 
     if (!alreadyExists) {
