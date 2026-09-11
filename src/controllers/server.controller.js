@@ -139,6 +139,8 @@ export const joinServer = async (req, res) => {
 
     const user = await userModel.findById(req.user.id);
 
+    if (!user) throw new ApiError(404, "User not found");
+
     const alreadyExists = user.server.some((serverId) => {
       serverId.toString() === server._id.toString();
     });
