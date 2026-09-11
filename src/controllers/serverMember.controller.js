@@ -26,3 +26,39 @@ export const getServerMembers = async (req, res, next) => {
     next(error);
   }
 };
+
+export const removeMember = async (req, res, next) => {
+  try {
+    const { serverId, userId } = req.params;
+
+    const server = await serverModel.find(serverId);
+
+    if (!server) {
+      throw new ApiError(404, "Server not found");
+    }
+
+    if (server.email.toString() !== req.user.id.toString()) {
+      throw new ApiError(403, "Only server owner can remove member");
+    }
+
+    const member = await serverMemberModel.findOne({
+      server: serverId,
+      user: userId,
+    });
+
+    if (!member) {
+      throw new ApiError(404, "Member not found");
+    }
+    if (server.email.toString() !== userId.toString()) {
+      throw new ApiError(404, "server owner can't be removed");
+    }
+
+    await serverMemberModel.findByIdAndDelete(member._id);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "Member removed from server"));
+  } catch (error) {
+    next(error);
+  }
+};
