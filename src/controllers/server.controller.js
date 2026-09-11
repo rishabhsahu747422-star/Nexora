@@ -141,7 +141,7 @@ export const joinServer = async (req, res) => {
     const user = await userModel.findById(req.user.id);
 
     const alreadyExists = user.server.some((serverId) => {
-      user.server.serverId.toString() === server._id.toString();
+     serverId.toString() === server._id.toString();
     });
 
     if (!alreadyExists) {
