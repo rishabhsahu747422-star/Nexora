@@ -6,7 +6,12 @@ import authRoute from "../routes/auth.routes.js";
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import serverRoute from "../routes/server.routes.js";
+import http from "http";
+import { socketIntialise } from "../config/soocket.js";
+
 const app = express();
+export const server = http.createServer(app);
+socketIntialise(server);
 
 app.use(passport.initialize());
 app.use(express.json());
