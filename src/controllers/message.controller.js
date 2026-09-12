@@ -62,59 +62,57 @@ export const createMessage = async (req, res, next) => {
   }
 };
 
+export const getAllChannelMessage = async (req, res, next) => {
+  try {
+    const { channelId } = req.params;
+    const channel = await channelModel.findById(channelId);
 
-
-
-export const getAllChannelMessage = async (req,res,next)=>{
-
-    try {
-        const{channelId} =req.params
-        const channel = await channelModel.findById(channelId)
-
-        if(!channel){
-            throw new ApiError(404,"channel not found")
-        }
-
-        const member = await serverMemberModel,findOne({
-            server:channel.server,
-            user:req.user._id
-        })
-
-        if(!member){
-            throw new ApiError(403,"You are not the member of this server")
-        }
-
-        const message = await messageModel.aggregate([
-            {
-                $match:{
-                    channel_id:channel._id
-               }
-            },
-            {
-                $lookup:{
-                    from:"users",
-                    localField:'author_id',
-                    foreignField:"_id",
-                    as:"auhtor_details"
-                }
-            },
-            {
-                $unwind:"$author_details"
-            },{
-                $project:{
-                    content:1,
-                    createdAt:1,
-                    "author_details.username":1
-                }
-            },{
-                $sort:{
-                    createdAt:-1
-                }
-            }
-        ])
-
-        return res.status(200).json(200,message,"message fetched sccesfully")
-    } catch (error) {
-     next(error)   
+    if (!channel) {
+      throw new ApiError(404, "channel not found");
     }
-}
+
+    const member = await serverMemberMode.findOne({
+      server: channel.server,
+      user: req.user._id,
+    });
+
+    if (!member) {
+      throw new ApiError(403, "You are not the member of this server");
+    }
+
+    const message = await messageModel.aggregate([
+      {
+        $match: {
+          channel_id: channel._id,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "author_id",
+          foreignField: "_id",
+          as: "auhtor_details",
+        },
+      },
+      {
+        $unwind: "$author_details",
+      },
+      {
+        $project: {
+          content: 1,
+          createdAt: 1,
+          "author_details.username": 1,
+        },
+      },
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+    ]);
+
+    return res.status(200).json(200, message, "message fetched sccesfully");
+  } catch (error) {
+    next(error);
+  }
+};
