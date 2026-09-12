@@ -62,6 +62,7 @@ export const removeMember = async (req, res, next) => {
     next(error);
   }
 };
+
 export const updateMemberRoles = async (req, res, next) => {
   try {
     const { serverId, userID } = req.params;
