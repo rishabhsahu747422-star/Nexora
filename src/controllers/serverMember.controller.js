@@ -62,3 +62,48 @@ export const removeMember = async (req, res, next) => {
     next(error);
   }
 };
+export const updateMemberRoles = async (req, res, next) => {
+  try {
+    const { serverId, userID } = req.params;
+    const { roles } = req.body;
+
+    const server = await serverModel.findById(serverId);
+
+    if (!server) {
+      throw new ApiError(404, "server not found");
+    }
+
+    if (server.email.toString() !== req.user._id.toString()) {
+      throw new ApiResponse(403, "Only Owner can update roles");
+    }
+
+    const member = await serverMemberModel.findOne({
+      server: serverId,
+      user: userId,
+    });
+
+    if (!member) {
+      throw new ApiError(404, "Member not found");
+    }
+
+    if (server.email.toString() !== userID.toString()) {
+      throw new ApiError(404, "server owner's roles cannot be changed");
+    }
+
+    member.roles = roles;
+    await member.save();
+
+    const updatedMember = await serverMemberModel
+      .findById(member._id)
+      .populate("user", "username fullname profile_pic")
+      .populate("roles", "name permissioon color position");
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, updatedMember, "Member roles updated succesfully"),
+      );
+  } catch (error) {
+    next(error);
+  }
+};
