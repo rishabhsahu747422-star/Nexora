@@ -43,6 +43,21 @@ export const updateProfile = async (req, res, next) => {
   }
 };
 
+export const getUserProfile = async (req, res, next) => {
+  try {
+    const user = await userModel
+      .findOne({ username: req.params.username })
+      .select("-password");
+    if (!user) throw new ApiError(404, "User not found");
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, user, "User fetched successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const searchUser = async (req, res, next) => {
   try {
     const user = await userModel
