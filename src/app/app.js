@@ -8,6 +8,10 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import serverRoute from "../routes/server.routes.js";
 import http from "http";
 import { socketIntialise } from "../config/soocket.js";
+import serverMemberRoutes from "../routes/serverMember.routes.js";
+import roleRoutes from "../routes/role.routes.js";
+import userRoutes from "../routes/user.routes.js";
+import messageRoutes from "../routes/message.routes.js";
 
 const app = express();
 export const server = http.createServer(app);
@@ -32,5 +36,8 @@ passport.use(
 
 app.use("/api/auth", authRoute);
 app.use("/api/server", serverRoute);
-
+app.use("/api/serverMembers", serverMemberRoutes);
+app.use("/api/roles", roleRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/messages", messageRoutes);
 export default app;
