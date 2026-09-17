@@ -6,116 +6,124 @@ import { generateOtp } from "../utils/otp.js";
 import { generateToken } from "../utils/token.js";
 import bcrypt from "bcrypt";
 
-export const register = async (req, res) => {
-  const { username, email, password, dob, fullname, mobile_no } = req.body;
+export const register = async (req, res, next) => {
+  try {
+    const { username, email, password, dob, fullname, mobile_no } = req.body;
 
-  const file = req.file;
+    const file = req.file;
 
-  if (!fullname || !username || !email || !password)
-    return res.status(400).json({
-      success: false,
-      message: "All fields are Required",
+    if (!fullname || !username || !email || !password)
+      return res.status(400).json({
+        success: false,
+        message: "All fields are Required",
+      });
+
+    let uploadImage = null;
+
+    if (file) {
+      uploadImage = await sendFiles(file.buffer, file.originalname);
+    }
+
+    const user = await userModel.create({
+      username,
+      email,
+      password,
+      dob,
+      fullname,
+      mobile_no,
+      profile_pic: uploadImage?.url,
     });
 
-  let uploadImage = null;
+    const accessToken = await generateToken(user._id, "10min");
+    const refreshToken = await generateToken(user._id, "1d");
 
-  if (file) {
-    uploadImage = await sendFiles(file.buffer, file.originalname);
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: 10 * 60 * 1000,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    const userData = user.toObject();
+    delete userData.password;
+
+    return res.status(201).json({
+      success: true,
+      message: "User Registered ",
+      user: userData,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  const user = await userModel.create({
-    username,
-    email,
-    password,
-    dob,
-    fullname,
-    mobile_no,
-    profile_pic: uploadImage?.url,
-  });
-
-  const accessToken = await generateToken(user._id, "10min");
-  const refreshToken = await generateToken(user._id, "1d");
-
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    maxAge: 10 * 60 * 1000,
-    secure: false,
-    sameSite: "strict",
-  });
-
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: false,
-    sameSite: "strict",
-  });
-
-  const userData = user.toObject();
-  delete userData.password;
-
-  return res.status(201).json({
-    success: true,
-    message: "User Registered ",
-    user: userData,
-  });
 };
 
-export const login = async (req, res) => {
-  const { email, password } = req.body;
+export const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-  if (!email || !password)
-    return res.status(400).json({
-      success: false,
-      message: "All field are Required",
+    if (!email || !password)
+      return res.status(400).json({
+        success: false,
+        message: "All field are Required",
+      });
+
+    const user = await userModel.findOne({ email }).select("password");
+
+    if (!user)
+      return res.status(400).json({
+        success: false,
+        message: "user not found",
+      });
+
+    if (!user.password || user.authProvider === "google")
+      return res.status(400).json({
+        success: false,
+        message: "Continue with Google",
+      });
+
+    const isCorrectPassword = user.comparePass(password);
+
+    if (!isCorrectPassword)
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Credentials",
+      });
+
+    const accessToken = generateToken(user._id, "10min");
+    const refreshToken = generateToken(user._id, "1d");
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: 10 * 60 * 1000,
+      secure: false,
+      sameSite: "strict",
     });
 
-  const user = await userModel.findOne({ email }).select("password");
-
-  if (!user)
-    return res.status(400).json({
-      success: false,
-      message: "user not found",
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+      secure: false,
+      sameSite: "strict",
     });
 
-  if (!user.password || user.authProvider === "google")
-    return res.status(400).json({
-      success: false,
-      message: "Continue with Google",
+    const userData = user.toObject();
+    delete userData.password;
+
+    return res.status(200).json({
+      success: true,
+      message: "User LoggedIn Successfully",
+      user: userData,
     });
-
-  const isCorrectPassword = user.comparePass(password);
-
-  if (!isCorrectPassword)
-    return res.status(400).json({
-      success: false,
-      message: "Invalid Credentials",
-    });
-
-  const accessToken = generateToken(user._id, "10min");
-  const refreshToken = generateToken(user._id, "1d");
-
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    maxAge: 10 * 60 * 1000,
-    secure: false,
-    sameSite: "strict",
-  });
-
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-    secure: false,
-    sameSite: "strict",
-  });
-
-  const userData = user.toObject();
-  delete userData.password;
-
-  return res.status(200).json({
-    success: true,
-    message: "User LoggedIn Successfully",
-    user: userData,
-  });
+  } catch (error) {
+    next(error);
+  }
 };
 
 export const googleAuth = async (req, res) => {
