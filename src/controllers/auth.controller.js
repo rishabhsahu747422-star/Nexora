@@ -126,112 +126,121 @@ export const login = async (req, res, next) => {
   }
 };
 
-export const googleAuth = async (req, res) => {
-  const { email, name, given_name, picture, sub } = req.user._json;
-  console.log(req.user);
-  const user = await userModel.findOne({ email });
+export const googleAuth = async (req, res, next) => {
+  try {
+    const { email, name, given_name, picture, sub } = req.user._json;
+    console.log(req.user);
+    const user = await userModel.findOne({ email });
 
-  if (!user) {
-    if (!user.googleID) {
-      user.googleID = sub;
-      await user.save();
+    if (!user) {
+      if (!user.googleID) {
+        user.googleID = sub;
+        await user.save();
+      }
+
+      const accessToken = await generateToken(user._id, "10min");
+      const refreshToken = await generateToken(user._id, "1d");
+
+      res.cookie("accessToken", accessToken, {
+        httpOnly: true,
+        maxAge: 15 * 60 * 1000,
+      });
+
+      res.cookiie("refreshToken", refreshToken, {
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "User Loggedin Successfully",
+        user,
+      });
     }
 
-    const accessToken = await generateToken(user._id, "10min");
-    const refreshToken = await generateToken(user._id, "1d");
+    const newUser = await userModel.create({
+      username: given_name,
+      fullname: name,
+      email,
+      profile_pic: picture,
+      googleId: sub,
+      authProvider: req.user.provider,
+    });
+
+    const accessToken = await generateToken(newUser._id, "10min");
+    const refreshToken = await generateToken(newUser._id, "1d");
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      maxAge: 15 * 60 * 1000,
+      maxAge: 10 * 60 * 1000,
     });
 
     res.cookiie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
+    return res.status(201).json({
+      success: true,
+      message: "User Loggedin Successfully",
+      newUser,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const logout = async (req, res, next) => {
+  try {
+    const { refreshToken, accessToken } = req.cookies;
+
+    if (accessToken) {
+      await redis.set(`Bearer:accessToken:${accessToken}`, "true");
+    }
+    if (refreshToken) {
+      await redis.set(`Bearer:refreshToken:${refreshToken}`, "true");
+    }
+
+    res.clearCookie("refreshToken");
+    res.clearCookie("accessToken");
 
     return res.status(200).json({
       success: true,
-      message: "User Loggedin Successfully",
-      user,
+      message: "User logout successfully",
     });
+  } catch (error) {
+    next(error);
   }
-
-  const newUser = await userModel.create({
-    username: given_name,
-    fullname: name,
-    email,
-    profile_pic: picture,
-    googleId: sub,
-    authProvider: req.user.provider,
-  });
-
-  const accessToken = await generateToken(newUser._id, "10min");
-  const refreshToken = await generateToken(newUser._id, "1d");
-
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,
-    maxAge: 10 * 60 * 1000,
-  });
-
-  res.cookiie("refreshToken", refreshToken, {
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000,
-  });
-  return res.status(201).json({
-    success: true,
-    message: "User Loggedin Successfully",
-    newUser,
-  });
 };
 
-export const logout = async (req, res) => {
-  const { refreshToken, accessToken } = req.cookies;
+export const forgetPassword = async (req, res, next) => {
+  try {
+    const { email } = req.body;
+    if (!email)
+      return redis.status(400).json({
+        success: false,
+        message: "Email is Required",
+      });
 
-  if (accessToken) {
-    await redis.set(`Bearer:accessToken:${accessToken}`, "true");
-  }
-  if (refreshToken) {
-    await redis.set(`Bearer:refreshToken:${refreshToken}`, "true");
-  }
+    const user = await userModel.findOne({ email });
 
-  res.clearCookie("refreshToken");
-  res.clearCookie("accessToken");
+    if (!user)
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
 
-  return res.status(200).json({
-    success: true,
-    message: "User logout successfully",
-  });
-};
+    const otp = generateOtp();
 
-export const forgetPassword = async (req, res) => {
-  const { email } = req.body;
-  if (!email)
-    return redis.status(400).json({
-      success: false,
-      message: "Email is Required",
-    });
+    const hashedOtp = bcrypt.hashSync(otp, 10);
 
-  const user = await userModel.findOne({ email });
+    await redis.set(`hashedOtp_reset_pass_${email}`, hashedOtp, "EX", 10 * 60);
 
-  if (!user)
-    return res.status(400).json({
-      success: false,
-      message: "User not found",
-    });
+    await sendEmail(
+      user.email,
+      "Reset your Discord Password",
+      `Reset your password using this OTP :${otp}`,
 
-  const otp = generateOtp();
-
-  const hashedOtp = bcrypt.hashSync(otp, 10);
-
-  await redis.set(`hashedOtp_reset_pass_${email}`, hashedOtp, "EX", 10 * 60);
-
-  await sendEmail(
-    user.email,
-    "Reset your Discord Password",
-    `Reset your password using this OTP :${otp}`,
-
-    `<div style="font-family: Arial, sans-serif;">
+      `<div style="font-family: Arial, sans-serif;">
                 <h2>Password Reset Request</h2>
 
                 <p>Your OTP for resetting your password is:</p>
@@ -244,91 +253,102 @@ export const forgetPassword = async (req, res) => {
 
                 <p>If you did not request a password reset, please ignore this email.</p>
             </div>`,
-  );
+    );
 
-  return res.status(200).json({
-    success: true,
-    message: "Email sent Successfully",
-  });
-};
-
-export const verifyOtp = async (req, res) => {
-  const { email, otp } = req.body;
-
-  if (!otp)
-    return res.status(400).json({
-      success: false,
-      message: "OTP is Required",
-    });
-
-  const hashedOtp = await redis.get(`hashedOtp_reset_pass_${email}`);
-
-  if (!hashedOtp)
-    return res.status(400).json({
-      success: false,
-      message: "OTP is Expired ",
-    });
-
-  const isValid = bcrypt.compareSync(otp, hashedOtp);
-
-  if (!isValid)
-    return res.status(400).json({
+    return res.status(200).json({
       success: true,
-      message: "Invalid OTP",
+      message: "Email sent Successfully",
     });
-
-  await redis.del(`hashedOtp_reset_pass_${email}`);
-
-  const resetToken = generateToken(email, "10min");
-
-  const hashedResetToken = bcrypt.hashSync(resetToken, 10);
-
-  await redis.set(
-    `hashed_reset_token_${email}`,
-    hashedResetToken,
-    "EX",
-    10 * 60,
-  );
-
-  return res.status(200).json({
-    success: true,
-    message: "OTP verified Successfully",
-    resetToken,
-  });
+  } catch (error) {
+    next(error);
+  }
 };
 
-export const resetPassword = async (req, res) => {
-  const { email, resetToken, newPassword } = req.body;
+export const verifyOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
 
-  if (!email || !resetToken || !newPassword)
-    return res.status(400).json({
-      success: false,
-      message: "Don't accept Empty Fields",
+    if (!otp)
+      return res.status(400).json({
+        success: false,
+        message: "OTP is Required",
+      });
+
+    const hashedOtp = await redis.get(`hashedOtp_reset_pass_${email}`);
+
+    if (!hashedOtp)
+      return res.status(400).json({
+        success: false,
+        message: "OTP is Expired ",
+      });
+
+    const isValid = bcrypt.compareSync(otp, hashedOtp);
+
+    if (!isValid)
+      return res.status(400).json({
+        success: true,
+        message: "Invalid OTP",
+      });
+
+    await redis.del(`hashedOtp_reset_pass_${email}`);
+
+    const resetToken = generateToken(email, "10min");
+
+    const hashedResetToken = bcrypt.hashSync(resetToken, 10);
+
+    await redis.set(
+      `hashed_reset_token_${email}`,
+      hashedResetToken,
+      "EX",
+      10 * 60,
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP verified Successfully",
+      resetToken,
     });
+  } catch (error) {
+    next(error);
+  }
+};
 
-  const hashedResetToken = await redis.get(`hashed_reset_token_${email}`);
+export const resetPassword = async (req, res, next) => {
+  try {
+    const { email, resetToken, newPassword } = req.body;
 
-  if (!hashedResetToken)
-    return res.status(400).json({
-      success: false,
-      message: "Session Timeout please try again",
+    if (!email || !resetToken || !newPassword)
+      return res.status(400).json({
+        success: false,
+        message: "Don't accept Empty Fields",
+      });
+
+    const hashedResetToken = await redis.get(`hashed_reset_token_${email}`);
+
+    if (!hashedResetToken)
+      return res.status(400).json({
+        success: false,
+        message: "Session Timeout please try again",
+      });
+
+    const user = await userModel.findOne({ email }).select("password");
+
+    if (!user)
+      return res.status(400).json({
+        success: false,
+        message: "User not found",
+      });
+
+    user.password = newPassword;
+    await user.save();
+
+    await redis.del(`hashed_reset_token_${email}`);
+
+    return res.status(200).json({
+      success: true,
+      message: "Password changed ",
     });
-
-  const user = await userModel.findOne({ email }).select("password");
-
-  if (!user)
-    return res.status(400).json({
-      success: false,
-      message: "User not found",
-    });
-
-  user.password = newPassword;
-  await user.save();
-
-  await redis.del(`hashed_reset_token_${email}`);
-
-  return res.status(200).json({
-    success: true,
-    message: "Password changed ",
-  });
+  } catch (error) {
+    next(error);
+  }
 };
