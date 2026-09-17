@@ -5,7 +5,7 @@ import ApiResponse from "../utils/ApiResponse.js";
 
 export const createChannel = async (req, res, next) => {
   try {
-    const { serverID } = req.params;
+    const { serverId } = req.params;
     const { name, type, position, isPrivate } = req.body;
 
     const server = await serverModel.findById(serverId);
