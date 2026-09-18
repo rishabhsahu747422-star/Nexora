@@ -12,7 +12,7 @@ const serverMemberSchema = new mongoose.Schema(
     },
     roles: [
       {
-        types: mongoose.Schema.types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "roles",
       },
     ],

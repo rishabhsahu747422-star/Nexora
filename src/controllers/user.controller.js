@@ -1,7 +1,7 @@
 import userModel from "../models/user.model.js";
 import sendFiles from "../services/storage.service.js";
 import ApiError from "../utils/ApiError.js";
-import ApiResponse from "../utils/ApiResponse";
+import ApiResponse from "../utils/ApiResponse.js";
 
 export const getMe = async (req, res, next) => {
   try {

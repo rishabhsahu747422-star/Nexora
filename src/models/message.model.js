@@ -12,7 +12,7 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
     author_id: {
-      type: mongoose.Schema.Typess.ObjectId,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "user",
       required: true,
     },

@@ -2,6 +2,7 @@ import express from "express";
 import { authMiddleware } from "../middlewares/authmiddleware.js";
 import {
   changePassword,
+  getMe,
   getUserProfile,
   searchUser,
   updateProfile,

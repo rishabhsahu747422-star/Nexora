@@ -4,7 +4,7 @@ dotenv.config();
 import ApiError from "../utils/ApiError.js";
 import redis from "../config/redis.js";
 import jwt from "jsonwebtoken";
-import userModel from "../models/user.model";
+import userModel from "../models/user.model.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
