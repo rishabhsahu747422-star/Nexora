@@ -1,7 +1,7 @@
-import roleModel from "../models/role.model";
-import serverModel from "../models/server.model";
-import ApiError from "../utils/ApiError";
-import ApiResponse from "../utils/ApiResponse";
+import roleModel from "../models/role.model.js";
+import serverModel from "../models/server.model.js";
+import ApiError from "../utils/ApiError.js";
+import ApiResponse from "../utils/ApiResponse.js";
 
 export const createRole = async (req, resizeBy, next) => {
   try {

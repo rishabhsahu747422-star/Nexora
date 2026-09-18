@@ -1,6 +1,6 @@
 import jwt from "jsonwebtoken";
-import ApiError from "../utils/ApiError";
-import userModel from "../models/user.model";
+import ApiError from "../utils/ApiError.js";
+import userModel from "../models/user.model.js";
 
 export const socketMiddleware = async (socket, next) => {
   try {

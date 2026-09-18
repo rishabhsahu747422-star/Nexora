@@ -1,7 +1,7 @@
 import serverModel from "../models/server.model.js";
-import serverMemberModel from "../models/serverMember.model";
+import serverMemberModel from "../models/serverMember.model.js";
 import ApiError from "../utils/ApiError.js";
-import ApiResponse from "../utils/ApiResponse";
+import ApiResponse from "../utils/ApiResponse.js";
 
 export const getServerMembers = async (req, res, next) => {
   try {
