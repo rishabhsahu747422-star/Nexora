@@ -11,14 +11,12 @@ export const authMiddleware = async (req, res, next) => {
     const token = req.cookies.accessToken;
 
     if (!token) {
-      throw new ApiError(401, "Access token not found");
+      throw new ApiError(401, "Access token not found from auth middleware");
     }
 
-    const isTokenBlacklisted = await redis.get(
-      `Bearer:accessToken:${accessToken}`,
-    );
+    const isTokenBlacklisted = await redis.get(`Bearer:accessToken:${token}`);
 
-    const decoded = jwt.verify(token.process.env.JWT_SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await userModel.findById(decoded.id).select("-password");
 

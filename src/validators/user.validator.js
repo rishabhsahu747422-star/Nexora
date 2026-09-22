@@ -1,7 +1,7 @@
 import { body, param, query } from "express-validator";
 
 const objectId = (field) =>
-  param(field).isMongoId().withmessage(`${field} must be a valid Id`);
+  param(field).isMongoId().withMessage(`${field} must be a valid Id`);
 
 export const updateProfileValidator = [
   body("username")
