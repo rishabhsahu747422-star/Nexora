@@ -1,3 +1,4 @@
+import { body, param } from "express-validator";
 export const registerValidator = [
   body("username")
     .trim()
