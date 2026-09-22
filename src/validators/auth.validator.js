@@ -36,7 +36,15 @@ export const forgotPasswordValidator = [
     .trim()
     .normalizeEmail()
     .isEmail()
-    .withMessage("Not a valid email"),
+    .withMessage("Please provide a valid email"),
+];
+
+export const verifyOtpValidator = [
+  body("email")
+    .trim()
+    .normalizeEmail()
+    .isEmail()
+    .withMessage("Please provide a valid email"),
   body("otp").isLength({ min: 4, max: 8 }).withMessage("OTP is invalid"),
 ];
 

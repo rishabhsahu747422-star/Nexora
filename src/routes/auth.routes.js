@@ -10,11 +10,25 @@ import {
   verifyOtp,
 } from "../controllers/auth.controller.js";
 import passport from "passport";
+import {
+  forgotPasswordValidator,
+  loginValidator,
+  registerValidator,
+  resetPasswordValidator,
+  verifyOtpValidator,
+} from "../validators/auth.validator.js";
+import { validate } from "../middlewares/validatte.middleware.js";
 
 const router = express.Router();
 
-router.post("/register", upload.single("image"), register);
-router.post("/login", login);
+router.post(
+  "/register",
+  upload.single("image"),
+  registerValidator,
+  validate,
+  register,
+);
+router.post("/login", loginValidator, validate, login);
 
 router.post(
   "google",
@@ -29,9 +43,14 @@ router.post(
 
 router.post("/logout", logout);
 
-router.post("/forget-password", forgetPassword);
-router.post("/verify-otp", verifyOtp);
+router.post(
+  "/forget-password",
+  forgotPasswordValidator,
+  validate,
+  forgetPassword,
+);
+router.post("/verify-otp", verifyOtpValidator, validate, verifyOtp);
 
-router.post("/reset-password", resetPassword);
+router.post("/reset-password", resetPasswordValidator, validate, resetPassword);
 
 export default router;
