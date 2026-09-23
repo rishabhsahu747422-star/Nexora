@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none">
+  <defs>
+    <linearGradient id="nexoraGrad" x1="4" y1="4" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#00F0FF" />
+      <stop offset="50%" stop-color="#6366F1" />
+      <stop offset="100%" stop-color="#A855F7" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  <!-- Background Plate -->
+  <rect width="48" height="48" rx="14" fill="#0C0F15" />
+  <rect width="48" height="48" rx="14" stroke="url(#nexoraGrad)" stroke-width="1.5" stroke-opacity="0.4" />
+  
+  <!-- Outer Interlocking Hex Orbit -->
+  <path d="M24 8 L38 16 L38 32 L24 40 L10 32 L10 16 Z" 
+        stroke="url(#nexoraGrad)" 
+        stroke-width="2.5" 
+        stroke-linejoin="round"
+        fill="none" 
+        opacity="0.85" />
+
+  <!-- Inner Dynamic Transmission Core (Nexora Beacon) -->
+  <path d="M24 14 L32 24 L24 34 L16 24 Z" 
+        fill="url(#nexoraGrad)" 
+        opacity="0.9" />
+
+  <!-- Core Orbital Node Links -->
+  <circle cx="24" cy="8" r="2.5" fill="#00F0FF" filter="url(#glow)" />
+  <circle cx="38" cy="16" r="2.5" fill="#6366F1" />
+  <circle cx="38" cy="32" r="2.5" fill="#A855F7" />
+  <circle cx="24" cy="40" r="2.5" fill="#A855F7" filter="url(#glow)" />
+  <circle cx="10" cy="32" r="2.5" fill="#6366F1" />
+  <circle cx="10" cy="16" r="2.5" fill="#00F0FF" />
+  
+  <!-- Central Pulse Point -->
+  <circle cx="24" cy="24" r="3.5" fill="#07080C" stroke="#FFFFFF" stroke-width="1.5" />
+</svg>
