@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 import { AnimatePresence } from 'framer-motion';
 
 // Pages
-import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Workspace from './pages/Workspace';
@@ -18,6 +17,11 @@ import StartupScreen from './components/loading/StartupScreen';
 import ToastContainer from './components/common/ToastContainer';
 import ModalManager from './components/modals/ModalManager';
 import GlobalSearchModal from './components/layout/GlobalSearchModal';
+
+function RootRedirect() {
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  return <Navigate to={isAuthenticated ? "/app" : "/login"} replace />;
+}
 
 export default function App() {
   const [hasStartedUp, setHasStartedUp] = useState(() => {
@@ -60,8 +64,8 @@ export default function App() {
 
       {/* Main Application Router */}
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<Landing />} />
+        {/* Root authentication-aware redirect */}
+        <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
