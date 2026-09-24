@@ -16,10 +16,10 @@ export const CURRENT_USER = {
 export const MOCK_USERS = [
   CURRENT_USER,
   {
-    id: 'usr_elena',
-    name: 'Dr. Elena Rostova',
-    username: 'elena_ai',
-    email: 'elena.rostova@nexus.org',
+    id: 'kazu',
+    name: 'Sagar Shirvastava',
+    username: 'kazu_123',
+    email: 'sagar@nexus.org',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
     banner: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&auto=format&fit=crop&q=80',
     status: 'online',
@@ -30,9 +30,9 @@ export const MOCK_USERS = [
     mutualServers: ['srv_synthetix', 'srv_quantum'],
   },
   {
-    id: 'usr_marcus',
-    name: 'Marcus Vance',
-    username: 'marcus_v',
+    id: 'punit_sahu',
+    name: 'Punit Sahu',
+    username: 'punit_123',
     email: 'marcus@cybersphere.games',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
     banner: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
