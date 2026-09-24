@@ -1,8 +1,8 @@
 export const CURRENT_USER = {
   id: 'usr_me',
-  name: 'Rishan Dev',
-  username: 'rishandev',
-  email: 'rishan@nexora.io',
+  name: 'Rishabh  Sahu',
+  username: 'rishabh-star',
+  email: 'rishabh@nexora.io',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
   banner: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
   status: 'online', // 'online' | 'idle' | 'dnd' | 'offline'
