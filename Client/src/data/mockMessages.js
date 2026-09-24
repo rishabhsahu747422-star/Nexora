@@ -5,7 +5,7 @@ export const MOCK_MESSAGES = {
       id: 'msg_syn_01',
       channelId: 'chn_syn_gen',
       authorId: 'usr_elena',
-      authorName: 'Dr. Elena Rostova',
+      authorName: 'Miss Somvi Bhairam',
       authorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
       authorRole: 'Founding Scientist',
       authorRoleColor: '#00F0FF',
