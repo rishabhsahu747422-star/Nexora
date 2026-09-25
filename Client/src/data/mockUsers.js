@@ -87,8 +87,8 @@ export const MOCK_USERS = [
   },
   {
     id: 'usr_devon',
-    name: 'Devon Cross',
-    username: 'devon_c',
+    name: 'Nasir Khan',
+    username: 'nasir_123',
     email: 'devon@nexora.io',
     avatar: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80',
     status: 'online',
