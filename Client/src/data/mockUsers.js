@@ -100,8 +100,8 @@ export const MOCK_USERS = [
   },
   {
     id: 'usr_maya',
-    name: 'Maya Lin',
-    username: 'maya_ux',
+    name: 'Shourya Samari',
+    username: 'samari.com',
     email: 'maya@nexora.io',
     avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
     status: 'online',
