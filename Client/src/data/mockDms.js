@@ -1,9 +1,9 @@
 export const MOCK_DMS = [
   {
     id: 'dm_elena',
-    recipientId: 'usr_elena',
-    name: 'Dr. Elena Rostova',
-    username: 'elena_ai',
+    recipientId: 'kanchhi_123',
+    name: 'Kanchhi Bhairam',
+    username: 'kanchhiji',
     avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
     status: 'online',
     lastMessage: 'Let us sync on the agent coordination architecture at 2 PM.',
@@ -12,9 +12,9 @@ export const MOCK_DMS = [
   },
   {
     id: 'dm_marcus',
-    recipientId: 'usr_marcus',
-    name: 'Marcus Vance',
-    username: 'marcus_v',
+    recipientId: 'nemaji',
+    name: 'Marcus Shivansh Nema',
+    username: 'shivansh_123',
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80',
     status: 'online',
     lastMessage: 'The new shader pipeline is running smooth now.',
