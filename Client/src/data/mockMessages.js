@@ -24,7 +24,7 @@ export const MOCK_MESSAGES = {
     {
       id: 'msg_syn_02',
       channelId: 'chn_syn_gen',
-      authorId: 'usr_liam',
+      authorId: 'om_verma',
       authorName: 'Om Verma',
       authorAvatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
       authorRole: 'Core Researcher',
