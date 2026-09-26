@@ -111,7 +111,7 @@ export const MOCK_SERVERS = [
       { id: 'role_member', name: 'Engineer', color: '#94A3B8' },
     ],
     members: [
-      'usr_me', 'usr_anya', 'usr_devon', 'usr_sophia', 'usr_oscar', 'usr_elena', 'usr_sora'
+      'kazu', 'punit_sahu', 'usr_devon', 'usr_sophia', 'usr_oscar', 'usr_elena', 'usr_sora'
     ],
   }
 ];
