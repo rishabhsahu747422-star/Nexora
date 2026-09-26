@@ -22,7 +22,7 @@ export const MOCK_MESSAGES = {
       attachments: []
     },
     {
-      id: 'msg_syn_02',
+      id: 'om_verma',
       channelId: 'chn_syn_gen',
       authorId: 'om_verma',
       authorName: 'Om Verma',
@@ -73,8 +73,8 @@ export const MOCK_MESSAGES = {
       id: 'msg_syn_04',
       channelId: 'chn_syn_gen',
       authorId: 'usr_me',
-      authorName: 'Rishan Dev',
-      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      authorName: 'Rishabh Sahu',
+      authorAvatar: 'https://images.unsplash.com/photo-1639329538274-5693ab17ebed?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDl8fGluZGlhbiUyMG1hbGUlMjBtb2RlbHxlbnwwfHwwfHx8MA%3D%3D',
       authorRole: 'Founding Architect',
       authorRoleColor: '#00F0FF',
       content: 'Phenomenal work @elena_ai. I can connect this into the Nexora distributed event bus so agent status pulses stream directly into our collaboration channels.',

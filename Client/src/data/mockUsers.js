@@ -3,7 +3,7 @@ export const CURRENT_USER = {
   name: 'Rishabh  Sahu',
   username: 'rishabh-star',
   email: 'rishabh@nexora.io',
-  avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+  avatar: 'https://images.unsplash.com/photo-1639329538274-5693ab17ebed?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDl8fGluZGlhbiUyMG1hbGUlMjBtb2RlbHxlbnwwfHwwfHx8MA%3D%3D',
   banner: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
   status: 'online', // 'online' | 'idle' | 'dnd' | 'offline'
   customStatus: 'Refining the Nexora engine 🚀',
