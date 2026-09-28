@@ -50,10 +50,10 @@ export const MOCK_USERS = [
     mutualServers: ["srv_cybersphere"],
   },
   {
-    id: "nishka",
-    name: "Nishka Bisen",
-    username: "nishka_123",
-    email: "sora@vanguard.xyz",
+    id: "somvi_bhairam",
+    name: "Somvi Bhairam",
+    username: "Somvi_123",
+    email: "somvi@gmail.com",
     avatar:
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
     banner:

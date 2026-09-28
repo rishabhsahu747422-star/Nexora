@@ -3,7 +3,7 @@ export const MOCK_FRIENDS = [
     id: "somvi_bhairam",
     userId: "Somvi Bhairam",
     name: "Somvi Bhairam",
-    username: "Somvi_123",
+    username: "Somvi_1234",
     avatar:
       "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
     status: "online",
