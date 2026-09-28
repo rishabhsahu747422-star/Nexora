@@ -5,7 +5,7 @@ export const MOCK_MESSAGES = {
       id: 'msg_syn_01',
       channelId: 'chn_syn_gen',
       authorId: 'usr_elena',
-      authorName: 'Dr. Elena Rostova',
+      authorName: 'Miss Somvi Bhairam',
       authorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
       authorRole: 'Founding Scientist',
       authorRoleColor: '#00F0FF',
@@ -22,10 +22,10 @@ export const MOCK_MESSAGES = {
       attachments: []
     },
     {
-      id: 'msg_syn_02',
+      id: 'om_verma',
       channelId: 'chn_syn_gen',
-      authorId: 'usr_liam',
-      authorName: 'Liam Sterling',
+      authorId: 'om_verma',
+      authorName: 'Om Verma',
       authorAvatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=150&auto=format&fit=crop&q=80',
       authorRole: 'Core Researcher',
       authorRoleColor: '#8B5CF6',
@@ -38,7 +38,7 @@ export const MOCK_MESSAGES = {
       ],
       replyTo: {
         id: 'msg_syn_01',
-        authorName: 'Dr. Elena Rostova',
+        authorName: 'Om Verma',
         content: 'Good morning everyone! We just finished the evaluation runs for the Neuro-Symbolic Agent Swarm v4.2...'
       },
       attachments: []
@@ -47,7 +47,7 @@ export const MOCK_MESSAGES = {
       id: 'msg_syn_03',
       channelId: 'chn_syn_gen',
       authorId: 'usr_elena',
-      authorName: 'Dr. Elena Rostova',
+      authorName: 'Reetika Dhaneshwar',
       authorAvatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80',
       authorRole: 'Founding Scientist',
       authorRoleColor: '#00F0FF',
@@ -73,8 +73,8 @@ export const MOCK_MESSAGES = {
       id: 'msg_syn_04',
       channelId: 'chn_syn_gen',
       authorId: 'usr_me',
-      authorName: 'Rishan Dev',
-      authorAvatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
+      authorName: 'Rishabh Sahu',
+      authorAvatar: 'https://images.unsplash.com/photo-1639329538274-5693ab17ebed?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDl8fGluZGlhbiUyMG1hbGUlMjBtb2RlbHxlbnwwfHwwfHx8MA%3D%3D',
       authorRole: 'Founding Architect',
       authorRoleColor: '#00F0FF',
       content: 'Phenomenal work @elena_ai. I can connect this into the Nexora distributed event bus so agent status pulses stream directly into our collaboration channels.',

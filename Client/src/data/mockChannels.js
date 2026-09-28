@@ -14,7 +14,7 @@ export const MOCK_CHANNELS = [
   {
     id: 'chn_syn_dispatch',
     serverId: 'srv_synthetix',
-    name: 'research-dispatches',
+    name: 'Gyaan',
     type: 'announcement',
     topic: 'Official model release papers, preprints, and benchmark tables.',
     category: 'Broadcasting',
@@ -25,7 +25,7 @@ export const MOCK_CHANNELS = [
   {
     id: 'chn_syn_agents',
     serverId: 'srv_synthetix',
-    name: 'agent-orchestration',
+    name: 'charcha',
     type: 'text',
     topic: 'Discussions on LangGraph, multi-agent swarms, and memory hierarchies.',
     category: 'Transmissions',

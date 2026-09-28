@@ -17,7 +17,7 @@ export const MOCK_NOTIFICATIONS = [
     type: "reply",
     title: "Reply to your transmission",
     message:
-      'Shivansh Nema replied: "Did the multi-hop reasoning hold up on the GSM8k benchmarks?"',
+      'Om Verma replied: "Did the multi-hop reasoning hold up on the GSM8k benchmarks?"',
     timestamp: "1h ago",
     read: false,
     link: "/app/server/srv_synthetix/channel/chn_syn_gen",

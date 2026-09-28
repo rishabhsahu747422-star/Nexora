@@ -1,10 +1,10 @@
 export const CURRENT_USER = {
   id: "usr_me",
-  name: "Rishan Dev",
-  username: "rishandev",
-  email: "rishan@nexora.io",
+  name: "Rishabh  Sahu",
+  username: "rishabh-star",
+  email: "rishabh@nexora.io",
   avatar:
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    "https://images.unsplash.com/photo-1639329538274-5693ab17ebed?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDl8fGluZGlhbiUyMG1hbGUlMjBtb2RlbHxlbnwwfHwwfHx8MA%3D%3D",
   banner:
     "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80",
   status: "online", // 'online' | 'idle' | 'dnd' | 'offline'
@@ -18,10 +18,10 @@ export const CURRENT_USER = {
 export const MOCK_USERS = [
   CURRENT_USER,
   {
-    id: "usr_somvi",
-    name: "Somvi Bhairam",
-    username: "Somvi_123",
-    email: "somvi@nexus.org",
+    id: "kazu",
+    name: "Sagar Shirvastava",
+    username: "kazu_123",
+    email: "sagar@nexus.org",
     avatar:
       "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
     banner:
@@ -34,9 +34,9 @@ export const MOCK_USERS = [
     mutualServers: ["srv_synthetix", "srv_quantum"],
   },
   {
-    id: "usr_om",
-    name: "Om Verma",
-    username: "Om_123",
+    id: "punit_sahu",
+    name: "Punit Sahu",
+    username: "punit_123",
     email: "marcus@cybersphere.games",
     avatar:
       "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
@@ -50,9 +50,9 @@ export const MOCK_USERS = [
     mutualServers: ["srv_cybersphere"],
   },
   {
-    id: "usr_sora",
-    name: "Sora Takahashi",
-    username: "sora_t",
+    id: "nishka",
+    name: "Nishka Bisen",
+    username: "nishka_123",
     email: "sora@vanguard.xyz",
     avatar:
       "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
@@ -66,9 +66,9 @@ export const MOCK_USERS = [
     mutualServers: ["srv_vanguard", "srv_quantum"],
   },
   {
-    id: "usr_kai",
-    name: "Kai Thorne",
-    username: "kaithorne",
+    id: "shourya",
+    name: "Shourya Singh",
+    username: "56singh",
     email: "kai@echosound.fm",
     avatar:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
@@ -99,8 +99,8 @@ export const MOCK_USERS = [
   },
   {
     id: "usr_devon",
-    name: "Devon Cross",
-    username: "devon_c",
+    name: "Nasir Khan",
+    username: "nasir_123",
     email: "devon@nexora.io",
     avatar:
       "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=150&auto=format&fit=crop&q=80",
@@ -113,8 +113,8 @@ export const MOCK_USERS = [
   },
   {
     id: "usr_maya",
-    name: "Maya Lin",
-    username: "maya_ux",
+    name: "Shourya Samari",
+    username: "samari.com",
     email: "maya@nexora.io",
     avatar:
       "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80",
