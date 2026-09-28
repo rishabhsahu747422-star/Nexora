@@ -1,14 +1,22 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { motion } from 'framer-motion';
-import { User, AtSign, Mail, Lock, UserPlus, ArrowRight, Check } from 'lucide-react';
-import NexoraLogo from '../assets/logo/NexoraLogo';
-import Input from '../components/common/Input';
-import Button from '../components/common/Button';
-import { registerSuccess } from '../redux/slices/authSlice';
-import { addToast } from '../redux/slices/uiSlice';
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { useNavigate, Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { motion } from "framer-motion";
+import {
+  User,
+  AtSign,
+  Mail,
+  Lock,
+  UserPlus,
+  ArrowRight,
+  Check,
+} from "lucide-react";
+import NexoraLogo from "../assets/logo/NexoraLogo";
+import Input from "../components/common/Input";
+import Button from "../components/common/Button";
+import { registerSuccess } from "../redux/slices/authSlice";
+import { addToast } from "../redux/slices/uiSlice";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -22,29 +30,29 @@ export default function Register() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      fullName: '',
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
+      fullName: "",
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
     },
   });
 
-  const passwordVal = watch('password', '');
+  const passwordVal = watch("password", "");
 
   // Calculate password strength
   const getPasswordStrength = (pwd) => {
-    if (!pwd) return { score: 0, text: 'Empty', color: 'bg-slate-700' };
+    if (!pwd) return { score: 0, text: "Empty", color: "bg-slate-700" };
     let score = 0;
     if (pwd.length >= 8) score += 1;
     if (/[A-Z]/.test(pwd)) score += 1;
     if (/[0-9]/.test(pwd)) score += 1;
     if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
 
-    if (score <= 1) return { score: 25, text: 'Weak', color: 'bg-rose-500' };
-    if (score === 2) return { score: 50, text: 'Fair', color: 'bg-amber-500' };
-    if (score === 3) return { score: 75, text: 'Good', color: 'bg-cyan-500' };
-    return { score: 100, text: 'Strong', color: 'bg-emerald-500' };
+    if (score <= 1) return { score: 25, text: "Weak", color: "bg-rose-500" };
+    if (score === 2) return { score: 50, text: "Fair", color: "bg-amber-500" };
+    if (score === 3) return { score: 75, text: "Good", color: "bg-cyan-500" };
+    return { score: 100, text: "Strong", color: "bg-emerald-500" };
   };
 
   const strength = getPasswordStrength(passwordVal);
@@ -54,28 +62,30 @@ export default function Register() {
     setTimeout(() => {
       setIsLoading(false);
       const newUser = {
-        id: 'usr_' + Date.now(),
+        id: "usr_" + Date.now(),
         name: data.fullName,
         username: data.username.toLowerCase(),
         email: data.email,
-        avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80',
-        banner: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
-        status: 'online',
-        customStatus: 'Exploring Nexora Nexus',
-        bio: 'New member of the Nexora communication network.',
-        roles: ['Member'],
-        joinedDate: 'Joined Just Now',
-        mutualServers: ['srv_synthetix'],
+        avatar:
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+        banner:
+          "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80",
+        status: "online",
+        customStatus: "Exploring Nexora Nexus",
+        bio: "New member of the Nexora communication network.",
+        roles: ["Member"],
+        joinedDate: "Joined Just Now",
+        mutualServers: ["srv_synthetix"],
       };
 
       dispatch(registerSuccess({ user: newUser }));
       dispatch(
         addToast({
-          type: 'success',
+          type: "success",
           message: `Welcome to Nexora, ${data.fullName}!`,
-        })
+        }),
       );
-      navigate('/app');
+      navigate("/app");
     }, 600);
   };
 
@@ -92,7 +102,7 @@ export default function Register() {
         className="w-full max-w-lg bg-[#10141C] border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/80 relative z-10"
       >
         <div className="flex flex-col items-center text-center mb-8">
-          <NexoraLogo size="lg" showTagline onClick={() => navigate('/')} />
+          <NexoraLogo size="lg" showTagline onClick={() => navigate("/")} />
           <h2 className="font-display font-bold text-2xl text-white mt-6">
             Create Your Account
           </h2>
@@ -107,11 +117,11 @@ export default function Register() {
               label="Full Name"
               type="text"
               icon={User}
-              placeholder="e.g. Alex Morgan"
+              placeholder="Rishabh Sahu"
               error={errors.fullName?.message}
-              {...register('fullName', {
-                required: 'Full name is required',
-                minLength: { value: 2, message: 'Minimum 2 characters' },
+              {...register("fullName", {
+                required: "Full name is required",
+                minLength: { value: 2, message: "Minimum 2 characters" },
               })}
             />
 
@@ -119,14 +129,14 @@ export default function Register() {
               label="Username"
               type="text"
               icon={AtSign}
-              placeholder="e.g. alexm"
+              placeholder="rishabh-star"
               error={errors.username?.message}
-              {...register('username', {
-                required: 'Username is required',
-                minLength: { value: 3, message: 'Minimum 3 characters' },
+              {...register("username", {
+                required: "Username is required",
+                minLength: { value: 3, message: "Minimum 3 characters" },
                 pattern: {
                   value: /^[a-zA-Z0-9_]+$/,
-                  message: 'Letters, numbers, underscores only',
+                  message: "Letters, numbers, underscores only",
                 },
               })}
             />
@@ -136,13 +146,13 @@ export default function Register() {
             label="Email Address"
             type="email"
             icon={Mail}
-            placeholder="name@domain.com"
+            placeholder="rishabh@gmail.com"
             error={errors.email?.message}
-            {...register('email', {
-              required: 'Email address is required',
+            {...register("email", {
+              required: "Email address is required",
               pattern: {
                 value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Invalid email address',
+                message: "Invalid email address",
               },
             })}
           />
@@ -153,11 +163,11 @@ export default function Register() {
             icon={Lock}
             placeholder="At least 8 characters"
             error={errors.password?.message}
-            {...register('password', {
-              required: 'Password is required',
+            {...register("password", {
+              required: "Password is required",
               minLength: {
                 value: 8,
-                message: 'Password must be at least 8 characters',
+                message: "Password must be at least 8 characters",
               },
             })}
           />
@@ -186,10 +196,10 @@ export default function Register() {
             icon={Lock}
             placeholder="Re-enter password"
             error={errors.confirmPassword?.message}
-            {...register('confirmPassword', {
-              required: 'Please confirm your password',
+            {...register("confirmPassword", {
+              required: "Please confirm your password",
               validate: (val) =>
-                val === passwordVal || 'Passwords do not match',
+                val === passwordVal || "Passwords do not match",
             })}
           />
 
@@ -208,7 +218,7 @@ export default function Register() {
         </form>
 
         <p className="text-center text-xs text-slate-400 mt-6">
-          Already have an account?{' '}
+          Already have an account?{" "}
           <Link
             to="/login"
             className="text-cyan-400 hover:text-cyan-300 font-semibold inline-flex items-center gap-1"

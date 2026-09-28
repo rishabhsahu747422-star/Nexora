@@ -101,7 +101,7 @@ export default function Login() {
             label="Email Address"
             type="email"
             icon={Mail}
-            placeholder="name@domain.com"
+            placeholder="nexora@gmail.com"
             error={errors.email?.message}
             {...register("email", {
               required: "Email address is required",
