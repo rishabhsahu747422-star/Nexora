@@ -1,7 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { CURRENT_USER } from '../../data/mockUsers';
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { CURRENT_USER } from "../../data/mockUsers";
 
-const STORAGE_KEY = 'nexora_auth_state';
+//AI code start
+const STORAGE_KEY = "nexora_auth_state";
 
 const loadPersistedAuth = () => {
   try {
@@ -10,23 +11,37 @@ const loadPersistedAuth = () => {
       return JSON.parse(serialized);
     }
   } catch (err) {
-    console.error('Failed to load auth from localStorage:', err);
+    console.error("Failed to load auth from localStorage:", err);
   }
   return {
     currentUser: CURRENT_USER,
     isAuthenticated: true, // Default to true for smooth exploration, can logout
-    token: 'mock_jwt_token_nexora_7849',
+    token: "mock_jwt_token_nexora_7849",
     loading: false,
     error: null,
   };
 };
 
 const initialState = loadPersistedAuth();
+//AI code end
 
 export const authSlice = createSlice({
-  name: 'auth',
-  initialState,
+  name: "auth",
+  initialState: {
+    user: null,
+    isAuthenticated: false,
+    loading: true,
+    error: null,
+  },
   reducers: {
+    clearUser: (state) => {
+      state.user = null;
+      state.isAuthenticated = false;
+      state.loading = false;
+      state.error = null;
+    },
+
+    //AI code start
     loginStart: (state) => {
       state.loading = true;
       state.error = null;
@@ -35,7 +50,7 @@ export const authSlice = createSlice({
       state.loading = false;
       state.isAuthenticated = true;
       state.currentUser = action.payload.user;
-      state.token = action.payload.token || 'mock_jwt_token_nexora_7849';
+      state.token = action.payload.token || "mock_jwt_token_nexora_7849";
       state.error = null;
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -51,7 +66,7 @@ export const authSlice = createSlice({
       state.loading = false;
       state.isAuthenticated = true;
       state.currentUser = action.payload.user;
-      state.token = 'mock_jwt_token_nexora_' + Date.now();
+      state.token = "mock_jwt_token_nexora_" + Date.now();
       state.error = null;
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
@@ -99,10 +114,74 @@ export const authSlice = createSlice({
         }
       }
     },
+    //AI code end
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loginUserAsync.pending, (state) => {
+        ((state.loading = true), (state.error = null));
+      })
+      .addCase(loginUserAsync.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.loading = false;
+        state.error = null;
+        state.isAuthenticated = true;
+      })
+      .addCase(loginUserAsync.rejected, (state, action) => {
+        ((state.user = null),
+          (state.isAuthenticated = false),
+          (state.loading = false));
+        state.error = action.payload || action.error.message;
+      });
+
+    builder
+      .addCase(getMeAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getMeAsync.fulfilled, (state, action) => {
+        state.user = action.payload;
+        ((state.isAuthenticated = true), (state.error = null));
+        state.loading = false;
+      })
+      .addCase(getMeAsync.rejected, (state, action) => {
+        state.user = null;
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+        state.isAuthenticated = false;
+      });
+    builder
+      .addCase(registerUserAsync.fulfilled, (state, action) => {
+        state.user = action.payload;
+        state.isAuthenticated = true;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(registerUserAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUserAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
+    builder
+      .addCase(logoutUserAsync.fulfilled, (state) => {
+        state.user = null;
+        state.isAuthenticated = false;
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(logoutUserAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || action.error.message;
+      });
   },
 });
 
 export const {
+  clearUser,
+  //AIcode
   loginStart,
   loginSuccess,
   loginFailure,
