@@ -1,5 +1,67 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { CURRENT_USER } from "../../data/mockUsers";
+import {
+  getMe,
+  loginUser,
+  logoutUser,
+  registerUser,
+} from "../../services/auth.service.js";
+
+const responseData = (response) => response?.data ?? response?.user ?? response;
+
+export const loginUserAsync = createAsyncThunk(
+  "/auth/login",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await loginUser(data);
+      return responseData(response);
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "unable to sign in",
+      );
+    }
+  },
+);
+
+export const registerUserAsync = createAsyncThunk(
+  "/auth/register",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await registerUser(data);
+      return responseData(response);
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Unable to create your account",
+      );
+    }
+  },
+);
+
+export const getMeAsync = createAsyncThunk(
+  "/auth/me",
+  async (_, { rejectWithValue }) => {
+    try {
+      return responseData(await getMe());
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "your session has expired",
+      );
+    }
+  },
+);
+
+export const logoutUserAsync = createAsyncThunk(
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      return await logoutUser();
+    } catch (error) {
+      return (
+        rejectWithValue(error.response?.data?.message) || "Unable to sign out"
+      );
+    }
+  },
+);
 
 //AI code start
 const STORAGE_KEY = "nexora_auth_state";
