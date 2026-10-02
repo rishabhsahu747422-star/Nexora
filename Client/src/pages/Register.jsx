@@ -81,7 +81,7 @@ export default function Register() {
 
     // setIsLoading(true);
     // setTimeout(() => {
-    //   setIsLoading(false);
+    // setIsLoading(false);
     // const newUser = {
     //   id: "usr_" + Date.now(),
     //   name: data.fullName,
@@ -100,12 +100,12 @@ export default function Register() {
     // };
 
     // dispatch(registerSuccess({ user: newUser }));
-    // dispatch(
-    //   addToast({
-    //     type: "success",
-    //     message: `Welcome to Nexora, ${data.fullName}!`,
-    //   }),
-    ///  );
+    dispatch(
+      addToast({
+        type: "success",
+        message: `Welcome to Nexora, ${data.fullname}!`,
+      }),
+    );
     //   navigate("/app");
     // }, 600);
   };

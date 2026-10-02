@@ -64,27 +64,27 @@ export const logoutUserAsync = createAsyncThunk(
 );
 
 //AI code start
-const STORAGE_KEY = "nexora_auth_state";
+// const STORAGE_KEY = "nexora_auth_state";
 
-const loadPersistedAuth = () => {
-  try {
-    const serialized = localStorage.getItem(STORAGE_KEY);
-    if (serialized) {
-      return JSON.parse(serialized);
-    }
-  } catch (err) {
-    console.error("Failed to load auth from localStorage:", err);
-  }
-  return {
-    currentUser: CURRENT_USER,
-    isAuthenticated: true, // Default to true for smooth exploration, can logout
-    token: "mock_jwt_token_nexora_7849",
-    loading: false,
-    error: null,
-  };
-};
+// const loadPersistedAuth = () => {
+//   try {
+//     const serialized = localStorage.getItem(STORAGE_KEY);
+//     if (serialized) {
+//       return JSON.parse(serialized);
+//     }
+//   } catch (err) {
+//     console.error("Failed to load auth from localStorage:", err);
+//   }
+//   return {
+//     currentUser: CURRENT_USER,
+//     isAuthenticated: true, // Default to true for smooth exploration, can logout
+//     token: "mock_jwt_token_nexora_7849",
+//     loading: false,
+//     error: null,
+//   };
+// };
 
-const initialState = loadPersistedAuth();
+// const initialState = loadPersistedAuth();
 //AI code end
 
 export const authSlice = createSlice({

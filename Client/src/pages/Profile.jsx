@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   User,
   Shield,
@@ -11,27 +11,29 @@ import {
   Save,
   Check,
   ArrowLeft,
-} from 'lucide-react';
-import GlobalHeader from '../components/layout/GlobalHeader';
-import MobileNav from '../components/layout/MobileNav';
-import Avatar from '../components/common/Avatar';
-import Badge from '../components/common/Badge';
-import Button from '../components/common/Button';
-import Input from '../components/common/Input';
-import { updateProfile } from '../redux/slices/authSlice';
-import { addToast } from '../redux/slices/uiSlice';
+} from "lucide-react";
+import GlobalHeader from "../components/layout/GlobalHeader";
+import MobileNav from "../components/layout/MobileNav";
+import Avatar from "../components/common/Avatar";
+import Badge from "../components/common/Badge";
+import Button from "../components/common/Button";
+import Input from "../components/common/Input";
+import { updateProfile } from "../redux/slices/authSlice";
+import { addToast } from "../redux/slices/uiSlice";
 
 export default function Profile() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.auth);
   const servers = useSelector((state) => state.servers.servers);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(currentUser?.name || '');
-  const [bio, setBio] = useState(currentUser?.bio || '');
-  const [customStatus, setCustomStatus] = useState(currentUser?.customStatus || '');
+  const [name, setName] = useState(currentUser?.fullname || "");
+  const [bio, setBio] = useState(currentUser?.bio || "");
+  const [customStatus, setCustomStatus] = useState(
+    currentUser?.customStatus || "",
+  );
 
   const handleSave = (e) => {
     e.preventDefault();
@@ -40,18 +42,20 @@ export default function Profile() {
         name: name.trim(),
         bio: bio.trim(),
         customStatus: customStatus.trim(),
-      })
+      }),
     );
     setIsEditing(false);
     dispatch(
       addToast({
-        type: 'success',
-        message: 'Profile parameters updated.',
-      })
+        type: "success",
+        message: "Profile parameters updated.",
+      }),
     );
   };
 
-  const userServers = servers.filter((s) => s.members?.includes(currentUser?.id));
+  const userServers = servers.filter((s) =>
+    s.members?.includes(currentUser?.id),
+  );
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#07080C] text-slate-100 overflow-hidden">
@@ -61,7 +65,7 @@ export default function Profile() {
         <div className="max-w-3xl mx-auto space-y-6">
           {/* Back button */}
           <button
-            onClick={() => navigate('/app')}
+            onClick={() => navigate("/app")}
             className="flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-cyan-400 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -86,7 +90,7 @@ export default function Profile() {
               <div className="-mt-16 flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-6">
                 <Avatar
                   src={currentUser?.avatar}
-                  name={currentUser?.name}
+                  name={currentUser?.fullname}
                   size="xl"
                   status={currentUser?.status}
                   className="ring-4 ring-[#10141C]"
@@ -98,7 +102,7 @@ export default function Profile() {
                   icon={Edit2}
                   onClick={() => setIsEditing(!isEditing)}
                 >
-                  {isEditing ? 'Cancel Edit' : 'Edit Profile'}
+                  {isEditing ? "Cancel Edit" : "Edit Profile"}
                 </Button>
               </div>
 
@@ -134,7 +138,12 @@ export default function Profile() {
                     >
                       Cancel
                     </Button>
-                    <Button type="submit" variant="primary" size="sm" icon={Save}>
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      size="sm"
+                      icon={Save}
+                    >
                       Save Changes
                     </Button>
                   </div>
@@ -144,7 +153,7 @@ export default function Profile() {
                 <div className="space-y-6">
                   <div>
                     <h2 className="font-display font-extrabold text-2xl text-white">
-                      {currentUser?.name}
+                      {currentUser?.fullname}
                     </h2>
                     <p className="font-mono text-xs text-cyan-400 mt-0.5">
                       @{currentUser?.username}
@@ -188,7 +197,9 @@ export default function Profile() {
                   <div className="pt-4 border-t border-white/5 grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-slate-400">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-slate-500" />
-                      <span>{currentUser?.joinedDate || 'Joined March 2024'}</span>
+                      <span>
+                        {currentUser?.joinedDate || "Joined March 2024"}
+                      </span>
                     </div>
 
                     <div className="flex items-center gap-2">

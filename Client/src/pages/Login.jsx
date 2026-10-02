@@ -39,18 +39,20 @@ export default function Login() {
   //         token: "mock_jwt_token_nexora_" + Date.now(),
   //       }),
   //     );
-  //     dispatch(
-  //       addToast({
-  //         type: "success",
-  //         message: `Welcome back, ${CURRENT_USER.name}!`,
-  //       }),
-  //     );
+
   //     navigate("/app");
   //   }, 600);
   // };
 
   const onSubmit = async (data) => {
     await dispatch(loginUserAsync(data)).unwrap();
+
+    dispatch(
+      addToast({
+        type: "success",
+        message: `Welcome back, ${CURRENT_USER.name}!`,
+      }),
+    );
     navigate("/");
   };
 
