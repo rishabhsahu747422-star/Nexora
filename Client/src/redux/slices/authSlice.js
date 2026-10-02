@@ -104,78 +104,78 @@ export const authSlice = createSlice({
     },
 
     //AI code start
-    loginStart: (state) => {
-      state.loading = true;
-      state.error = null;
-    },
-    loginSuccess: (state, action) => {
-      state.loading = false;
-      state.isAuthenticated = true;
-      state.currentUser = action.payload.user;
-      state.token = action.payload.token || "mock_jwt_token_nexora_7849";
-      state.error = null;
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    loginFailure: (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    },
-    registerSuccess: (state, action) => {
-      state.loading = false;
-      state.isAuthenticated = true;
-      state.currentUser = action.payload.user;
-      state.token = "mock_jwt_token_nexora_" + Date.now();
-      state.error = null;
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    logout: (state) => {
-      state.isAuthenticated = false;
-      state.currentUser = null;
-      state.token = null;
-      try {
-        localStorage.removeItem(STORAGE_KEY);
-      } catch (e) {
-        console.error(e);
-      }
-    },
-    updateProfile: (state, action) => {
-      if (state.currentUser) {
-        state.currentUser = { ...state.currentUser, ...action.payload };
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    },
-    setUserStatus: (state, action) => {
-      if (state.currentUser) {
-        state.currentUser.status = action.payload;
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    },
-    setCustomStatus: (state, action) => {
-      if (state.currentUser) {
-        state.currentUser.customStatus = action.payload;
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    },
+    // loginStart: (state) => {
+    //   state.loading = true;
+    //   state.error = null;
+    // },
+    // loginSuccess: (state, action) => {
+    //   state.loading = false;
+    //   state.isAuthenticated = true;
+    //   state.currentUser = action.payload.user;
+    //   state.token = action.payload.token || "mock_jwt_token_nexora_7849";
+    //   state.error = null;
+    //   try {
+    //     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    // },
+    // loginFailure: (state, action) => {
+    //   state.loading = false;
+    //   state.error = action.payload;
+    // },
+    // registerSuccess: (state, action) => {
+    //   state.loading = false;
+    //   state.isAuthenticated = true;
+    //   state.currentUser = action.payload.user;
+    //   state.token = "mock_jwt_token_nexora_" + Date.now();
+    //   state.error = null;
+    //   try {
+    //     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    // },
+    // logout: (state) => {
+    //   state.isAuthenticated = false;
+    //   state.currentUser = null;
+    //   state.token = null;
+    //   try {
+    //     localStorage.removeItem(STORAGE_KEY);
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    // },
+    // updateProfile: (state, action) => {
+    //   if (state.currentUser) {
+    //     state.currentUser = { ...state.currentUser, ...action.payload };
+    //     try {
+    //       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    //     } catch (e) {
+    //       console.error(e);
+    //     }
+    //   }
+    // },
+    // setUserStatus: (state, action) => {
+    //   if (state.currentUser) {
+    //     state.currentUser.status = action.payload;
+    //     try {
+    //       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    //     } catch (e) {
+    //       console.error(e);
+    //     }
+    //   }
+    // },
+    // setCustomStatus: (state, action) => {
+    //   if (state.currentUser) {
+    //     state.currentUser.customStatus = action.payload;
+    //     try {
+    //       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    //     } catch (e) {
+    //       console.error(e);
+    //     }
+    //   }
+    // },
     //AI code end
   },
   extraReducers: (builder) => {

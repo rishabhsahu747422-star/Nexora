@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURl: "http://localhost:3000/api",
+  baseURL: "http://localhost:3000/api",
   withCredentials: true,
 });
 
@@ -24,7 +24,7 @@ api.interceptors.response.use(
         await api.post("/auth/refresh");
         return api(originalRequest);
       } catch (error) {
-        return Promise.reject(RefreshError);
+        return Promise.reject(refreshError);
       }
     }
 

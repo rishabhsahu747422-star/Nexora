@@ -7,6 +7,12 @@ export const registerValidator = [
     .isLength({ min: 3, max: 20 })
     .withMessage("username must bw between 3 and 20 characters"),
 
+  body("mobile_no")
+    .trim()
+    .notEmpty()
+    .isLength({ min: 10 })
+    .withMessage("Mobile Number must have atleast 10 digits"),
+
   body("email")
     .trim()
     .normalizeEmail()
@@ -14,6 +20,10 @@ export const registerValidator = [
     .withMessage("Email is REquired")
     .isEmail()
     .withMessage("Please provide vadil email"),
+
+  body("password")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters"),
 
   body("fullname").notEmpty().withMessage("Fullnaem is required"),
 ];

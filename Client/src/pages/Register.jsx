@@ -11,12 +11,14 @@ import {
   UserPlus,
   ArrowRight,
   Check,
+  Phone,
 } from "lucide-react";
 import NexoraLogo from "../assets/logo/NexoraLogo";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
-import { registerSuccess } from "../redux/slices/authSlice";
+import { registerUserAsync } from "../redux/slices/authSlice";
 import { addToast } from "../redux/slices/uiSlice";
+import { registerUser } from "../services/auth.service";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -30,7 +32,7 @@ export default function Register() {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      fullName: "",
+      fullname: "",
       username: "",
       email: "",
       password: "",
@@ -57,36 +59,55 @@ export default function Register() {
 
   const strength = getPasswordStrength(passwordVal);
 
-  const onSubmit = (data) => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      const newUser = {
-        id: "usr_" + Date.now(),
-        name: data.fullName,
-        username: data.username.toLowerCase(),
-        email: data.email,
-        avatar:
-          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-        banner:
-          "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80",
-        status: "online",
-        customStatus: "Exploring Nexora Nexus",
-        bio: "New member of the Nexora communication network.",
-        roles: ["Member"],
-        joinedDate: "Joined Just Now",
-        mutualServers: ["srv_synthetix"],
-      };
+  const onSubmit = async (data) => {
+    const formData = new FormData();
 
-      dispatch(registerSuccess({ user: newUser }));
-      dispatch(
-        addToast({
-          type: "success",
-          message: `Welcome to Nexora, ${data.fullName}!`,
-        }),
-      );
-      navigate("/app");
-    }, 600);
+    formData.append("username", data.username);
+    formData.append("fullname", data.fullname);
+    formData.append("mobile_no", data.mobile_no);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+
+    if (data.profile_pic?.[0]) {
+      formData.append("image", data.profile_pic[0]);
+    }
+
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+    await dispatch(registerUserAsync(formData)).unwrap();
+
+    navigate("/app");
+
+    // setIsLoading(true);
+    // setTimeout(() => {
+    //   setIsLoading(false);
+    // const newUser = {
+    //   id: "usr_" + Date.now(),
+    //   name: data.fullName,
+    //   username: data.username.toLowerCase(),
+    //   email: data.email,
+    //   avatar:
+    //     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    //   banner:
+    //     "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80",
+    //   status: "online",
+    //   customStatus: "Exploring Nexora Nexus",
+    //   bio: "New member of the Nexora communication network.",
+    //   roles: ["Member"],
+    //   joinedDate: "Joined Just Now",
+    //   mutualServers: ["srv_synthetix"],
+    // };
+
+    // dispatch(registerSuccess({ user: newUser }));
+    // dispatch(
+    //   addToast({
+    //     type: "success",
+    //     message: `Welcome to Nexora, ${data.fullName}!`,
+    //   }),
+    ///  );
+    //   navigate("/app");
+    // }, 600);
   };
 
   return (
@@ -118,8 +139,8 @@ export default function Register() {
               type="text"
               icon={User}
               placeholder="Rishabh Sahu"
-              error={errors.fullName?.message}
-              {...register("fullName", {
+              error={errors.fullname?.message}
+              {...register("fullname", {
                 required: "Full name is required",
                 minLength: { value: 2, message: "Minimum 2 characters" },
               })}
@@ -141,6 +162,22 @@ export default function Register() {
               })}
             />
           </div>
+
+          <Input
+            label="Mobile Number"
+            type="text"
+            icon={Phone}
+            placeholder="9616000016"
+            error={errors.mobile_no?.message}
+            {...register("mobile_no", {
+              required: "Mobile Number is required",
+              minLength: { value: 10, message: "Minimum 10 characters" },
+              pattern: {
+                value: /^[a-zA-Z0-9_]+$/,
+                message: "10 digits Only",
+              },
+            })}
+          />
 
           <Input
             label="Email Address"
@@ -212,7 +249,7 @@ export default function Register() {
               className="w-full"
               icon={UserPlus}
             >
-              Complete Registration
+              Register
             </Button>
           </div>
         </form>

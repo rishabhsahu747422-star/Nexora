@@ -12,6 +12,8 @@ import serverMemberRoutes from "../routes/serverMember.routes.js";
 import roleRoutes from "../routes/role.routes.js";
 import userRoutes from "../routes/user.routes.js";
 import messageRoutes from "../routes/message.routes.js";
+import cors from "cors";
+import { errorMiddleware } from "../middlewares/error.middleware.js";
 
 const app = express();
 export const server = http.createServer(app);
@@ -20,6 +22,13 @@ socketIntialise(server);
 app.use(passport.initialize());
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  }),
+);
 
 passport.use(
   new GoogleStrategy(
@@ -41,4 +50,5 @@ app.use("/api/roles", roleRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/messages", messageRoutes);
 
+app.use(errorMiddleware);
 export default app;

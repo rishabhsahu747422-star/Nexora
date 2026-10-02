@@ -15,6 +15,7 @@ export const store = configureStore({
     servers: serverReducer,
     channels: channelReducer,
     messages: messageReducer,
+    // AI code
     dms: dmReducer,
     friends: friendReducer,
     notifications: notificationReducer,

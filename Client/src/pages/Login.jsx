@@ -7,7 +7,7 @@ import { Mail, Lock, LogIn, ArrowRight } from "lucide-react";
 import NexoraLogo from "../assets/logo/NexoraLogo";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
-import { loginSuccess } from "../redux/slices/authSlice";
+import { loginSuccess, loginUserAsync } from "../redux/slices/authSlice";
 import { addToast } from "../redux/slices/uiSlice";
 import { CURRENT_USER } from "../data/mockUsers";
 
@@ -22,35 +22,36 @@ export default function Login() {
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: {
-      email: "rishan@nexora.io",
-      password: "password123",
-      rememberMe: true,
-    },
+    mode: "onBlur",
   });
 
+  // const onSubmit = async (data) => {
+  //   setIsLoading(true);
+  //   // Simulate brief network auth handshake
+  //   setTimeout(() => {
+  //     setIsLoading(false);
+  //     dispatch(
+  //       loginSuccess({
+  //         user: {
+  //           ...CURRENT_USER,
+  //           email: data.email,
+  //         },
+  //         token: "mock_jwt_token_nexora_" + Date.now(),
+  //       }),
+  //     );
+  //     dispatch(
+  //       addToast({
+  //         type: "success",
+  //         message: `Welcome back, ${CURRENT_USER.name}!`,
+  //       }),
+  //     );
+  //     navigate("/app");
+  //   }, 600);
+  // };
+
   const onSubmit = async (data) => {
-    setIsLoading(true);
-    // Simulate brief network auth handshake
-    setTimeout(() => {
-      setIsLoading(false);
-      dispatch(
-        loginSuccess({
-          user: {
-            ...CURRENT_USER,
-            email: data.email,
-          },
-          token: "mock_jwt_token_nexora_" + Date.now(),
-        }),
-      );
-      dispatch(
-        addToast({
-          type: "success",
-          message: `Welcome back, ${CURRENT_USER.name}!`,
-        }),
-      );
-      navigate("/app");
-    }, 600);
+    await dispatch(loginUserAsync(data)).unwrap();
+    navigate("/");
   };
 
   const handleGoogleLogin = () => {
