@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { AnimatePresence } from "framer-motion";
 
 // Pages
-import Login from './pages/Login';
-import Register from './pages/Register';
-import Workspace from './pages/Workspace';
-import Profile from './pages/Profile';
-import SettingsPage from './pages/SettingsPage';
-import NotFound from './pages/NotFound';
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Workspace from "./pages/Workspace";
+import Profile from "./pages/Profile";
+import SettingsPage from "./pages/SettingsPage";
+import NotFound from "./pages/NotFound";
 
 // Layout & Global Overlays
-import ProtectedRoute from './components/layout/ProtectedRoute';
-import StartupScreen from './components/loading/StartupScreen';
-import ToastContainer from './components/common/ToastContainer';
-import ModalManager from './components/modals/ModalManager';
-import GlobalSearchModal from './components/layout/GlobalSearchModal';
+import ProtectedRoute from "./components/layout/ProtectedRoute";
+import StartupScreen from "./components/loading/StartupScreen";
+import ToastContainer from "./components/common/ToastContainer";
+import ModalManager from "./components/modals/ModalManager";
+import GlobalSearchModal from "./components/layout/GlobalSearchModal";
 
 function RootRedirect() {
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
@@ -27,29 +27,29 @@ export default function App() {
   const [hasStartedUp, setHasStartedUp] = useState(() => {
     // Check if previously loaded in session to prevent annoying re-load on refreshes if desired,
     // or let it run on first load. Let's run StartupScreen for full branded delight.
-    return sessionStorage.getItem('nexora_booted') === 'true';
+    return sessionStorage.getItem("nexora_booted") === "true";
   });
 
   const theme = useSelector((state) => state.ui.theme);
 
   useEffect(() => {
     const root = document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else if (theme === 'light') {
-      root.classList.remove('dark');
+    if (theme === "dark") {
+      root.classList.add("dark");
+    } else if (theme === "light") {
+      root.classList.remove("dark");
     } else {
       // System mode
-      if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        root.classList.add('dark');
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        root.classList.add("dark");
       } else {
-        root.classList.remove('dark');
+        root.classList.remove("dark");
       }
     }
   }, [theme]);
 
   const handleStartupComplete = () => {
-    sessionStorage.setItem('nexora_booted', 'true');
+    sessionStorage.setItem("nexora_booted", "true");
     setHasStartedUp(true);
   };
 
@@ -57,9 +57,7 @@ export default function App() {
     <div className="h-full w-full relative">
       {/* Nexora Startup / Loading Experience */}
       <AnimatePresence>
-        {!hasStartedUp && (
-          <StartupScreen onComplete={handleStartupComplete} />
-        )}
+        {!hasStartedUp && <StartupScreen onComplete={handleStartupComplete} />}
       </AnimatePresence>
 
       {/* Main Application Router */}

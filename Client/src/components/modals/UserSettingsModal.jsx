@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   User,
   Sliders,
@@ -13,13 +13,18 @@ import {
   Moon,
   Sun,
   LayoutGrid,
-} from 'lucide-react';
-import Modal from '../common/Modal';
-import Input from '../common/Input';
-import Button from '../common/Button';
-import Avatar from '../common/Avatar';
-import { updateProfile, logout } from '../../redux/slices/authSlice';
-import { setTheme, setMessageDensity, addToast, closeModal } from '../../redux/slices/uiSlice';
+} from "lucide-react";
+import Modal from "../common/Modal";
+import Input from "../common/Input";
+import Button from "../common/Button";
+import Avatar from "../common/Avatar";
+import { updateProfile, logout } from "../../redux/slices/authSlice";
+import {
+  setTheme,
+  setMessageDensity,
+  addToast,
+  closeModal,
+} from "../../redux/slices/uiSlice";
 
 export default function UserSettingsModal({ isOpen, onClose }) {
   const dispatch = useDispatch();
@@ -29,10 +34,12 @@ export default function UserSettingsModal({ isOpen, onClose }) {
   const theme = useSelector((state) => state.ui.theme);
   const messageDensity = useSelector((state) => state.ui.messageDensity);
 
-  const [activeTab, setActiveTab] = useState('account'); // 'account' | 'appearance' | 'notifications' | 'privacy'
-  const [name, setName] = useState(currentUser?.name || '');
-  const [bio, setBio] = useState(currentUser?.bio || '');
-  const [customStatus, setCustomStatus] = useState(currentUser?.customStatus || '');
+  const [activeTab, setActiveTab] = useState("account"); // 'account' | 'appearance' | 'notifications' | 'privacy'
+  const [name, setName] = useState(currentUser?.fullname || "");
+  const [bio, setBio] = useState(currentUser?.bio || "");
+  const [customStatus, setCustomStatus] = useState(
+    currentUser?.customStatus || "",
+  );
 
   const handleSaveProfile = (e) => {
     e.preventDefault();
@@ -41,13 +48,13 @@ export default function UserSettingsModal({ isOpen, onClose }) {
         name: name.trim(),
         bio: bio.trim(),
         customStatus: customStatus.trim(),
-      })
+      }),
     );
     dispatch(
       addToast({
-        type: 'success',
-        message: 'Profile parameters updated and persisted.',
-      })
+        type: "success",
+        message: "Profile parameters updated and persisted.",
+      }),
     );
   };
 
@@ -55,9 +62,9 @@ export default function UserSettingsModal({ isOpen, onClose }) {
     dispatch(setTheme(newTheme));
     dispatch(
       addToast({
-        type: 'info',
+        type: "info",
         message: `Visual theme switched to ${newTheme}.`,
-      })
+      }),
     );
   };
 
@@ -65,17 +72,17 @@ export default function UserSettingsModal({ isOpen, onClose }) {
     dispatch(setMessageDensity(density));
     dispatch(
       addToast({
-        type: 'info',
+        type: "info",
         message: `Message density set to ${density}.`,
-      })
+      }),
     );
   };
 
   const tabs = [
-    { id: 'account', label: 'My Account', icon: User },
-    { id: 'appearance', label: 'Appearance & UI', icon: Sliders },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'privacy', label: 'Privacy & Sessions', icon: Lock },
+    { id: "account", label: "My Account", icon: User },
+    { id: "appearance", label: "Appearance & UI", icon: Sliders },
+    { id: "notifications", label: "Notifications", icon: Bell },
+    { id: "privacy", label: "Privacy & Sessions", icon: Lock },
   ];
 
   return (
@@ -100,8 +107,8 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors text-left ${
                   activeTab === tab.id
-                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                    ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                    : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
                 }`}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
@@ -115,8 +122,10 @@ export default function UserSettingsModal({ isOpen, onClose }) {
               onClick={() => {
                 dispatch(closeModal());
                 dispatch(logout());
-                dispatch(addToast({ type: 'info', message: 'Signed out of Nexora.' }));
-                navigate('/login');
+                dispatch(
+                  addToast({ type: "info", message: "Signed out of Nexora." }),
+                );
+                navigate("/login");
               }}
               className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition-colors"
             >
@@ -128,7 +137,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
 
         {/* Right Content */}
         <div className="flex-1 p-6 overflow-y-auto">
-          {activeTab === 'account' && (
+          {activeTab === "account" && (
             <form onSubmit={handleSaveProfile} className="space-y-4">
               <h3 className="font-display font-semibold text-base text-slate-100">
                 Account Credentials
@@ -142,9 +151,15 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                   status={currentUser?.status}
                 />
                 <div>
-                  <h4 className="text-sm font-semibold text-white">{currentUser?.name}</h4>
-                  <p className="text-xs font-mono text-cyan-400">@{currentUser?.username}</p>
-                  <p className="text-[11px] text-slate-400">{currentUser?.email}</p>
+                  <h4 className="text-sm font-semibold text-white">
+                    {currentUser?.name}
+                  </h4>
+                  <p className="text-xs font-mono text-cyan-400">
+                    @{currentUser?.username}
+                  </p>
+                  <p className="text-[11px] text-slate-400">
+                    {currentUser?.email}
+                  </p>
                 </div>
               </div>
 
@@ -177,7 +192,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
             </form>
           )}
 
-          {activeTab === 'appearance' && (
+          {activeTab === "appearance" && (
             <div className="space-y-6">
               <div>
                 <h3 className="font-display font-semibold text-base text-slate-100 mb-1">
@@ -189,9 +204,24 @@ export default function UserSettingsModal({ isOpen, onClose }) {
 
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { id: 'dark', label: 'Dark Void', icon: Moon, desc: 'Nexora signature' },
-                    { id: 'light', label: 'Luminescence', icon: Sun, desc: 'High daylight' },
-                    { id: 'system', label: 'System Sync', icon: Laptop, desc: 'Match OS' },
+                    {
+                      id: "dark",
+                      label: "Dark Void",
+                      icon: Moon,
+                      desc: "Nexora signature",
+                    },
+                    {
+                      id: "light",
+                      label: "Luminescence",
+                      icon: Sun,
+                      desc: "High daylight",
+                    },
+                    {
+                      id: "system",
+                      label: "System Sync",
+                      icon: Laptop,
+                      desc: "Match OS",
+                    },
                   ].map((t) => {
                     const Icon = t.icon;
                     const isSelected = theme === t.id;
@@ -201,8 +231,8 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                         onClick={() => handleThemeChange(t.id)}
                         className={`flex flex-col items-center text-center p-3 rounded-xl border cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-300'
-                            : 'bg-[#0C0F15] border-white/10 text-slate-400 hover:text-white'
+                            ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-300"
+                            : "bg-[#0C0F15] border-white/10 text-slate-400 hover:text-white"
                         }`}
                       >
                         <Icon className="w-5 h-5 mb-1.5" />
@@ -219,20 +249,21 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                   Message Spacing & Density
                 </h3>
                 <p className="text-xs text-slate-400 mb-3">
-                  Control how information is compressed in the transmission stream.
+                  Control how information is compressed in the transmission
+                  stream.
                 </p>
 
                 <div className="grid grid-cols-2 gap-3">
                   {[
                     {
-                      id: 'comfortable',
-                      label: 'Comfortable',
-                      desc: 'Generous avatars and spacing',
+                      id: "comfortable",
+                      label: "Comfortable",
+                      desc: "Generous avatars and spacing",
                     },
                     {
-                      id: 'compact',
-                      label: 'Compact',
-                      desc: 'Maximum message density',
+                      id: "compact",
+                      label: "Compact",
+                      desc: "Maximum message density",
                     },
                   ].map((d) => {
                     const isSelected = messageDensity === d.id;
@@ -242,11 +273,13 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                         onClick={() => handleDensityChange(d.id)}
                         className={`p-3 rounded-xl border cursor-pointer transition-all ${
                           isSelected
-                            ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-300'
-                            : 'bg-[#0C0F15] border-white/10 text-slate-400 hover:text-white'
+                            ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-300"
+                            : "bg-[#0C0F15] border-white/10 text-slate-400 hover:text-white"
                         }`}
                       >
-                        <span className="text-xs font-semibold block">{d.label}</span>
+                        <span className="text-xs font-semibold block">
+                          {d.label}
+                        </span>
                         <span className="text-[11px] opacity-70 block mt-0.5">
                           {d.desc}
                         </span>
@@ -258,7 +291,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
             </div>
           )}
 
-          {activeTab === 'notifications' && (
+          {activeTab === "notifications" && (
             <div className="space-y-4">
               <h3 className="font-display font-semibold text-base text-slate-100">
                 Notification Rules
@@ -269,9 +302,21 @@ export default function UserSettingsModal({ isOpen, onClose }) {
 
               <div className="space-y-3 pt-2">
                 {[
-                  { title: 'Desktop Transmissions Alert', desc: 'Push notifications for direct mentions', checked: true },
-                  { title: 'Audible Sound Effects', desc: 'Subtle acoustic click when sending and receiving', checked: true },
-                  { title: 'Direct Transmission Highlights', desc: 'Notify on 1-on-1 private transmissions', checked: true },
+                  {
+                    title: "Desktop Transmissions Alert",
+                    desc: "Push notifications for direct mentions",
+                    checked: true,
+                  },
+                  {
+                    title: "Audible Sound Effects",
+                    desc: "Subtle acoustic click when sending and receiving",
+                    checked: true,
+                  },
+                  {
+                    title: "Direct Transmission Highlights",
+                    desc: "Notify on 1-on-1 private transmissions",
+                    checked: true,
+                  },
                 ].map((item, idx) => (
                   <label
                     key={idx}
@@ -283,7 +328,9 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                       className="mt-0.5 w-4 h-4 rounded bg-[#07080C] border-white/10 text-cyan-500 focus:ring-cyan-500/20"
                     />
                     <div>
-                      <p className="text-xs font-semibold text-slate-200">{item.title}</p>
+                      <p className="text-xs font-semibold text-slate-200">
+                        {item.title}
+                      </p>
                       <p className="text-[11px] text-slate-400">{item.desc}</p>
                     </div>
                   </label>
@@ -292,7 +339,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
             </div>
           )}
 
-          {activeTab === 'privacy' && (
+          {activeTab === "privacy" && (
             <div className="space-y-4">
               <h3 className="font-display font-semibold text-base text-slate-100">
                 Active Sessions

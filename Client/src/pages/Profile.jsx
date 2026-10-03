@@ -25,7 +25,7 @@ export default function Profile() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const currentUser = useSelector((state) => state.auth);
+  const currentUser = useSelector((state) => state.auth.user);
   const servers = useSelector((state) => state.servers.servers);
 
   const [isEditing, setIsEditing] = useState(false);
@@ -54,7 +54,7 @@ export default function Profile() {
   };
 
   const userServers = servers.filter((s) =>
-    s.members?.includes(currentUser?.id),
+    s.members?.includes(currentUser?._id),
   );
 
   return (
@@ -89,7 +89,7 @@ export default function Profile() {
               {/* Floating Avatar & Actions */}
               <div className="-mt-16 flex flex-col sm:flex-row justify-between sm:items-end gap-4 mb-6">
                 <Avatar
-                  src={currentUser?.avatar}
+                  src={currentUser?.profile_pic}
                   name={currentUser?.fullname}
                   size="xl"
                   status={currentUser?.status}
