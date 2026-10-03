@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Compass,
   MessageSquare,
@@ -9,23 +9,23 @@ import {
   Plus,
   ArrowRight,
   Sparkles,
-} from 'lucide-react';
-import GlobalHeader from '../components/layout/GlobalHeader';
-import MobileNav from '../components/layout/MobileNav';
-import ChannelList from '../components/channel/ChannelList';
-import MemberList from '../components/members/MemberList';
-import ChatContainer from '../components/chat/ChatContainer';
-import VoiceStage from '../components/voice/VoiceStage';
-import DmList from '../components/dm/DmList';
-import DmConversation from '../components/dm/DmConversation';
-import FriendsHub from '../components/friends/FriendsHub';
-import Button from '../components/common/Button';
-import Avatar from '../components/common/Avatar';
-import Badge from '../components/common/Badge';
-import { selectServer } from '../redux/slices/serverSlice';
-import { selectChannel } from '../redux/slices/channelSlice';
-import { selectDm } from '../redux/slices/dmSlice';
-import { openModal } from '../redux/slices/uiSlice';
+} from "lucide-react";
+import GlobalHeader from "../components/layout/GlobalHeader";
+import MobileNav from "../components/layout/MobileNav";
+import ChannelList from "../components/channel/ChannelList";
+import MemberList from "../components/members/MemberList";
+import ChatContainer from "../components/chat/ChatContainer";
+import VoiceStage from "../components/voice/VoiceStage";
+import DmList from "../components/dm/DmList";
+import DmConversation from "../components/dm/DmConversation";
+import FriendsHub from "../components/friends/FriendsHub";
+import Button from "../components/common/Button";
+import Avatar from "../components/common/Avatar";
+import Badge from "../components/common/Badge";
+import { selectServer } from "../redux/slices/serverSlice";
+import { selectChannel } from "../redux/slices/channelSlice";
+import { selectDm } from "../redux/slices/dmSlice";
+import { openModal } from "../redux/slices/uiSlice";
 
 export default function Workspace() {
   const dispatch = useDispatch();
@@ -36,9 +36,11 @@ export default function Workspace() {
   const servers = useSelector((state) => state.servers.servers);
   const activeServerId = useSelector((state) => state.servers.activeServerId);
   const channels = useSelector((state) => state.channels.channels);
-  const activeChannelId = useSelector((state) => state.channels.activeChannelId);
+  const activeChannelId = useSelector(
+    (state) => state.channels.activeChannelId,
+  );
   const activeDmId = useSelector((state) => state.dms.activeDmId);
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.auth.user);
 
   // Sync URL params with Redux state
   useEffect(() => {
@@ -60,13 +62,17 @@ export default function Workspace() {
   }, [dmId, activeDmId, dispatch]);
 
   // Determine current mode based on route
-  const isDmMode = location.pathname.startsWith('/app/messages');
-  const isServerMode = location.pathname.startsWith('/app/server');
-  const isHubMode = location.pathname === '/app' || location.pathname === '/app/';
+  const isDmMode = location.pathname.startsWith("/app/messages");
+  const isServerMode = location.pathname.startsWith("/app/server");
+  const isHubMode =
+    location.pathname === "/app" || location.pathname === "/app/";
 
   // Find active server & channel objects
-  const currentServer = servers.find((s) => s.id === (serverId || activeServerId)) || servers[0];
-  const currentChannel = channels.find((c) => c.id === (channelId || activeChannelId)) || channels[0];
+  const currentServer =
+    servers.find((s) => s.id === (serverId || activeServerId)) || servers[0];
+  const currentChannel =
+    channels.find((c) => c.id === (channelId || activeChannelId)) ||
+    channels[0];
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#07080C] text-slate-100 overflow-hidden select-none">
@@ -85,7 +91,7 @@ export default function Workspace() {
 
             {/* Main Channel Area (Chat or Voice Stage) */}
             <div className="flex-1 flex flex-col min-w-0 bg-[#07080C] h-full">
-              {currentChannel?.type === 'voice' ? (
+              {currentChannel?.type === "voice" ? (
                 <VoiceStage channel={currentChannel} />
               ) : (
                 <ChatContainer channel={currentChannel} />
@@ -126,13 +132,15 @@ export default function Workspace() {
                 <div className="relative z-10 max-w-2xl">
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-3">
                     <Sparkles className="w-3.5 h-3.5" />
-                    <span>NEXORA COMMAND DECK</span>
+                    <span>NEXORA </span>
                   </div>
                   <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white">
-                    Welcome back, {currentUser?.name?.split(' ')[0]}
+                    Welcome back, {currentUser?.fullname?.split(" ")[0]}
                   </h1>
                   <p className="text-slate-400 text-xs sm:text-sm mt-2 leading-relaxed">
-                    You have active nodes connected across {servers.length} communities. Jump into a transmission stream or check your pending network connections below.
+                    You have active nodes connected across {servers.length}{" "}
+                    communities. Jump into a transmission stream or check your
+                    pending network connections below.
                   </p>
 
                   <div className="mt-5 flex flex-wrap gap-3">
@@ -140,7 +148,9 @@ export default function Workspace() {
                       variant="primary"
                       size="sm"
                       icon={Plus}
-                      onClick={() => dispatch(openModal({ type: 'CREATE_SERVER' }))}
+                      onClick={() =>
+                        dispatch(openModal({ type: "CREATE_SERVER" }))
+                      }
                     >
                       Create Community
                     </Button>
@@ -148,7 +158,7 @@ export default function Workspace() {
                       variant="secondary"
                       size="sm"
                       icon={MessageSquare}
-                      onClick={() => navigate('/app/messages')}
+                      onClick={() => navigate("/app/messages")}
                     >
                       Open Transmissions
                     </Button>
@@ -156,7 +166,9 @@ export default function Workspace() {
                 </div>
 
                 <div className="absolute right-[-20px] bottom-[-40px] opacity-10 pointer-events-none hidden md:block">
-                  <span className="font-mono text-[220px] font-black text-cyan-400">NX</span>
+                  <span className="font-mono text-[220px] font-black text-cyan-400">
+                    NX
+                  </span>
                 </div>
               </div>
 
@@ -175,7 +187,9 @@ export default function Workspace() {
                     variant="ghost"
                     size="sm"
                     icon={Plus}
-                    onClick={() => dispatch(openModal({ type: 'CREATE_SERVER' }))}
+                    onClick={() =>
+                      dispatch(openModal({ type: "CREATE_SERVER" }))
+                    }
                   >
                     New
                   </Button>

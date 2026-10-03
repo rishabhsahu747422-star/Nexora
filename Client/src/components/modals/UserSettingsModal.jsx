@@ -30,7 +30,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.auth.user);
   const theme = useSelector((state) => state.ui.theme);
   const messageDensity = useSelector((state) => state.ui.messageDensity);
 
@@ -45,7 +45,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
     e.preventDefault();
     dispatch(
       updateProfile({
-        name: name.trim(),
+        fullname: fullname.trim(),
         bio: bio.trim(),
         customStatus: customStatus.trim(),
       }),
@@ -145,14 +145,14 @@ export default function UserSettingsModal({ isOpen, onClose }) {
 
               <div className="flex items-center gap-4 p-3 bg-[#0C0F15] rounded-xl border border-white/5">
                 <Avatar
-                  src={currentUser?.avatar}
-                  name={currentUser?.name}
+                  src={currentUser?.profile_pic}
+                  name={currentUser?.fullname}
                   size="lg"
                   status={currentUser?.status}
                 />
                 <div>
                   <h4 className="text-sm font-semibold text-white">
-                    {currentUser?.name}
+                    {currentUser?.fullname}
                   </h4>
                   <p className="text-xs font-mono text-cyan-400">
                     @{currentUser?.username}
