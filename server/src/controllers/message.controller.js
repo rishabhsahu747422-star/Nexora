@@ -1,3 +1,4 @@
+import { getIO } from "../config/soocket.js";
 import channelModel from "../models/channel.model.js";
 import messageModel from "../models/message.model.js";
 import serverMemberModel from "../models/serverMember.model.js";
@@ -54,9 +55,17 @@ export const createMessage = async (req, res, next) => {
       attachments,
     });
 
+    const messageDetails = await messageModel
+      .findById(message._id)
+      .populate("author_id", "profile_pic username");
+    const io = getIO();
+
+    io.to(`channel:${channelId}`).emit("message:new", messageDetails);
     return res
       .status(200)
-      .json(new ApiResponse(200, message, "Message created successfully"));
+      .json(
+        new ApiResponse(200, messageDetails, "Message created successfully"),
+      );
   } catch (error) {
     next(error);
   }
@@ -71,7 +80,7 @@ export const getAllChannelMessage = async (req, res, next) => {
       throw new ApiError(404, "channel not found");
     }
 
-    const member = await serverMemberMode.findOne({
+    const member = await serverMemberModel.findOne({
       server: channel.server,
       user: req.user._id,
     });
@@ -112,6 +121,70 @@ export const getAllChannelMessage = async (req, res, next) => {
     ]);
 
     return res.status(200).json(200, message, "message fetched sccesfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getMessage = async (req, res, next) => {
+  try {
+    const { channelId, messageId } = req.params;
+    const message = await messageModel
+      .findOne({ _id: messageId, channel_id: channelId })
+      .populate("author_id", "profile_pic username fullname");
+
+    if (!message) throw new ApiError(404, "Message not found");
+    return res
+      .status(200)
+      .json(new ApiResponse(200, message, "message fetched successfully"));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateMessage = async (req, res, next) => {
+  try {
+    const { channelId, messageId } = req.params;
+    const message = await messageModel.findOne({
+      _id: messageId,
+      channel_id: channelId,
+    });
+    if (!message) throw new ApiError(404, "Message not found");
+    if (message.author_id.toString() !== req.user._id.toString())
+      throw new ApiError(403, "only author can update this message");
+    message.content = req.body.content?.trim() ?? message.content;
+    await message.save();
+    const updatedMessage = await message.populate(
+      "author_id",
+      "profile_pic username fullname",
+    );
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(200, updatedMessage, "message updated ssuccessfully"),
+      );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteMessage = async (req, res, next) => {
+  try {
+    const { channelId, messageId } = req.params;
+    const message = await messageModel.findOne({
+      _id: messageId,
+      channel_id: channelId,
+    });
+
+    if (!message) throw new ApiError(404, "message not found");
+
+    if (message.author_id.toString() !== req.user._id)
+      throw new ApiError(403, "only author can delete the messsage");
+    await messageModel.findByIdAndDelete(message._id);
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, null, "messsage deleted successfullly"));
   } catch (error) {
     next(error);
   }

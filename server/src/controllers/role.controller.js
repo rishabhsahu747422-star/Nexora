@@ -94,6 +94,13 @@ export const updateRole = async (req, res, next) => {
       throw new ApiError(404, "role not found");
     }
 
+    if (name !== undefined) role.name = name;
+    if (permission !== undefined) role.permission = permission;
+    if (color !== undefined) role.color = color;
+    if (position !== undefined) role.position = position;
+
+    await role.save();
+
     return res
       .status(200)
       .json(new ApiResponse(200, role, "Role updated Successfully"));
@@ -104,7 +111,7 @@ export const updateRole = async (req, res, next) => {
 
 export const deleteRole = async (re, res, next) => {
   try {
-    const { serverId } = req.params;
+    const { serverId, roleId } = req.params;
 
     const server = serverModel.find(serverId);
 

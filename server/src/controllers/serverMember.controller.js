@@ -1,3 +1,4 @@
+import roleModel from "../models/role.model.js";
 import serverModel from "../models/server.model.js";
 import serverMemberModel from "../models/serverMember.model.js";
 import ApiError from "../utils/ApiError.js";
@@ -89,6 +90,15 @@ export const updateMemberRoles = async (req, res, next) => {
 
     if (server.email.toString() !== userID.toString()) {
       throw new ApiError(404, "server owner's roles cannot be changed");
+    }
+
+    const validRoles = await roleModel.find({
+      _id: { $in: roles },
+      server: serverId,
+    });
+
+    if (validRoles.length !== roles.length) {
+      throw new ApiError(400, "roles are invalid");
     }
 
     member.roles = roles;

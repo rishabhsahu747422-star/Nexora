@@ -5,6 +5,7 @@ import {
   googleAuth,
   login,
   logout,
+  refreshToken,
   register,
   resetPassword,
   verifyOtp,
@@ -18,6 +19,8 @@ import {
   verifyOtpValidator,
 } from "../validators/auth.validator.js";
 import { validate } from "../middlewares/validatte.middleware.js";
+import { authMiddleware } from "../middlewares/authmiddleware.js";
+import { getMe } from "../controllers/user.controller.js";
 
 const router = express.Router();
 
@@ -28,20 +31,22 @@ router.post(
   validate,
   register,
 );
-router.post("/login", loginValidator, validate, login);
+router.get("/login", loginValidator, validate, login);
 
 router.post(
   "google",
   passport.authenticate("google", { scope: ["Profile", "email"] }),
 ); //is line ka matlab samjhna h
 
-router.post(
+router.get(
   "google/callback",
   passport.authenticate("google", { session: false, failureRedirect: "/" }),
   googleAuth,
 ); //line samjh nhi aayi
 
 router.post("/logout", logout);
+router.post("/refresh", refreshToken);
+router.get("/me", authMiddleware, getMe);
 
 router.post(
   "/forget-password",
