@@ -91,41 +91,6 @@ export const serverSlice = createSlice({
     clearServerError: (state) => {
       state.error = null;
     },
-    extraReducers: (builder) => {
-      builder
-        .addCase(fetchServers.pending, (state) => {
-          state.loading = true;
-          state.error = null;
-        })
-        .addCase(fetchServers.fulfilled, (state, action) => {
-          stateloading = false;
-          state.servers = action.payload || [];
-          if (!state.selectedServer)
-            state.selectedServer = server.server[0] || null;
-        })
-        .addCase(fetchServers.rejected, (state, action) => {
-          state.loading = false;
-          state.error = action.payload;
-        })
-        .addCase(createServerAsync.fulfilled, (state, action) => {
-          state.servers.push(action.payload);
-          state.selectedServer = action.payload;
-        })
-        .addCase(createServerAsync.rejected, (state, action) => {
-          state.error = action.payload;
-        })
-        .addCase(joinServerAsync.fulfilled, (state, action) => {
-          state.error = null;
-          state.servers.push(action.payload);
-          state.selectedServer = action.payload;
-        })
-        .addCase(joinServerAsync.rejected, (state, action) => {
-          state.error = action.payload;
-        })
-        .addCase(fetchServerMembers.fulfilled, (state, action) => {
-          state.members = action.payload.members || [];
-        });
-    },
 
     // AI code
     //     createServer: (state, action) => {
@@ -216,6 +181,41 @@ export const serverSlice = createSlice({
     //         }
     //       }
     //     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchServers.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchServers.fulfilled, (state, action) => {
+        stateloading = false;
+        state.servers = action.payload || [];
+        if (!state.selectedServer)
+          state.selectedServer = server.server[0] || null;
+      })
+      .addCase(fetchServers.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(createServerAsync.fulfilled, (state, action) => {
+        state.servers.push(action.payload);
+        state.selectedServer = action.payload;
+      })
+      .addCase(createServerAsync.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      .addCase(joinServerAsync.fulfilled, (state, action) => {
+        state.error = null;
+        state.servers.push(action.payload);
+        state.selectedServer = action.payload;
+      })
+      .addCase(joinServerAsync.rejected, (state, action) => {
+        state.error = action.payload;
+      })
+      .addCase(fetchServerMembers.fulfilled, (state, action) => {
+        state.members = action.payload.members || [];
+      });
   },
 });
 
