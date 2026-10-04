@@ -5,6 +5,10 @@ import sendFiles from "../services/storage.service.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import { generateInviteCode } from "../utils/inviteCode.js";
+import roleModel from "../models/role.model.js";
+import channelModel from "../models/channel.model.js";
+import { createServerMember } from "../services/serverMember.service.js";
+import serverMemberModel from "../models/serverMember.model.js";
 
 export const createServer = async (req, res) => {
   try {
@@ -37,6 +41,39 @@ export const createServer = async (req, res) => {
       isPublic,
       inviteCode,
     });
+
+    const ownerRole = await roleModel.create({
+      name: "Owner",
+      server: server._id,
+      permissions: [
+        "MANAGE_SERVER",
+        "MANAGE_CHANNELS",
+        "MANAGE_MEMBERS",
+        "MANAGE_MEMBERS",
+        "MANAGE_MESSAGES",
+      ],
+      position: 100,
+    });
+
+    const memberRole = await roleModel.create({
+      name: "member",
+      server: server._id,
+      permissions: [],
+      position: 10,
+    });
+
+    const defaultChannels = await channelModel.create([
+      { name: "#general-chat", server: server._id, position: 1 },
+      {
+        name: "announcement",
+        server: server._id,
+        position: 2,
+      },
+    ]);
+
+    const serverMember = await createServerMember(req.user.id, server._id, [
+      ownerRole._id,
+    ]);
     return res
       .status(201)
       .json(new ApiResponse(201, server, "Server created Succesfully"));
@@ -56,6 +93,9 @@ export const deleteServer = async (req, res) => {
     }
 
     await serverModel.findByIdAndDelete({ serverId });
+    await serverMemberModel.deleteMany({ server: server._id });
+    await channelModel.deleteMany({ server: server._id });
+    await roleModel.deleteMany({ server: server._id });
 
     return res
       .status(200)
@@ -73,6 +113,12 @@ export const getSingleServer = async (req, res) => {
     if (!server) {
       throw new ApiError(400, "Server not Exist");
     }
+    const member = await serverMemberModel.exists({
+      server: server._id,
+      user: req.user._id,
+    });
+
+    if (!member) throw new ApiError(403, "you are not a member of the server");
 
     return res
       .status(200)
@@ -83,13 +129,13 @@ export const getSingleServer = async (req, res) => {
 };
 export const updateServer = async (req, res) => {
   try {
-    const { _id } = req.params;
+    const { serverId } = req.params;
     const { name, description, isPublic } = req.body;
     const icon = req.files.icon[0];
     const banner = req.files.banner[0];
 
     const server = await serverModel.findByIdAndUpdate(
-      _id,
+      serverId,
       { name, description, isPublic, icon, banner },
       { new: true },
     );
@@ -98,6 +144,9 @@ export const updateServer = async (req, res) => {
       throw new ApiError(400, "Server not found");
     }
 
+    if (server.email.toString() !== req.user._id.toString()) {
+      throw new ApiError(403, "only server owner can update server details");
+    }
     return res
       .status(200)
       .json(new ApiResponse(200, server, "Server updated Successfully"));
@@ -129,11 +178,11 @@ export const getAllServer = async (req, res) => {
 };
 export const joinServer = async (req, res) => {
   try {
-    const { inviteCode } = req.params;
+    const inviteCode = req.params.inviteCode.trim();
 
     const server = await serverModel.findOne({ inviteCode });
 
-    if (!inviteCode) {
+    if (!server) {
       throw new ApiError(404, "Invalid Invite Code");
     }
 
@@ -141,16 +190,25 @@ export const joinServer = async (req, res) => {
 
     if (!user) throw new ApiError(404, "User not found");
 
-    const alreadyExists = user.server.some((serverId) => {
-      serverId.toString() === server._id.toString();
+    // const alreadyExists = user.server.some((serverId) => {
+    //   serverId.toString() === server._id.toString();
+    // });
+
+    const alreadyExists = await serverMemberModel.exists({
+      user: req.user._id,
+      server: server._id,
     });
 
     if (!alreadyExists) {
       throw new ApiError(400, "Already Member");
     }
+    const memberRole = await roleModel.findOne({
+      server: server._id,
+      name: "member",
+    });
 
-    user.server.push(server._id);
-    await user.save();
+    await createServerMember(req.user._id, server._id, [memberRole._id]);
+
     return res
       .status(200)
       .json(new ApiResponse(200, server, "server join successfully"));
@@ -160,19 +218,58 @@ export const joinServer = async (req, res) => {
 };
 export const leaveServer = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { serverId } = req.params;
 
-    const user = userModel.findByIdAndUpdate(
-      req.user._id,
-      { $pull: { server: id } },
-      { new: true },
-    );
-    if (!user) {
-      throw new ApiError(400, "User not found");
+    const server = serverModel.findById(serverId);
+    if (!server) {
+      throw new ApiError(400, "server not found");
+    }
+
+    if (server.email.toString() === req.user.if.toString()) {
+      throw new ApiError(403, "only server owner can't leave the server");
+    }
+
+    const member = await serverMemberModel.findByIdAndDelete({
+      server: server._id,
+      user: req.user._id,
+    });
+
+    if (!member) {
+      throw new ApiError(404, "you are not the menber of server");
     }
     return res
       .status(200)
-      .json(new ApiResponse(200, server, "User left successfully"));
+      .json(new ApiResponse(200, null, "User left successfully"));
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+export const createInvite = async (req, res) => {
+  try {
+    const { serverId } = req.params;
+    const server = await serverModel.findById(serverId);
+    if (!server) {
+      throw new ApiError(404, "server not found");
+    }
+
+    if (
+      !(await serverMemberModel.exists({
+        server: server._id,
+        user: req.user._id,
+      }))
+    ) {
+      throw new ApiError(403, "you are not a member of this server");
+    }
+
+    return res
+      .status(200)
+      .json(
+        new ApiResponse(
+          200,
+          { inviteCode: server.inviteCode },
+          "Invite creaated successfully",
+        ),
+      );
   } catch (error) {
     console.log(error.message);
   }

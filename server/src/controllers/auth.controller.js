@@ -352,3 +352,50 @@ export const resetPassword = async (req, res, next) => {
     next(error);
   }
 };
+
+export const refreshToken = async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
+
+  if (!refreshToken) {
+    return res.status(401).json({
+      success: false,
+      message: "unauthorise",
+    });
+  }
+
+  const isBlacklisted = await redis.get(`Bearer:refreshToken:${refreshToken}`);
+
+  if (!isBlacklisted) {
+    return res.status(401).json({
+      success: false,
+      message: "Refresh Token has ben revoked",
+    });
+  }
+
+  const decoded = JsonWebTokenError.verify(
+    refreshToken,
+    process.env.JWT_SECRET_KEY,
+  );
+  const user = await userModel.findById(decoded.id);
+
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: "user not found",
+    });
+  }
+
+  const accessToken = generateToken(user._id, "10m");
+
+  res.cookie("accessToken", accessToken, {
+    httpOnly,
+    maxAge: 15 * 60 * 1000,
+    secure: false,
+    samesite: "strict",
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Access token regeneration successfully",
+  });
+};
