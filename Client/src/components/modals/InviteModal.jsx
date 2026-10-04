@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { Copy, RefreshCw, Check, Link as LinkIcon, Shield } from 'lucide-react';
-import Modal from '../common/Modal';
-import Button from '../common/Button';
-import { regenerateInvite } from '../../redux/slices/serverSlice';
-import { addToast } from '../../redux/slices/uiSlice';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { Copy, RefreshCw, Check, Link as LinkIcon, Shield } from "lucide-react";
+import Modal from "../common/Modal";
+import Button from "../common/Button";
+// import { regenerateInvite } from '../../redux/slices/serverSlice';
+import { addToast } from "../../redux/slices/uiSlice";
 
 export default function InviteModal({ isOpen, onClose, server }) {
   const dispatch = useDispatch();
   const [copied, setCopied] = useState(false);
-  const [expiry, setExpiry] = useState('7 days');
-  const [maxUses, setMaxUses] = useState('No limit');
+  const [expiry, setExpiry] = useState("7 days");
+  const [maxUses, setMaxUses] = useState("No limit");
 
   if (!server) return null;
 
-  const inviteCode = server.inviteCode || 'nx-synth-ai';
+  const inviteCode = server.inviteCode || "nx-synth-ai";
   const inviteUrl = `https://nexora.io/invite/${inviteCode}`;
 
   const handleCopy = () => {
@@ -22,9 +22,9 @@ export default function InviteModal({ isOpen, onClose, server }) {
     setCopied(true);
     dispatch(
       addToast({
-        type: 'success',
-        message: 'Invite link copied to clipboard!',
-      })
+        type: "success",
+        message: "Invite link copied to clipboard!",
+      }),
     );
     setTimeout(() => setCopied(false), 2000);
   };
@@ -33,9 +33,9 @@ export default function InviteModal({ isOpen, onClose, server }) {
     dispatch(regenerateInvite(server.id));
     dispatch(
       addToast({
-        type: 'info',
-        message: 'New invite token generated.',
-      })
+        type: "info",
+        message: "New invite token generated.",
+      }),
     );
   };
 
@@ -62,12 +62,12 @@ export default function InviteModal({ isOpen, onClose, server }) {
               className="bg-transparent text-xs font-mono text-slate-200 flex-1 focus:outline-none select-all"
             />
             <Button
-              variant={copied ? 'secondary' : 'primary'}
+              variant={copied ? "secondary" : "primary"}
               size="sm"
               icon={copied ? Check : Copy}
               onClick={handleCopy}
             >
-              {copied ? 'Copied' : 'Copy'}
+              {copied ? "Copied" : "Copy"}
             </Button>
           </div>
         </div>

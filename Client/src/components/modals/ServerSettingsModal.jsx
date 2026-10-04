@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Settings,
   Shield,
@@ -11,22 +11,22 @@ import {
   AlertTriangle,
   Save,
   Check,
-} from 'lucide-react';
-import Modal from '../common/Modal';
-import Input from '../common/Input';
-import Button from '../common/Button';
-import Badge from '../common/Badge';
-import { updateServer, deleteServer } from '../../redux/slices/serverSlice';
-import { addToast, closeModal } from '../../redux/slices/uiSlice';
+} from "lucide-react";
+import Modal from "../common/Modal";
+import Input from "../common/Input";
+import Button from "../common/Button";
+import Badge from "../common/Badge";
+// import { updateServer, deleteServer } from '../../redux/slices/serverSlice';
+import { addToast, closeModal } from "../../redux/slices/uiSlice";
 
 export default function ServerSettingsModal({ isOpen, onClose, server }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'roles' | 'members' | 'moderation' | 'danger'
-  const [serverName, setServerName] = useState(server?.name || '');
-  const [serverDesc, setServerDesc] = useState(server?.description || '');
-  const [serverTag, setServerTag] = useState(server?.tag || '');
+  const [activeTab, setActiveTab] = useState("overview"); // 'overview' | 'roles' | 'members' | 'moderation' | 'danger'
+  const [serverName, setServerName] = useState(server?.name || "");
+  const [serverDesc, setServerDesc] = useState(server?.description || "");
+  const [serverTag, setServerTag] = useState(server?.tag || "");
 
   if (!server) return null;
 
@@ -40,39 +40,39 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
           description: serverDesc.trim(),
           tag: serverTag.trim().toUpperCase(),
         },
-      })
+      }),
     );
     dispatch(
       addToast({
-        type: 'success',
-        message: 'Community parameters synchronized.',
-      })
+        type: "success",
+        message: "Community parameters synchronized.",
+      }),
     );
   };
 
   const handleDeleteServer = () => {
     if (
       window.confirm(
-        `Are you sure you want to completely purge and delete "${server.name}"? This action cannot be undone.`
+        `Are you sure you want to completely purge and delete "${server.name}"? This action cannot be undone.`,
       )
     ) {
       dispatch(deleteServer(server.id));
       dispatch(closeModal());
       dispatch(
         addToast({
-          type: 'info',
+          type: "info",
           message: `Community "${server.name}" deleted.`,
-        })
+        }),
       );
-      navigate('/app');
+      navigate("/app");
     }
   };
 
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: Settings },
-    { id: 'roles', label: 'Roles & Permissions', icon: Shield },
-    { id: 'moderation', label: 'Moderation Safety', icon: Bell },
-    { id: 'danger', label: 'Danger Zone', icon: AlertTriangle },
+    { id: "overview", label: "Overview", icon: Settings },
+    { id: "roles", label: "Roles & Permissions", icon: Shield },
+    { id: "moderation", label: "Moderation Safety", icon: Bell },
+    { id: "danger", label: "Danger Zone", icon: AlertTriangle },
   ];
 
   return (
@@ -91,7 +91,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
           </div>
           {tabs.map((tab) => {
             const Icon = tab.icon;
-            const isDanger = tab.id === 'danger';
+            const isDanger = tab.id === "danger";
             return (
               <button
                 key={tab.id}
@@ -99,11 +99,11 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors text-left ${
                   activeTab === tab.id
                     ? isDanger
-                      ? 'bg-rose-500/15 text-rose-300 border border-rose-500/30'
-                      : 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
+                      ? "bg-rose-500/15 text-rose-300 border border-rose-500/30"
+                      : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
                     : isDanger
-                    ? 'text-rose-400 hover:bg-rose-500/10'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
+                      ? "text-rose-400 hover:bg-rose-500/10"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
                 }`}
               >
                 <Icon className="w-4 h-4 flex-shrink-0" />
@@ -115,7 +115,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
 
         {/* Right Content */}
         <div className="flex-1 p-6 overflow-y-auto">
-          {activeTab === 'overview' && (
+          {activeTab === "overview" && (
             <form onSubmit={handleSaveOverview} className="space-y-4">
               <h3 className="font-display font-semibold text-base text-slate-100">
                 Community Overview
@@ -163,7 +163,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
             </form>
           )}
 
-          {activeTab === 'roles' && (
+          {activeTab === "roles" && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -200,30 +200,31 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
             </div>
           )}
 
-          {activeTab === 'moderation' && (
+          {activeTab === "moderation" && (
             <div className="space-y-4">
               <h3 className="font-display font-semibold text-base text-slate-100">
                 Automated Verification & Filters
               </h3>
               <p className="text-xs text-slate-400">
-                Configure protocol filters for spam containment and transmission screening.
+                Configure protocol filters for spam containment and transmission
+                screening.
               </p>
 
               <div className="space-y-3 pt-2">
                 {[
                   {
-                    title: 'Require Verified Cryptographic ID',
-                    desc: 'Members must authenticate through verified handles.',
+                    title: "Require Verified Cryptographic ID",
+                    desc: "Members must authenticate through verified handles.",
                     checked: true,
                   },
                   {
-                    title: 'Block Unsolicited Executable Snippets',
-                    desc: 'Automatically flag untrusted shell scripts and binaries.',
+                    title: "Block Unsolicited Executable Snippets",
+                    desc: "Automatically flag untrusted shell scripts and binaries.",
                     checked: true,
                   },
                   {
-                    title: 'Audit Logging',
-                    desc: 'Stream all role updates and purges to moderation nodes.',
+                    title: "Audit Logging",
+                    desc: "Stream all role updates and purges to moderation nodes.",
                     checked: true,
                   },
                 ].map((item, idx) => (
@@ -237,7 +238,9 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
                       className="mt-0.5 w-4 h-4 rounded bg-[#07080C] border-white/10 text-cyan-500 focus:ring-cyan-500/20"
                     />
                     <div>
-                      <p className="text-xs font-semibold text-slate-200">{item.title}</p>
+                      <p className="text-xs font-semibold text-slate-200">
+                        {item.title}
+                      </p>
                       <p className="text-[11px] text-slate-400">{item.desc}</p>
                     </div>
                   </label>
@@ -246,7 +249,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
             </div>
           )}
 
-          {activeTab === 'danger' && (
+          {activeTab === "danger" && (
             <div className="space-y-4">
               <h3 className="font-display font-semibold text-base text-rose-400 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5" />
@@ -261,7 +264,8 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
                   Delete This Community
                 </h4>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  Purges all channels, messages, roles, and member links for {server.name}. Once confirmed, data cannot be recovered.
+                  Purges all channels, messages, roles, and member links for{" "}
+                  {server.name}. Once confirmed, data cannot be recovered.
                 </p>
                 <Button
                   variant="danger"
