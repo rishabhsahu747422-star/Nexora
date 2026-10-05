@@ -18,7 +18,7 @@ import Avatar from "../components/common/Avatar";
 import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
-import { updateProfile } from "../redux/slices/authSlice";
+// import { updateProfile } from "../redux/slices/authSlice";
 import { addToast } from "../redux/slices/uiSlice";
 
 export default function Profile() {

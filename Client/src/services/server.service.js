@@ -3,10 +3,14 @@ import api from "../config/api.js";
 const data = (response) => response.data?.data ?? response.data;
 
 export const createServer = async (payload) =>
-  data(await api.post("/server", payload));
+  data(await api.post("/server/create", payload));
 
-export const getServer = async (serverId) =>
-  data(await api.get(`/server/${serverId}`));
+export const getServers = async (serverId) => data(await api.get(`/server`));
+
+export const getServer = async (serverId) => {
+  const response = await api.get(`/server/${serverId}`);
+  return response.data.data;
+};
 
 export const updateServer = async (serverId) =>
   data(await api.patch(`/server/${serverId}`));

@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
+import { fetchChannels, selectChannel } from "../redux/slices/channelSlice";
 import {
   Compass,
   MessageSquare,
@@ -23,7 +24,6 @@ import Button from "../components/common/Button";
 import Avatar from "../components/common/Avatar";
 import Badge from "../components/common/Badge";
 import { selectServer } from "../redux/slices/serverSlice";
-import { selectChannel } from "../redux/slices/channelSlice";
 import { selectDm } from "../redux/slices/dmSlice";
 import { openModal } from "../redux/slices/uiSlice";
 
@@ -35,25 +35,45 @@ export default function Workspace() {
 
   const servers = useSelector((state) => state.servers.servers);
   const activeServerId = useSelector((state) => state.servers.activeServerId);
-  const channels = useSelector((state) => state.channels.channels);
   const activeChannelId = useSelector(
     (state) => state.channels.activeChannelId,
+  );
+
+  const selectedServer = useSelector((state) => state.servers.selectedServer);
+
+  const channels = useSelector((state) => state.channels.channels);
+
+  const selectedChannel = useSelector(
+    (state) => state.channels.selectedChannel,
   );
   const activeDmId = useSelector((state) => state.dms.activeDmId);
   const currentUser = useSelector((state) => state.auth.user);
 
   // Sync URL params with Redux state
   useEffect(() => {
-    if (serverId && serverId !== activeServerId) {
-      dispatch(selectServer(serverId));
-    }
-  }, [serverId, activeServerId, dispatch]);
+    if (!serverId) return;
+
+    dispatch(selectServer(serverId));
+    dispatch(fetchChannels(serverId));
+  }, [serverId, dispatch]);
 
   useEffect(() => {
-    if (channelId && channelId !== activeChannelId) {
+    if (channelId) {
       dispatch(selectChannel(channelId));
     }
-  }, [channelId, activeChannelId, dispatch]);
+  }, [channelId, dispatch]);
+
+  // useEffect(() => {
+  //   if (serverId && serverId !== activeServerId) {
+  //     dispatch(selectServer(serverId));
+  //   }
+  // }, [serverId, activeServerId, dispatch]);
+
+  // useEffect(() => {
+  //   if (channelId && channelId !== activeChannelId) {
+  //     dispatch(selectChannel(channelId));
+  //   }
+  // }, [channelId, activeChannelId, dispatch]);
 
   useEffect(() => {
     if (dmId && dmId !== activeDmId) {
@@ -69,10 +89,12 @@ export default function Workspace() {
 
   // Find active server & channel objects
   const currentServer =
-    servers.find((s) => s.id === (serverId || activeServerId)) || servers[0];
+    selectedServer || servers.find((server) => server._id === serverId) || null;
+
   const currentChannel =
-    channels.find((c) => c.id === (channelId || activeChannelId)) ||
-    channels[0];
+    selectedChannel ||
+    channels.find((channel) => channel._id === channelId) ||
+    null;
 
   return (
     <div className="h-screen w-screen flex flex-col bg-[#07080C] text-slate-100 overflow-hidden select-none">

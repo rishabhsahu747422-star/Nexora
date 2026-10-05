@@ -18,7 +18,7 @@ import Modal from "../common/Modal";
 import Input from "../common/Input";
 import Button from "../common/Button";
 import Avatar from "../common/Avatar";
-import { updateProfile, logout } from "../../redux/slices/authSlice";
+// import { updateProfile } from "../../redux/slices/authSlice";
 import {
   setTheme,
   setMessageDensity,

@@ -18,7 +18,6 @@ import Input from "../components/common/Input";
 import Button from "../components/common/Button";
 import { registerUserAsync } from "../redux/slices/authSlice";
 import { addToast } from "../redux/slices/uiSlice";
-import { registerUser } from "../services/auth.service";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -72,42 +71,40 @@ export default function Register() {
       formData.append("image", data.profile_pic[0]);
     }
 
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
+    try {
+      await dispatch(registerUserAsync(formData)).unwrap();
+
+      dispatch(
+        addToast({
+          type: "success",
+          message: `Welcome to Nexora, ${data.fullname}!`,
+        }),
+      );
+
+      navigate("/app");
+    } catch (error) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: error || "Unable to create your account",
+        }),
+      );
     }
-    await dispatch(registerUserAsync(formData)).unwrap();
+  };
 
-    navigate("/app");
+  const [googleLoading, setGoogleLoading] = useState(false);
 
-    // setIsLoading(true);
-    // setTimeout(() => {
-    // setIsLoading(false);
-    // const newUser = {
-    //   id: "usr_" + Date.now(),
-    //   name: data.fullName,
-    //   username: data.username.toLowerCase(),
-    //   email: data.email,
-    //   avatar:
-    //     "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    //   banner:
-    //     "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80",
-    //   status: "online",
-    //   customStatus: "Exploring Nexora Nexus",
-    //   bio: "New member of the Nexora communication network.",
-    //   roles: ["Member"],
-    //   joinedDate: "Joined Just Now",
-    //   mutualServers: ["srv_synthetix"],
-    // };
+  const handleGoogleRegister = () => {
+    setGoogleLoading(true);
 
-    // dispatch(registerSuccess({ user: newUser }));
+    window.location.href = "http://localhost:3000/api/auth/google";
+    setGoogleLoading(false);
     dispatch(
       addToast({
         type: "success",
-        message: `Welcome to Nexora, ${data.fullname}!`,
+        message: "Register successfully with Google account.",
       }),
     );
-    //   navigate("/app");
-    // }, 600);
   };
 
   return (
@@ -253,6 +250,34 @@ export default function Register() {
             </Button>
           </div>
         </form>
+
+        {/* Google One-Click Auth */}
+        <button
+          type="button"
+          onClick={handleGoogleRegister}
+          disabled={googleLoading || isLoading}
+          className="w-full flex items-center justify-center gap-3 bg-[#151A23] hover:bg-[#1E2535] border border-white/10 hover:border-white/20 text-slate-200 text-sm font-medium py-3 rounded-xl transition-all mb-6 active:scale-[0.99]"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <path
+              fill="#4285F4"
+              d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.8-2.4 3.65v3.03h3.88c2.27-2.09 3.665-5.17 3.665-9.12z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.03c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.24v3.13C3.26 21.48 7.34 24 12 24z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.28 14.29c-.25-.72-.38-1.49-.38-2.29s.13-1.57.38-2.29V6.58H1.24C.45 8.14 0 9.99 0 12s.45 3.86 1.24 5.42l4.04-3.13z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.34 0 3.26 2.52 1.24 6.58l4.04 3.13c.95-2.83 3.6-4.96 6.72-4.96z"
+            />
+          </svg>
+          {googleLoading ? "Connecting to Google..." : "Continue with Google"}
+        </button>
 
         <p className="text-center text-xs text-slate-400 mt-6">
           Already have an account?{" "}

@@ -7,9 +7,8 @@ import { Mail, Lock, LogIn, ArrowRight } from "lucide-react";
 import NexoraLogo from "../assets/logo/NexoraLogo";
 import Input from "../components/common/Input";
 import Button from "../components/common/Button";
-import { loginSuccess, loginUserAsync } from "../redux/slices/authSlice";
+import { loginUserAsync } from "../redux/slices/authSlice";
 import { addToast } from "../redux/slices/uiSlice";
-import { CURRENT_USER } from "../data/mockUsers";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -25,56 +24,60 @@ export default function Login() {
     mode: "onBlur",
   });
 
-  // const onSubmit = async (data) => {
-  //   setIsLoading(true);
-  //   // Simulate brief network auth handshake
-  //   setTimeout(() => {
-  //     setIsLoading(false);
-  //     dispatch(
-  //       loginSuccess({
-  //         user: {
-  //           ...CURRENT_USER,
-  //           email: data.email,
-  //         },
-  //         token: "mock_jwt_token_nexora_" + Date.now(),
-  //       }),
-  //     );
+  const handleGoogleLogin = () => {
+    setGoogleLoading(true);
 
-  //     navigate("/app");
-  //   }, 600);
-  // };
-
-  const onSubmit = async (data) => {
-    await dispatch(loginUserAsync(data)).unwrap();
-
+    window.location.href = "http://localhost:3000/api/auth/google";
+    setGoogleLoading(false);
     dispatch(
       addToast({
         type: "success",
-        message: `Welcome back, ${CURRENT_USER.name}!`,
+        message: "Signed in successfully with Google account.",
       }),
     );
-    navigate("/");
   };
 
-  const handleGoogleLogin = () => {
-    setGoogleLoading(true);
-    setTimeout(() => {
-      setGoogleLoading(false);
-      dispatch(
-        loginSuccess({
-          user: CURRENT_USER,
-          token: "google_oauth_mock_token_" + Date.now(),
-        }),
-      );
+  const onSubmit = async (data) => {
+    try {
+      const user = await dispatch(loginUserAsync(data)).unwrap();
+
       dispatch(
         addToast({
           type: "success",
-          message: "Signed in successfully with Google account.",
+          message: `Welcome back, ${user.fullname}!`,
         }),
       );
+
       navigate("/app");
-    }, 600);
+    } catch (error) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: error || "Unable to sign in",
+        }),
+      );
+    }
   };
+
+  // const handleGoogleLogin = () => {
+  //   setGoogleLoading(true);
+  //   setTimeout(() => {
+  //     setGoogleLoading(false);
+  //     dispatch(
+  //       loginSuccess({
+  //         user: CURRENT_USER,
+  //         token: "google_oauth_mock_token_" + Date.now(),
+  //       }),
+  //     );
+  //     dispatch(
+  //       addToast({
+  //         type: "success",
+  //         message: "Signed in successfully with Google account.",
+  //       }),
+  //     );
+  //     navigate("/app");
+  //   }, 600);
+  // };
 
   return (
     <div className="min-h-screen bg-[#07080C] text-slate-100 flex flex-col justify-center items-center p-4 relative overflow-hidden select-none">

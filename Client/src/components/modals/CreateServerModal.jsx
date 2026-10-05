@@ -6,8 +6,7 @@ import { Server, Sparkles, Image as ImageIcon } from "lucide-react";
 import Modal from "../common/Modal";
 import Input from "../common/Input";
 import Button from "../common/Button";
-// import { createServer } from "../../redux/slices/serverSlice";
-import { createChannel } from "../../redux/slices/channelSlice";
+import { createServerAsync } from "../../redux/slices/serverSlice";
 import { closeModal, addToast } from "../../redux/slices/uiSlice";
 
 const DEFAULT_SERVER_ICONS = [
@@ -39,40 +38,35 @@ export default function CreateServerModal({ isOpen, onClose }) {
     },
   });
 
-  const onSubmit = (data) => {
-    const serverPayload = {
-      name: data.name.trim(),
-      description: data.description.trim(),
-      category: data.category,
-      icon: selectedIcon,
-    };
+  const onSubmit = async (data) => {
+    const formData = new FormData();
 
-    // Dispatch createServer
-    const actionResult = dispatch(createServer(serverPayload));
-    // The serverSlice creates default channel and sets activeServerId
-    const newServerId = actionResult.payload
-      ? actionResult.payload.id
-      : "srv_" + Date.now();
+    formData.append("name", data.name.trim());
+    formData.append("description", data.description.trim());
+    formData.append("isPublic", "true");
 
-    // Create default channel
-    dispatch(
-      createChannel({
-        serverId: newServerId,
-        name: "transmissions-general",
-        type: "text",
-        topic: "General community discussion and transmissions.",
-      }),
-    );
+    try {
+      const newServer = await dispatch(createServerAsync(formData)).unwrap();
 
-    dispatch(closeModal());
-    reset();
-    dispatch(
-      addToast({
-        type: "success",
-        message: `Community "${data.name}" established!`,
-      }),
-    );
-    navigate(`/app/server/${newServerId}`);
+      dispatch(closeModal());
+      reset();
+
+      dispatch(
+        addToast({
+          type: "success",
+          message: `Community "${data.name}" established!`,
+        }),
+      );
+
+      navigate(`/app/server/${newServer._id}`);
+    } catch (error) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: error || "Unable to create server",
+        }),
+      );
+    }
   };
 
   return (

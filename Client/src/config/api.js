@@ -24,7 +24,7 @@ api.interceptors.response.use(
         await api.post("/auth/refresh");
         return api(originalRequest);
       } catch (error) {
-        return Promise.reject(refreshError);
+        return Promise.reject(error);
       }
     }
 

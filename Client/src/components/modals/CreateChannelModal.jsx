@@ -1,15 +1,20 @@
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { Hash, Volume2, Megaphone, Lock, Plus } from 'lucide-react';
-import Modal from '../common/Modal';
-import Input from '../common/Input';
-import Button from '../common/Button';
-import { createChannel } from '../../redux/slices/channelSlice';
-import { closeModal, addToast } from '../../redux/slices/uiSlice';
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { Hash, Volume2, Megaphone, Lock, Plus } from "lucide-react";
+import Modal from "../common/Modal";
+import Input from "../common/Input";
+import Button from "../common/Button";
+import { createChannelAsync } from "../../redux/slices/channelSlice";
+import { closeModal, addToast } from "../../redux/slices/uiSlice";
 
-export default function CreateChannelModal({ isOpen, onClose, serverId, defaultType = 'text' }) {
+export default function CreateChannelModal({
+  isOpen,
+  onClose,
+  serverId,
+  defaultType = "text",
+}) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -21,34 +26,54 @@ export default function CreateChannelModal({ isOpen, onClose, serverId, defaultT
     formState: { errors },
   } = useForm({
     defaultValues: {
-      name: '',
+      name: "",
       type: defaultType,
-      topic: '',
+      topic: "",
       isPrivate: false,
     },
   });
 
-  const selectedType = watch('type');
+  const selectedType = watch("type");
 
-  const onSubmit = (data) => {
-    const channelName = data.name.toLowerCase().replace(/\s+/g, '-');
-    dispatch(
-      createChannel({
-        serverId,
-        name: channelName,
-        type: data.type,
-        topic: data.topic,
-        isPrivate: data.isPrivate,
-      })
-    );
+  const onSubmit = async (data) => {
+    const channelName = data.name.toLowerCase().replace(/\s+/g, "-");
+    try {
+      const newChannel = await dispatch(
+        createChannelAsync({
+          serverId,
+          name: channelName,
+          type: data.type,
+          isPrivate: data.isPrivate,
+        }),
+      ).unwrap();
+
+      dispatch(closeModal());
+      reset();
+
+      dispatch(
+        addToast({
+          type: "success",
+          message: `Channel #${channelName} created!`,
+        }),
+      );
+
+      navigate(`/app/server/${serverId}/channel/${newChannel._id}`);
+    } catch (error) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: error || "Unable to create channel",
+        }),
+      );
+    }
 
     dispatch(closeModal());
     reset();
     dispatch(
       addToast({
-        type: 'success',
+        type: "success",
         message: `Channel #${channelName} created!`,
-      })
+      }),
     );
   };
 
@@ -68,9 +93,14 @@ export default function CreateChannelModal({ isOpen, onClose, serverId, defaultT
           </label>
           <div className="grid grid-cols-3 gap-2">
             {[
-              { id: 'text', label: 'Text', desc: 'Transmissions', icon: Hash },
-              { id: 'announcement', label: 'Dispatch', desc: 'Read-only', icon: Megaphone },
-              { id: 'voice', label: 'Audio', desc: 'Stage', icon: Volume2 },
+              { id: "text", label: "Text", desc: "Transmissions", icon: Hash },
+              {
+                id: "announcement",
+                label: "Dispatch",
+                desc: "Read-only",
+                icon: Megaphone,
+              },
+              { id: "voice", label: "Audio", desc: "Stage", icon: Volume2 },
             ].map((t) => {
               const Icon = t.icon;
               return (
@@ -78,15 +108,15 @@ export default function CreateChannelModal({ isOpen, onClose, serverId, defaultT
                   key={t.id}
                   className={`flex flex-col items-center p-3 rounded-xl border cursor-pointer transition-all ${
                     selectedType === t.id
-                      ? 'bg-cyan-500/15 border-cyan-500/50 text-cyan-300'
-                      : 'bg-[#0C0F15] border-white/10 text-slate-400 hover:text-slate-200'
+                      ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-300"
+                      : "bg-[#0C0F15] border-white/10 text-slate-400 hover:text-slate-200"
                   }`}
                 >
                   <input
                     type="radio"
                     value={t.id}
                     className="hidden"
-                    {...register('type')}
+                    {...register("type")}
                   />
                   <Icon className="w-5 h-5 mb-1" />
                   <span className="text-xs font-semibold">{t.label}</span>
@@ -101,9 +131,9 @@ export default function CreateChannelModal({ isOpen, onClose, serverId, defaultT
           label="Channel Name"
           placeholder="e.g. quantum-benchmarks"
           error={errors.name?.message}
-          {...register('name', {
-            required: 'Channel name is required',
-            minLength: { value: 2, message: 'Minimum 2 characters' },
+          {...register("name", {
+            required: "Channel name is required",
+            minLength: { value: 2, message: "Minimum 2 characters" },
           })}
         />
 
@@ -111,7 +141,7 @@ export default function CreateChannelModal({ isOpen, onClose, serverId, defaultT
           label="Topic / Purpose"
           placeholder="Guidelines or topic for this channel"
           error={errors.topic?.message}
-          {...register('topic')}
+          {...register("topic")}
         />
 
         {/* Private Toggle */}
@@ -119,7 +149,7 @@ export default function CreateChannelModal({ isOpen, onClose, serverId, defaultT
           <input
             type="checkbox"
             className="w-4 h-4 rounded bg-[#07080C] border-white/10 text-cyan-500 focus:ring-cyan-500/20"
-            {...register('isPrivate')}
+            {...register("isPrivate")}
           />
           <div className="flex-1">
             <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200">

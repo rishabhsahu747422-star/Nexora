@@ -19,7 +19,7 @@ import ModalManager from "./components/modals/ModalManager";
 import GlobalSearchModal from "./components/layout/GlobalSearchModal";
 
 function RootRedirect() {
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const isAuthenticated = useSelector((state) => state.auth.user);
   return <Navigate to={isAuthenticated ? "/app" : "/login"} replace />;
 }
 

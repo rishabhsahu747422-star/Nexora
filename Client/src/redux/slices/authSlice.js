@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { CURRENT_USER } from "../../data/mockUsers";
 import {
   getMe,
   loginUser,
@@ -13,8 +12,7 @@ export const loginUserAsync = createAsyncThunk(
   "/auth/login",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await loginUser(data);
-      return responseData(response);
+      return await loginUser(data);
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "unable to sign in",
@@ -27,8 +25,7 @@ export const registerUserAsync = createAsyncThunk(
   "/auth/register",
   async (data, { rejectWithValue }) => {
     try {
-      const response = await registerUser(data);
-      return responseData(response);
+      return await registerUser(data);
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Unable to create your account",
@@ -41,7 +38,7 @@ export const getMeAsync = createAsyncThunk(
   "/auth/me",
   async (_, { rejectWithValue }) => {
     try {
-      return responseData(await getMe());
+      return await getMe();
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "your session has expired",
@@ -63,38 +60,16 @@ export const logoutUserAsync = createAsyncThunk(
   },
 );
 
-//AI code start
-// const STORAGE_KEY = "nexora_auth_state";
-
-// const loadPersistedAuth = () => {
-//   try {
-//     const serialized = localStorage.getItem(STORAGE_KEY);
-//     if (serialized) {
-//       return JSON.parse(serialized);
-//     }
-//   } catch (err) {
-//     console.error("Failed to load auth from localStorage:", err);
-//   }
-//   return {
-//     currentUser: CURRENT_USER,
-//     isAuthenticated: true, // Default to true for smooth exploration, can logout
-//     token: "mock_jwt_token_nexora_7849",
-//     loading: false,
-//     error: null,
-//   };
-// };
-
-// const initialState = loadPersistedAuth();
-//AI code end
+const initialState = {
+  user: null,
+  isAuthenticated: false,
+  loading: true,
+  error: null,
+};
 
 export const authSlice = createSlice({
   name: "auth",
-  initialState: {
-    user: null,
-    isAuthenticated: false,
-    loading: true,
-    error: null,
-  },
+  initialState,
   reducers: {
     clearUser: (state) => {
       state.user = null;
@@ -102,81 +77,6 @@ export const authSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
-
-    //AI code start
-    // loginStart: (state) => {
-    //   state.loading = true;
-    //   state.error = null;
-    // },
-    // loginSuccess: (state, action) => {
-    //   state.loading = false;
-    //   state.isAuthenticated = true;
-    //   state.currentUser = action.payload.user;
-    //   state.token = action.payload.token || "mock_jwt_token_nexora_7849";
-    //   state.error = null;
-    //   try {
-    //     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    //   } catch (e) {
-    //     console.error(e);
-    //   }
-    // },
-    // loginFailure: (state, action) => {
-    //   state.loading = false;
-    //   state.error = action.payload;
-    // },
-    // registerSuccess: (state, action) => {
-    //   state.loading = false;
-    //   state.isAuthenticated = true;
-    //   state.currentUser = action.payload.user;
-    //   state.token = "mock_jwt_token_nexora_" + Date.now();
-    //   state.error = null;
-    //   try {
-    //     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    //   } catch (e) {
-    //     console.error(e);
-    //   }
-    // },
-    // logout: (state) => {
-    //   state.isAuthenticated = false;
-    //   state.currentUser = null;
-    //   state.token = null;
-    //   try {
-    //     localStorage.removeItem(STORAGE_KEY);
-    //   } catch (e) {
-    //     console.error(e);
-    //   }
-    // },
-    // updateProfile: (state, action) => {
-    //   if (state.currentUser) {
-    //     state.currentUser = { ...state.currentUser, ...action.payload };
-    //     try {
-    //       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    //     } catch (e) {
-    //       console.error(e);
-    //     }
-    //   }
-    // },
-    // setUserStatus: (state, action) => {
-    //   if (state.currentUser) {
-    //     state.currentUser.status = action.payload;
-    //     try {
-    //       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    //     } catch (e) {
-    //       console.error(e);
-    //     }
-    //   }
-    // },
-    // setCustomStatus: (state, action) => {
-    //   if (state.currentUser) {
-    //     state.currentUser.customStatus = action.payload;
-    //     try {
-    //       localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    //     } catch (e) {
-    //       console.error(e);
-    //     }
-    //   }
-    // },
-    //AI code end
   },
   extraReducers: (builder) => {
     builder
@@ -237,21 +137,13 @@ export const authSlice = createSlice({
       .addCase(logoutUserAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || action.error.message;
+      })
+      .addCase(logoutUserAsync.pending, (state) => {
+        state.loading = true;
       });
   },
 });
 
-export const {
-  clearUser,
-  //AIcode
-  loginStart,
-  loginSuccess,
-  loginFailure,
-  registerSuccess,
-  logout,
-  updateProfile,
-  setUserStatus,
-  setCustomStatus,
-} = authSlice.actions;
+export const { clearUser } = authSlice.actions;
 
 export default authSlice.reducer;

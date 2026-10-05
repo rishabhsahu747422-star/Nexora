@@ -25,33 +25,35 @@ export default function ChannelList({ onCloseMobile }) {
   const navigate = useNavigate();
 
   const servers = useSelector((state) => state.servers.servers);
-  const activeServerId = useSelector((state) => state.servers.activeServerId);
+  const activeServer = useSelector((state) => state.servers.selectedServer);
+  const activeServerId = activeServer?._id;
   const channels = useSelector((state) => state.channels.channels);
   const activeChannelId = useSelector(
     (state) => state.channels.activeChannelId,
   );
-  const activeServer =
-    servers.find((s) => s.id === activeServerId) || servers[0];
 
-  const serverChannels = channels.filter((c) => c.serverId === activeServerId);
+  const serverChannels = channels.filter(
+    (channel) =>
+      channel.server === activeServerId ||
+      channel.server?._id === activeServerId,
+  );
 
   // Group channels by category
   const categories = ["Transmissions", "Broadcasting", "Nexus Audio"];
+
   const grouped = {
-    Transmissions: serverChannels.filter(
-      (c) => c.category === "Transmissions" || c.type === "text",
-    ),
+    Transmissions: serverChannels.filter((channel) => channel.type === "text"),
+
     Broadcasting: serverChannels.filter(
-      (c) => c.category === "Broadcasting" || c.type === "announcement",
+      (channel) => channel.type === "announcement",
     ),
-    "Nexus Audio": serverChannels.filter(
-      (c) => c.category === "Nexus Audio" || c.type === "voice",
-    ),
+
+    "Nexus Audio": serverChannels.filter((channel) => channel.type === "voice"),
   };
 
   const handleSelectChannel = (channel) => {
-    dispatch(selectChannel(channel.id));
-    navigate(`/app/server/${activeServerId}/channel/${channel.id}`);
+    dispatch(selectChannel(channel._id));
+    navigate(`/app/server/${activeServerId}/channel/${channel._id}`);
     if (onCloseMobile) onCloseMobile();
   };
 
@@ -205,8 +207,7 @@ export default function ChannelList({ onCloseMobile }) {
               {/* Channels in Category */}
               <div className="space-y-0.5">
                 {list.map((chan) => {
-                  const isSelected = chan.id === activeChannelId;
-
+                  const isSelected = chan._id === selectedChannel?._id;
                   return (
                     <div
                       key={chan.id}

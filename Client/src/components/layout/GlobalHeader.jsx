@@ -39,11 +39,7 @@ import {
   addToast,
 } from "../../redux/slices/uiSlice";
 import { leaveVoiceChannel, toggleMute } from "../../redux/slices/voiceSlice";
-import {
-  logout,
-  logoutUserAsync,
-  setUserStatus,
-} from "../../redux/slices/authSlice";
+import { logoutUserAsync } from "../../redux/slices/authSlice";
 
 export default function GlobalHeader() {
   const navigate = useNavigate();
@@ -409,7 +405,7 @@ export default function GlobalHeader() {
               ].map((s) => (
                 <button
                   key={s.val}
-                  onClick={() => dispatch(setUserStatus(s.val))}
+                  // onClick={() => dispatch(setUserStatus(s.val))}
                   className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] transition-colors ${
                     currentUser?.status === s.val
                       ? "bg-white/10 text-white font-medium"
