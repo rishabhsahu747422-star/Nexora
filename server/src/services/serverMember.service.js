@@ -1,4 +1,4 @@
-import serverMemberModel from "../models/serverMember.model";
+import serverMemberModel from "../models/serverMember.model.js";
 
 export const createServerMember = async (
   useImperativeHandle,
