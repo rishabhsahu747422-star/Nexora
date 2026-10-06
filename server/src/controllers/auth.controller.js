@@ -365,7 +365,7 @@ export const refreshToken = async (req, res) => {
 
   const isBlacklisted = await redis.get(`Bearer:refreshToken:${refreshToken}`);
 
-  if (!isBlacklisted) {
+  if (isBlacklisted) {
     return res.status(401).json({
       success: false,
       message: "Refresh Token has ben revoked",

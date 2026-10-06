@@ -14,6 +14,7 @@ import userRoutes from "../routes/user.routes.js";
 import messageRoutes from "../routes/message.routes.js";
 import cors from "cors";
 import { errorMiddleware } from "../middlewares/error.middleware.js";
+import channelRoutes from "../routes/channel.routes.js";
 
 const app = express();
 export const server = http.createServer(app);
@@ -47,6 +48,7 @@ app.use("/api/auth", authRoute);
 app.use("/api/server", serverRoute);
 app.use("/api/serverMembers", serverMemberRoutes);
 app.use("/api/roles", roleRoutes);
+app.use("/api/channel", channelRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/messages", messageRoutes);
 

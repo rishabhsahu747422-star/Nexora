@@ -47,12 +47,17 @@ export const createChannel = async (req, res, next) => {
 export const getServerChannels = async (req, res, next) => {
   try {
     await requireMember(req.params.serverId, req.user._id);
-    const channel = (
-      await channelModel.find({ server: req.params.serverId })
-    ).toSorted({ position: 1, createedAt: 1 });
+
+    const channels = await channelModel
+      .find({ server: req.params.serverId })
+      .sort({
+        position: 1,
+        createdAt: 1,
+      });
+
     return res
       .status(200)
-      .json(new ApiResponse(200, channel, "channel fetched successfully"));
+      .json(new ApiResponse(200, channels, "Channels fetched successfully"));
   } catch (error) {
     next(error);
   }

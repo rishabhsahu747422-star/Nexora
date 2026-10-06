@@ -31,15 +31,15 @@ router.post(
   validate,
   register,
 );
-router.get("/login", loginValidator, validate, login);
+router.post("/login", loginValidator, validate, login);
 
-router.post(
-  "google",
+router.get(
+  "/google",
   passport.authenticate("google", { scope: ["Profile", "email"] }),
 ); //is line ka matlab samjhna h
 
 router.get(
-  "google/callback",
+  "/google/callback",
   passport.authenticate("google", { session: false, failureRedirect: "/" }),
   googleAuth,
 ); //line samjh nhi aayi

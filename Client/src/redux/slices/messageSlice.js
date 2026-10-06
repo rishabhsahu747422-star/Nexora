@@ -1,6 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { MOCK_MESSAGES } from "../../data/mockMessages";
-import { MOCK_DM_MESSAGES } from "../../data/mockDms";
 import { createMessage, getMessages } from "../../services/message.service";
 
 const STORAGE_KEY = "nexora_messages_state";
@@ -62,7 +60,12 @@ export const sendMessage = createAsyncThunk(
 
 export const messageSlice = createSlice({
   name: "messages",
-  initialState: { messages: [], loading: false, error: null },
+  initialState: {
+    messages: [],
+    loading: false,
+    error: null,
+    highlightedMessageId: null,
+  },
   reducers: {
     addMessage: (state, action) => {
       if (
@@ -90,6 +93,9 @@ export const messageSlice = createSlice({
           (message._id || message.id) ===
           (action.payload._id || action.payload.id),
       );
+    },
+    setHighlightedMessageId: (state, action) => {
+      state.highlightedMessageId = action.payload;
     },
 
     //AI code
@@ -241,6 +247,7 @@ export const {
   addMessage,
   updateMessage,
   removeMessage,
+  setHighlightedMessageId,
   //AI CODE
   // sendMessage,
   editMessage,
@@ -250,7 +257,6 @@ export const {
   setReplyTarget,
   clearReplyTarget,
   setEditingMessageId,
-  setHighlightedMessageId,
 } = messageSlice.actions;
 
 export default messageSlice.reducer;

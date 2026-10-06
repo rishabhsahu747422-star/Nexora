@@ -74,6 +74,11 @@ export const createServer = async (req, res) => {
     const serverMember = await createServerMember(req.user.id, server._id, [
       ownerRole._id,
     ]);
+
+    await userModel.findByIdAndUpdate(req.user._id, {
+      $push: { server: server._id },
+    });
+
     return res
       .status(201)
       .json(new ApiResponse(201, server, "Server created Succesfully"));
@@ -108,7 +113,7 @@ export const getSingleServer = async (req, res) => {
   try {
     const { serverId } = req.params;
 
-    const server = await serverModel.findById({ serverId });
+    const server = await serverModel.findById(serverId);
 
     if (!server) {
       throw new ApiError(400, "Server not Exist");

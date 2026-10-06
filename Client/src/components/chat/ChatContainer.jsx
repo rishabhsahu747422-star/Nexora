@@ -1,10 +1,10 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import ChannelHeader from '../channel/ChannelHeader';
-import MessageItem from './MessageItem';
-import MessageComposer from './MessageComposer';
-import PinnedMessagesModal from './PinnedMessagesModal';
-import { setHighlightedMessageId } from '../../redux/slices/messageSlice';
+import React, { useRef, useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import ChannelHeader from "../channel/ChannelHeader";
+import MessageItem from "./MessageItem";
+import MessageComposer from "./MessageComposer";
+import PinnedMessagesModal from "./PinnedMessagesModal";
+import { setHighlightedMessageId } from "../../redux/slices/messageSlice";
 
 export default function ChatContainer({ channel }) {
   const dispatch = useDispatch();
@@ -12,12 +12,10 @@ export default function ChatContainer({ channel }) {
   const containerRef = useRef(null);
 
   const contextId = channel?.id;
-  const messages = useSelector(
-    (state) => state.messages.messagesByContext[contextId] || []
-  );
+  const messages = useSelector((state) => state.messages.messages || []);
   const density = useSelector((state) => state.ui.messageDensity);
   const highlightedMessageId = useSelector(
-    (state) => state.messages.highlightedMessageId
+    (state) => state.messages.highlightedMessageId,
   );
 
   const [isPinnedOpen, setIsPinnedOpen] = useState(false);
@@ -25,7 +23,7 @@ export default function ChatContainer({ channel }) {
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = (smooth = true) => {
     messagesEndRef.current?.scrollIntoView({
-      behavior: smooth ? 'smooth' : 'auto',
+      behavior: smooth ? "smooth" : "auto",
     });
   };
 
@@ -42,7 +40,7 @@ export default function ChatContainer({ channel }) {
     dispatch(setHighlightedMessageId(msgId));
     const el = document.getElementById(`msg-${msgId}`);
     if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
     }
   };
 
@@ -78,17 +76,20 @@ export default function ChatContainer({ channel }) {
               Welcome to #{channel?.name}!
             </h3>
             <p className="text-xs text-slate-400 max-w-sm mt-1">
-              This is the start of the transmission stream. Send the first message to ignite the conversation.
+              This is the start of the transmission stream. Send the first
+              message to ignite the conversation.
             </p>
           </div>
         ) : (
           messages.map((message) => (
             <MessageItem
-              key={message.id}
+              key={message._id}
               message={message}
               contextId={contextId}
               density={density}
-              isHighlighted={highlightedMessageId === message.id}
+              isHighlighted={
+                highlightedMessageId === (message._id || message.id)
+              }
               onJumpToReply={handleJumpToMessage}
             />
           ))
@@ -99,7 +100,7 @@ export default function ChatContainer({ channel }) {
       {/* Composer Deck */}
       <MessageComposer
         contextId={contextId}
-        placeholder={`Transmit to #${channel?.name || 'channel'}...`}
+        placeholder={`Transmit to #${channel?.name || "channel"}...`}
       />
 
       {/* Pinned Messages Modal */}

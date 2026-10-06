@@ -24,8 +24,8 @@ export default function ChannelList({ onCloseMobile }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const servers = useSelector((state) => state.servers.servers);
-  const activeServer = useSelector((state) => state.servers.selectedServer);
+  const servers = useSelector((state) => state.server.servers);
+  const activeServer = useSelector((state) => state.server.selectedServer);
   const activeServerId = activeServer?._id;
   const channels = useSelector((state) => state.channels.channels);
   const activeChannelId = useSelector(

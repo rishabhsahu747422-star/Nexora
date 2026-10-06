@@ -5,7 +5,7 @@ const data = (response) => response.data?.data ?? response.data;
 export const createServer = async (payload) =>
   data(await api.post("/server/create", payload));
 
-export const getServers = async (serverId) => data(await api.get(`/server`));
+export const getServers = async () => data(await api.get(`/server`)).servers;
 
 export const getServer = async (serverId) => {
   const response = await api.get(`/server/${serverId}`);

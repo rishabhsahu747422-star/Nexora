@@ -4,6 +4,7 @@ import {
   createServer,
   deleteServer,
   getAllServer,
+  getSingleServer,
   joinServer,
   leaveServer,
   updateServer,
@@ -15,7 +16,6 @@ import {
   inviteCodeValidator,
 } from "../validators/server.validator.js";
 import { validate } from "../middlewares/validatte.middleware.js";
-import { getServer } from "../../../Client/src/services/server.service.js";
 
 const router = express.Router();
 
@@ -41,7 +41,7 @@ router.post(
 
 router.get("/", authMiddleware, getAllServer);
 // router.post("/",authMiddleware,upload.fields([{name:"icon",maxCount:1},{name:"banner",maxCount:1}]),createServer)
-router.get("/:serverId", authMiddleware, getServer);
+router.get("/:serverId", authMiddleware, getSingleServer);
 router.patch("/:serverId", authMiddleware, updateServer);
 router.delete("/:serverId", authMiddleware, deleteServer);
 router.post("/:serverId/invite", authMiddleware, createInvite);

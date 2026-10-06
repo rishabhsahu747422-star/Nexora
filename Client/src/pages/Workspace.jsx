@@ -23,7 +23,7 @@ import FriendsHub from "../components/friends/FriendsHub";
 import Button from "../components/common/Button";
 import Avatar from "../components/common/Avatar";
 import Badge from "../components/common/Badge";
-import { selectServer } from "../redux/slices/serverSlice";
+import { fetchServers, selectServer } from "../redux/slices/serverSlice";
 import { selectDm } from "../redux/slices/dmSlice";
 import { openModal } from "../redux/slices/uiSlice";
 
@@ -33,13 +33,9 @@ export default function Workspace() {
   const location = useLocation();
   const { serverId, channelId, dmId } = useParams();
 
-  const servers = useSelector((state) => state.servers.servers);
-  const activeServerId = useSelector((state) => state.servers.activeServerId);
-  const activeChannelId = useSelector(
-    (state) => state.channels.activeChannelId,
-  );
+  const servers = useSelector((state) => state.server.servers);
 
-  const selectedServer = useSelector((state) => state.servers.selectedServer);
+  const selectedServer = useSelector((state) => state.server.selectedServer);
 
   const channels = useSelector((state) => state.channels.channels);
 
@@ -48,6 +44,10 @@ export default function Workspace() {
   );
   const activeDmId = useSelector((state) => state.dms.activeDmId);
   const currentUser = useSelector((state) => state.auth.user);
+
+  useEffect(() => {
+    dispatch(fetchServers());
+  }, [dispatch]);
 
   // Sync URL params with Redux state
   useEffect(() => {
@@ -62,18 +62,6 @@ export default function Workspace() {
       dispatch(selectChannel(channelId));
     }
   }, [channelId, dispatch]);
-
-  // useEffect(() => {
-  //   if (serverId && serverId !== activeServerId) {
-  //     dispatch(selectServer(serverId));
-  //   }
-  // }, [serverId, activeServerId, dispatch]);
-
-  // useEffect(() => {
-  //   if (channelId && channelId !== activeChannelId) {
-  //     dispatch(selectChannel(channelId));
-  //   }
-  // }, [channelId, activeChannelId, dispatch]);
 
   useEffect(() => {
     if (dmId && dmId !== activeDmId) {
@@ -220,9 +208,9 @@ export default function Workspace() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {servers.map((srv) => (
                     <div
-                      key={srv.id}
+                      key={srv._id}
                       onClick={() => {
-                        dispatch(selectServer(srv.id));
+                        dispatch(selectServer(srv._id));
                         const def = channels.find((c) => c.serverId === srv.id);
                         if (def) {
                           dispatch(selectChannel(def.id));

@@ -54,8 +54,7 @@ export default function GlobalHeader() {
   const currentUser = useSelector((state) => state.auth.user);
   console.log(currentUser);
 
-  const servers = useSelector((state) => state.servers.servers);
-  const activeServerId = useSelector((state) => state.servers.activeServerId);
+  const servers = useSelector((state) => state.server.servers);
   const channels = useSelector((state) => state.channels.channels);
   const notifications = useSelector(
     (state) => state.notifications.notifications,
@@ -63,8 +62,8 @@ export default function GlobalHeader() {
   const voice = useSelector((state) => state.voice);
   const dms = useSelector((state) => state.dms.conversations);
 
-  const activeServer =
-    servers.find((s) => s.id === activeServerId) || servers[0];
+  const activeServer = useSelector((state) => state.server.selectedServer);
+  const activeServerId = activeServer?._id;
   const unreadNotifsCount = notifications.filter((n) => !n.read).length;
   const unreadDmsCount = dms.reduce((acc, d) => acc + (d.unreadCount || 0), 0);
 

@@ -8,7 +8,7 @@ const serverSchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      ref: "user",
+      ref: "users",
     },
     description: {
       type: String,
@@ -37,6 +37,6 @@ const serverSchema = new mongoose.Schema(
   },
 );
 
-const serverModel = mongoose.model("server", serverSchema);
+const serverModel = mongoose.model("servers", serverSchema);
 
 export default serverModel;

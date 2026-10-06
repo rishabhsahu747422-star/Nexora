@@ -12,7 +12,7 @@ import uiReducer from "./slices/uiSlice";
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    servers: serverReducer,
+    server: serverReducer,
     channels: channelReducer,
     messages: messageReducer,
     // AI code
