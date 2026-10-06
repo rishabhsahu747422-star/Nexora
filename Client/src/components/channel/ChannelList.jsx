@@ -18,10 +18,10 @@ import Dropdown from "../common/Dropdown";
 import Badge from "../common/Badge";
 import { selectChannel } from "../../redux/slices/channelSlice";
 import { openModal, addToast } from "../../redux/slices/uiSlice";
-// import {
-//   createNitroOrder,
-//   verifyNitroPayment,
-// } from "../../services/payment.service";
+import {
+  createOrder,
+  verifyNexPayment,
+} from "../../services/payment.service";
 // import { leaveServer } from '../../redux/slices/serverSlice';
 
 export default function ChannelList({ onCloseMobile }) {
@@ -64,81 +64,81 @@ export default function ChannelList({ onCloseMobile }) {
     if (onCloseMobile) onCloseMobile();
   };
 
-  // const handlePayment = async () => {
-  //   if (isLoading) return;
+  const handlePayment = async () => {
+    if (isLoading) return;
 
-  //   setIsLoading(true);
-  //   try {
-  //     if (!window.Razorpay) {
-  //       throw new Error(
-  //         "Razorpay checkout did not load. Check your internet connection and try again.",
-  //       );
-  //     }
+    setIsLoading(true);
+    try {
+      if (!window.Razorpay) {
+        throw new Error(
+          "Razorpay checkout did not load. Check your internet connection and try again.",
+        );
+      }
 
-  //     const response = await createNitroOrder();
-  //     const order = response.data;
+      const response = await createOrder();
+      const order = response.data;
 
-  //     if (!order?.keyId || !order?.orderId) {
-  //       throw new Error("The server did not return a valid Razorpay order.");
-  //     }
+      if (!order?.keyId || !order?.orderId) {
+        throw new Error("The server did not return a valid Razorpay order.");
+      }
 
-  //     const option = {
-  //       key: order.keyId,
-  //       amount: order.amount,
-  //       currency: order.currency,
-  //       name: "Nexora",
-  //       description: "The Next-Gen community & Communication Platform",
-  //       order_id: order.orderId,
-  //       handler: async (paymentResponse) => {
-  //         try {
-  //           await verifyNitroPayment(paymentResponse);
-  //           dispatch(
-  //             addToast({
-  //               type: "success",
-  //               message: "Nex+ activated for 30 days.",
-  //             }),
-  //           );
-  //         } catch (error) {
-  //           dispatch(
-  //             addToast({
-  //               type: "error",
-  //               message:
-  //                 error.response?.data?.message || "Unable to verify payment.",
-  //             }),
-  //           );
-  //         } finally {
-  //           setIsLoading(false);
-  //         }
-  //       },
-  //       modal: {
-  //         ondismiss: () => setIsLoading(false),
-  //       },
-  //     };
+      const option = {
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        name: "Nexora",
+        description: "The Next-Gen community & Communication Platform",
+        order_id: order.orderId,
+        handler: async (paymentResponse) => {
+          try {
+            await verifyNexPayment(paymentResponse);
+            dispatch(
+              addToast({
+                type: "success",
+                message: "Nex+ activated for 30 days.",
+              }),
+            );
+          } catch (error) {
+            dispatch(
+              addToast({
+                type: "error",
+                message:
+                  error.response?.data?.message || "Unable to verify payment.",
+              }),
+            );
+          } finally {
+            setIsLoading(false);
+          }
+        },
+        modal: {
+          ondismiss: () => setIsLoading(false),
+        },
+      };
 
-  //     const razorpay = new window.Razorpay(option);
-  //     razorpay.on("payment.failed", () => {
-  //       dispatch(
-  //         addToast({
-  //           type: "error",
-  //           message: "Payment was not completed. Please try again.",
-  //         }),
-  //       );
-  //       setIsLoading(false);
-  //     });
-  //     razorpay.open();
-  //   } catch (error) {
-  //     dispatch(
-  //       addToast({
-  //         type: "error",
-  //         message:
-  //           error.response?.data?.message ||
-  //           error.message ||
-  //           "Unable to start payment.",
-  //       }),
-  //     );
-  //     setIsLoading(false);
-  //   }
-  // };
+      const razorpay = new window.Razorpay(option);
+      razorpay.on("payment.failed", () => {
+        dispatch(
+          addToast({
+            type: "error",
+            message: "Payment was not completed. Please try again.",
+          }),
+        );
+        setIsLoading(false);
+      });
+      razorpay.open();
+    } catch (error) {
+      dispatch(
+        addToast({
+          type: "error",
+          message:
+            error.response?.data?.message ||
+            error.message ||
+            "Unable to start payment.",
+        }),
+      );
+      setIsLoading(false);
+    }
+  };
 
   const getChannelIcon = (type) => {
     switch (type) {
@@ -254,7 +254,7 @@ export default function ChannelList({ onCloseMobile }) {
         <p className="text-[11px] text-slate-400 px-1.5 mt-1 line-clamp-1">
           {activeServer?.description}
         </p>
-        {/* <button
+        <button
           onClick={handlePayment}
           disabled={isLoading}
           className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-gradient-to-r from-cyan-500/15 to-indigo-500/15 px-3 py-2 text-xs font-semibold text-cyan-200 transition-colors hover:border-cyan-300/50 hover:from-cyan-500/25 hover:to-indigo-500/25 disabled:cursor-wait disabled:opacity-60"
@@ -262,7 +262,7 @@ export default function ChannelList({ onCloseMobile }) {
         >
           <Sparkles className="h-3.5 w-3.5" />
           <span>{isLoading ? "Opening checkout..." : "Nex+"}</span>
-        </button> */}
+        </button>
       </div>
 
       {/* Channel Categories & List */}

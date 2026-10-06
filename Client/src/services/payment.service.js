@@ -1,20 +1,18 @@
-// import { createOrder } from "../../../server/src/controllers/payment.controller.js";
-// import api from "../config/api.js";
+import api from "../config/api.js";
 
-// export const createNitroOrder = async () => {
-//   const response = await api.post("/payments/create-order", createOrder);
+export const createOrder = async () => {
+  const response = await api.post("/payments/create-order");
+  return response.data;
+};
 
-//   return response.data;
-// };
+export const verifyNexPayment = async (paymentDetails) => {
+  const response = await api.post("/payments/verify", paymentDetails);
 
-// export const verifyNitroPayment = async (paymentDetails) => {
-//   const response = await api.post("/payments/verify", paymentDetails);
+  return response.data;
+};
 
-//   return response.data;
-// };
+export const getMyNex = async () => {
+  const response = await api.get("/payments/nex");
 
-// export const getMyNitro = async () => {
-//   const response = await api.get("/payments/nex+");
-
-//   return response.data;
-// };
+  return response.data;
+};

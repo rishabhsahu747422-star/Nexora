@@ -31,7 +31,7 @@ const paymentSchema = new mongoose.Schema(
     },
     product: {
       type: String,
-      enum: ["nitro"],
+      enum: ["Nex"],
       required: true,
     },
   },
