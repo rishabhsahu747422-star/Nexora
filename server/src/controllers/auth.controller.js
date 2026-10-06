@@ -40,14 +40,14 @@ export const register = async (req, res, next) => {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       maxAge: 10 * 60 * 1000,
-      secure: false,
+      secure: true,
       sameSite: "strict",
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      secure: false,
+      secure: true,
       sameSite: "strict",
     });
 
@@ -102,14 +102,14 @@ export const login = async (req, res, next) => {
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       maxAge: 10 * 60 * 1000,
-      secure: false,
+      secure: true,
       sameSite: "strict",
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
-      secure: false,
+      secure: true,
       sameSite: "strict",
     });
 
