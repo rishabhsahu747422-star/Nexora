@@ -21,7 +21,7 @@ const nitroSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["activa", "expire", "cancelled"],
+      enum: ["active", "expired", "cancelled"],
       default: "active",
     },
     razorpayOrderId: {
