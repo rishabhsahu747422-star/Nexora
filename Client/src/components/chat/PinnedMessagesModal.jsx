@@ -1,19 +1,27 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { Pin, Trash2, ExternalLink } from 'lucide-react';
-import Modal from '../common/Modal';
-import Avatar from '../common/Avatar';
-import { togglePinMessage, setHighlightedMessageId } from '../../redux/slices/messageSlice';
-import { addToast } from '../../redux/slices/uiSlice';
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Pin, Trash2, ExternalLink } from "lucide-react";
+import Modal from "../common/Modal";
+import Avatar from "../common/Avatar";
+import {
+  togglePinMessage,
+  setHighlightedMessageId,
+} from "../../redux/slices/messageSlice";
+import { addToast } from "../../redux/slices/uiSlice";
 
-export default function PinnedMessagesModal({ isOpen, onClose, contextId, onJumpToMessage }) {
+export default function PinnedMessagesModal({
+  isOpen,
+  onClose,
+  contextId,
+  onJumpToMessage,
+}) {
   const dispatch = useDispatch();
-  const messages = useSelector((state) => state.messages.messagesByContext[contextId] || []);
+  const messages = useSelector((state) => state.messages.messages || []);
   const pinnedMessages = messages.filter((m) => m.isPinned);
 
   const handleUnpin = (msgId) => {
     dispatch(togglePinMessage({ contextId, messageId: msgId }));
-    dispatch(addToast({ type: 'info', message: 'Transmission unpinned.' }));
+    dispatch(addToast({ type: "info", message: "Transmission unpinned." }));
   };
 
   const handleJump = (msgId) => {
@@ -27,7 +35,7 @@ export default function PinnedMessagesModal({ isOpen, onClose, contextId, onJump
       isOpen={isOpen}
       onClose={onClose}
       title="Pinned Transmissions"
-      subtitle={`${pinnedMessages.length} message${pinnedMessages.length === 1 ? '' : 's'} pinned in this stream`}
+      subtitle={`${pinnedMessages.length} message${pinnedMessages.length === 1 ? "" : "s"} pinned in this stream`}
       maxWidth="max-w-xl"
     >
       <div className="space-y-3">
@@ -43,7 +51,11 @@ export default function PinnedMessagesModal({ isOpen, onClose, contextId, onJump
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Avatar src={msg.authorAvatar} name={msg.authorName} size="xs" />
+                  <Avatar
+                    src={msg.authorAvatar}
+                    name={msg.authorName}
+                    size="xs"
+                  />
                   <span className="text-xs font-semibold text-slate-200">
                     {msg.authorName}
                   </span>

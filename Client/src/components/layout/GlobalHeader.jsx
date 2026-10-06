@@ -52,7 +52,7 @@ export default function GlobalHeader() {
   };
 
   const currentUser = useSelector((state) => state.auth.user);
-  console.log(currentUser);
+  // console.log(currentUser);
 
   const servers = useSelector((state) => state.server.servers);
   const channels = useSelector((state) => state.channels.channels);
@@ -79,16 +79,8 @@ export default function GlobalHeader() {
   const activeTab = getActiveTab();
 
   const handleServerSwitch = (server) => {
-    dispatch(selectServer(server.id));
-    const defaultChan = channels.find((c) => c.serverId === server.id) || {
-      id: server.defaultChannelId,
-    };
-    if (defaultChan) {
-      dispatch(selectChannel(defaultChan.id));
-      navigate(`/app/server/${server.id}/channel/${defaultChan.id}`);
-    } else {
-      navigate(`/app/server/${server.id}`);
-    }
+    dispatch(selectServer(server._id));
+    navigate(`/app/server/${server._id}`);
   };
 
   return (
@@ -147,10 +139,10 @@ export default function GlobalHeader() {
             </div>
 
             {servers.map((srv) => {
-              const isSelected = srv.id === activeServerId;
+              const isSelected = srv._id === activeServerId;
               return (
                 <div
-                  key={srv.id}
+                  key={srv._id}
                   onClick={() => handleServerSwitch(srv)}
                   className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors ${
                     isSelected
@@ -207,14 +199,9 @@ export default function GlobalHeader() {
 
         <button
           onClick={() => {
-            const defChan = channels.find(
-              (c) => c.serverId === activeServer.id,
-            );
-            if (defChan) {
-              navigate(`/app/server/${activeServer.id}/channel/${defChan.id}`);
-            } else {
-              navigate(`/app/server/${activeServer.id}`);
-            }
+            if (!activeServer?._id) return;
+
+            navigate(`/app/server/${activeServer._id}`);
           }}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
             activeTab === "communities"

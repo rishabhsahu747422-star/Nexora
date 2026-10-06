@@ -1,30 +1,31 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Shield, Sparkles } from 'lucide-react';
-import Avatar from '../common/Avatar';
-import { openModal } from '../../redux/slices/uiSlice';
-import { MOCK_USERS } from '../../data/mockUsers';
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Shield, Sparkles } from "lucide-react";
+import Avatar from "../common/Avatar";
+import { openModal } from "../../redux/slices/uiSlice";
+import { MOCK_USERS } from "../../data/mockUsers";
 
 export default function MemberList({ onCloseMobile }) {
   const dispatch = useDispatch();
-  const activeServerId = useSelector((state) => state.servers.activeServerId);
-  const activeServer = useSelector((state) =>
-    state.servers.servers.find((s) => s.id === activeServerId)
-  );
+
+  const activeServer = useSelector((state) => state.server.selectedServer);
+  const activeServerId = activeServer?._id;
 
   // Filter members belonging to this active server
-  const serverMemberIds = activeServer?.members || ['usr_me'];
-  const serverMembers = MOCK_USERS.filter((u) => serverMemberIds.includes(u.id));
+  const serverMemberIds = activeServer?.members || ["usr_me"];
+  const serverMembers = MOCK_USERS.filter((u) =>
+    serverMemberIds.includes(u.id),
+  );
 
   // Group by status
   const onlineMembers = serverMembers.filter(
-    (m) => m.status === 'online' || m.status === 'dnd'
+    (m) => m.status === "online" || m.status === "dnd",
   );
-  const idleMembers = serverMembers.filter((m) => m.status === 'idle');
-  const offlineMembers = serverMembers.filter((m) => m.status === 'offline');
+  const idleMembers = serverMembers.filter((m) => m.status === "idle");
+  const offlineMembers = serverMembers.filter((m) => m.status === "offline");
 
   const handleMemberClick = (user) => {
-    dispatch(openModal({ type: 'PROFILE', props: { user } }));
+    dispatch(openModal({ type: "PROFILE", props: { user } }));
     if (onCloseMobile) onCloseMobile();
   };
 
@@ -56,7 +57,7 @@ export default function MemberList({ onCloseMobile }) {
                   </span>
                   {member.roles?.[0] && (
                     <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-white/5 text-slate-400">
-                      {member.roles[0].split(' ')[0]}
+                      {member.roles[0].split(" ")[0]}
                     </span>
                   )}
                 </div>
@@ -86,9 +87,9 @@ export default function MemberList({ onCloseMobile }) {
         </span>
       </div>
 
-      {renderGroup('Online & Active', onlineMembers)}
-      {renderGroup('Away / Idle', idleMembers)}
-      {renderGroup('Offline', offlineMembers)}
+      {renderGroup("Online & Active", onlineMembers)}
+      {renderGroup("Away / Idle", idleMembers)}
+      {renderGroup("Offline", offlineMembers)}
     </div>
   );
 }

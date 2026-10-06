@@ -1,25 +1,23 @@
-import React, { useRef, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { Shield, PhoneCall, Video, User } from 'lucide-react';
-import Avatar from '../common/Avatar';
-import MessageItem from '../chat/MessageItem';
-import MessageComposer from '../chat/MessageComposer';
-import { openModal } from '../../redux/slices/uiSlice';
+import React, { useRef, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { Shield, PhoneCall, Video, User } from "lucide-react";
+import Avatar from "../common/Avatar";
+import MessageItem from "../chat/MessageItem";
+import MessageComposer from "../chat/MessageComposer";
+import { openModal } from "../../redux/slices/uiSlice";
 
 export default function DmConversation({ dmId }) {
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
   const conversation = useSelector((state) =>
-    state.dms.conversations.find((c) => c.id === dmId)
+    state.dms.conversations.find((c) => c.id === dmId),
   );
-  const messages = useSelector(
-    (state) => state.messages.messagesByContext[dmId] || []
-  );
+  const messages = useSelector((state) => state.messages.messages || []);
   const density = useSelector((state) => state.ui.messageDensity);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, dmId]);
 
   if (!conversation) {
@@ -38,7 +36,7 @@ export default function DmConversation({ dmId }) {
           onClick={() =>
             dispatch(
               openModal({
-                type: 'PROFILE',
+                type: "PROFILE",
                 props: {
                   user: {
                     id: conversation.recipientId,
@@ -48,7 +46,7 @@ export default function DmConversation({ dmId }) {
                     status: conversation.status,
                   },
                 },
-              })
+              }),
             )
           }
           className="flex items-center gap-3 cursor-pointer hover:opacity-90"
@@ -92,7 +90,7 @@ export default function DmConversation({ dmId }) {
             {conversation.name}
           </h4>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
-            This is the very beginning of your direct transmission history with{' '}
+            This is the very beginning of your direct transmission history with{" "}
             <span className="text-cyan-400">@{conversation.username}</span>.
           </p>
         </div>

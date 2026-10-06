@@ -1,5 +1,5 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
 import {
   Hash,
   Volume2,
@@ -10,30 +10,29 @@ import {
   Users,
   Radio,
   PhoneCall,
-} from 'lucide-react';
-import { openModal, toggleMobileMembers } from '../../redux/slices/uiSlice';
-import { joinVoiceChannel } from '../../redux/slices/voiceSlice';
+} from "lucide-react";
+import { openModal, toggleMobileMembers } from "../../redux/slices/uiSlice";
+import { joinVoiceChannel } from "../../redux/slices/voiceSlice";
 
 export default function ChannelHeader({ channel, onOpenPinned }) {
   const dispatch = useDispatch();
   const voice = useSelector((state) => state.voice);
-  const activeServerId = useSelector((state) => state.servers.activeServerId);
-  const activeServer = useSelector((state) =>
-    state.servers.servers.find((s) => s.id === activeServerId)
-  );
+
+  const activeServer = useSelector((state) => state.server.selectedServer);
+  const activeServerId = activeServer?._id;
 
   if (!channel) return null;
 
-  const isVoice = channel.type === 'voice';
+  const isVoice = channel.type === "voice";
 
   return (
     <div className="h-14 bg-[#10141C] border-b border-white/10 px-4 flex items-center justify-between z-10 flex-shrink-0">
       {/* Left: Channel Indicator, Name, Topic */}
       <div className="flex items-center gap-2.5 min-w-0">
         <div className="p-1.5 rounded-lg bg-white/5 text-cyan-400">
-          {channel.type === 'voice' ? (
+          {channel.type === "voice" ? (
             <Volume2 className="w-4 h-4 text-emerald-400" />
-          ) : channel.type === 'announcement' ? (
+          ) : channel.type === "announcement" ? (
             <Megaphone className="w-4 h-4 text-indigo-400" />
           ) : (
             <Hash className="w-4 h-4 text-cyan-400" />
@@ -65,7 +64,7 @@ export default function ChannelHeader({ channel, onOpenPinned }) {
                   channelId: channel.id,
                   channelName: channel.name,
                   existingParticipants: channel.activeParticipants || [],
-                })
+                }),
               )
             }
             className="flex items-center gap-1.5 bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/30 text-emerald-300 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors"

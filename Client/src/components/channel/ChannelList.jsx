@@ -32,6 +32,8 @@ export default function ChannelList({ onCloseMobile }) {
     (state) => state.channels.activeChannelId,
   );
 
+  const activeChannel = useSelector((state) => state.channels.selectedChannel);
+
   const serverChannels = channels.filter(
     (channel) =>
       channel.server === activeServerId ||
@@ -55,6 +57,15 @@ export default function ChannelList({ onCloseMobile }) {
     dispatch(selectChannel(channel._id));
     navigate(`/app/server/${activeServerId}/channel/${channel._id}`);
     if (onCloseMobile) onCloseMobile();
+  };
+
+  const handleNexPlusClick = () => {
+    dispatch(
+      addToast({
+        type: "info",
+        message: "Nex+ checkout is coming soon.",
+      }),
+    );
   };
 
   const getChannelIcon = (type) => {
@@ -171,6 +182,14 @@ export default function ChannelList({ onCloseMobile }) {
         <p className="text-[11px] text-slate-400 px-1.5 mt-1 line-clamp-1">
           {activeServer?.description}
         </p>
+        <button
+          onClick={handleNexPlusClick}
+          className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-gradient-to-r from-cyan-500/15 to-indigo-500/15 px-3 py-2 text-xs font-semibold text-cyan-200 transition-colors hover:border-cyan-300/50 hover:from-cyan-500/25 hover:to-indigo-500/25"
+          title="Explore Nex+"
+        >
+          <Sparkles className="h-3.5 w-3.5" />
+          <span>Nex+</span>
+        </button>
       </div>
 
       {/* Channel Categories & List */}
@@ -207,7 +226,7 @@ export default function ChannelList({ onCloseMobile }) {
               {/* Channels in Category */}
               <div className="space-y-0.5">
                 {list.map((chan) => {
-                  const isSelected = chan._id === selectedChannel?._id;
+                  const isSelected = chan._id === activeChannel?._id;
                   return (
                     <div
                       key={chan.id}

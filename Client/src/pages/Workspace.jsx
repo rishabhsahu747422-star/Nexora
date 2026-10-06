@@ -211,13 +211,7 @@ export default function Workspace() {
                       key={srv._id}
                       onClick={() => {
                         dispatch(selectServer(srv._id));
-                        const def = channels.find((c) => c.serverId === srv.id);
-                        if (def) {
-                          dispatch(selectChannel(def.id));
-                          navigate(`/app/server/${srv.id}/channel/${def.id}`);
-                        } else {
-                          navigate(`/app/server/${srv.id}`);
-                        }
+                        navigate(`/app/server/${srv._id}`);
                       }}
                       className="group bg-[#10141C] hover:bg-[#151A23] border border-white/10 hover:border-cyan-500/40 rounded-2xl p-5 cursor-pointer transition-all duration-300 shadow-xl flex flex-col justify-between"
                     >
