@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://nexora-qhdp.onrender.com/api",
+  baseURL: "https://nexora-ikwc.onrender.com/api",
   withCredentials: true,
 });
 
