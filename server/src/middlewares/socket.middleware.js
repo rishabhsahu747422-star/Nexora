@@ -1,34 +1,30 @@
 import jwt from "jsonwebtoken";
 import ApiError from "../utils/ApiError.js";
 import userModel from "../models/user.model.js";
-import redis from "../config/redis.js";
+import { isTokenBlocklisted } from "../services/tokenBlocklist.service.js";
 
 export const socketMiddleware = async (socket, next) => {
   try {
+    let accessToken = null;
     const cookies = socket.handshake.headers.cookie;
-    if (!cookies) {
+    if (cookies) {
+      accessToken = cookies
+        .split(";")
+        .map((c) => c.trim())
+        .find((cookie) => cookie.startsWith("accessToken="))
+        ?.split("=")[1];
+    }
+
+    if (!accessToken && socket.handshake.auth?.token) {
+      accessToken = socket.handshake.auth.token;
+    }
+
+    if (!accessToken) {
       throw new ApiError(401, "Auth is required from socket middleware");
     }
 
-    const accessToken = cookies
-      .split(";")
-      .map((c) => c.trim())
-      .find((cookie) => cookie.startsWith("accessToken="))
-      ?.split("=")[1];
-
-    if (!accessToken) {
-      throw new ApiError(401, "unauthorized");
-    }
-
-    let isBlocklisted = null;
-    try {
-      if (redis.status === "ready") {
-        isBlocklisted = await redis.get(`Bearer:accessToken:${accessToken}`);
-      }
-    } catch (err) {
-      console.warn("Redis socket blocklist check skipped:", err.message);
-    }
-    if (isBlocklisted) {
+    const isRevoked = await isTokenBlocklisted(accessToken, "accessToken");
+    if (isRevoked) {
       throw new ApiError(403, "Token is Invalid or Revoked");
     }
 

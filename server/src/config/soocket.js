@@ -6,6 +6,30 @@ import ApiError from "../utils/ApiError.js";
 import serverMemberModel from "../models/serverMember.model.js";
 
 let io = null;
+const voiceRooms = new Map();
+const socketToVoiceRoom = new Map();
+
+const handleVoiceLeave = (socket, channelId) => {
+  if (!channelId) return;
+  socketToVoiceRoom.delete(socket.id);
+
+  if (voiceRooms.has(channelId)) {
+    const roomMap = voiceRooms.get(channelId);
+    roomMap.delete(socket.id);
+    if (roomMap.size === 0) {
+      voiceRooms.delete(channelId);
+    }
+  }
+
+  socket.leave(`voice:${channelId}`);
+
+  if (io && socket.user) {
+    io.to(`voice:${channelId}`).emit("voice:participant-left", {
+      socketId: socket.id,
+      userId: socket.user._id ? socket.user._id.toString() : socket.id,
+    });
+  }
+};
 
 export const socketIntialise = (server) => {
   io = new Server(server, {
@@ -83,7 +107,143 @@ export const socketIntialise = (server) => {
       socket.leave(`conversation:${conversationId}`);
     });
 
+    // Voice channel room management & signaling
+    socket.on("voice:join", async (data) => {
+      try {
+        const channelId = typeof data === "string" ? data : data?.channelId;
+        if (!channelId) {
+          throw new ApiError(400, "channelId is required for voice join");
+        }
+
+        const channel = await channelModel.findById(channelId);
+        if (!channel) {
+          throw new ApiError(404, "Voice channel not found");
+        }
+        if (channel.type !== "voice") {
+          throw new ApiError(400, "Requested channel is not a voice channel");
+        }
+
+        const member = await serverMemberModel.findOne({
+          server: channel.server,
+          user: socket.user._id,
+        });
+        if (!member) {
+          throw new ApiError(403, "You are not an authorized member of this server");
+        }
+
+        // Leave any previous voice room if switching rooms
+        const prevRoomId = socketToVoiceRoom.get(socket.id);
+        if (prevRoomId && prevRoomId !== channelId) {
+          handleVoiceLeave(socket, prevRoomId);
+        }
+
+        if (!voiceRooms.has(channelId)) {
+          voiceRooms.set(channelId, new Map());
+        }
+        const roomMap = voiceRooms.get(channelId);
+
+        const participantData = {
+          socketId: socket.id,
+          userId: socket.user._id.toString(),
+          user: {
+            _id: socket.user._id.toString(),
+            username: socket.user.username,
+            fullname: socket.user.fullname,
+            profile_pic: socket.user.profile_pic,
+          },
+          muted: !!data?.muted,
+          deafened: !!data?.deafened,
+          video: !!data?.video,
+        };
+
+        const existingParticipants = Array.from(roomMap.values());
+
+        roomMap.set(socket.id, participantData);
+        socketToVoiceRoom.set(socket.id, channelId);
+
+        socket.join(`voice:${channelId}`);
+
+        socket.emit("voice:joined", {
+          channelId,
+          channelName: channel.name,
+          serverId: channel.server.toString(),
+          participants: existingParticipants,
+          existingParticipants,
+        });
+
+        socket.to(`voice:${channelId}`).emit("voice:participant-joined", participantData);
+      } catch (err) {
+        socket.emit("voice:error", {
+          code: err.statusCode || 500,
+          message: err.message,
+        });
+      }
+    });
+
+    socket.on("voice:signal", (data) => {
+      try {
+        const { targetSocketId, signal } = data || {};
+        if (!targetSocketId || !signal) {
+          throw new ApiError(400, "Invalid signaling payload");
+        }
+
+        const senderRoomId = socketToVoiceRoom.get(socket.id);
+        if (!senderRoomId) {
+          throw new ApiError(403, "Sender is not connected to a voice channel");
+        }
+
+        const targetRoomId = socketToVoiceRoom.get(targetSocketId);
+        if (targetRoomId !== senderRoomId) {
+          throw new ApiError(403, "Target peer is not in the same voice room");
+        }
+
+        io.to(targetSocketId).emit("voice:signal", {
+          from: socket.id,
+          senderSocketId: socket.id,
+          senderUserId: socket.user._id.toString(),
+          signal,
+        });
+      } catch (err) {
+        socket.emit("voice:error", {
+          code: err.statusCode || 500,
+          message: err.message,
+        });
+      }
+    });
+
+    socket.on("voice:toggle-media", (data) => {
+      const channelId = socketToVoiceRoom.get(socket.id);
+      if (!channelId || !voiceRooms.has(channelId)) return;
+
+      const roomMap = voiceRooms.get(channelId);
+      const participant = roomMap.get(socket.id);
+      if (participant) {
+        if (data.muted !== undefined) participant.muted = !!data.muted;
+        if (data.deafened !== undefined) participant.deafened = !!data.deafened;
+        if (data.video !== undefined) participant.video = !!data.video;
+
+        io.to(`voice:${channelId}`).emit("voice:participant-updated", {
+          socketId: socket.id,
+          userId: socket.user._id.toString(),
+          muted: participant.muted,
+          deafened: participant.deafened,
+          video: participant.video,
+        });
+      }
+    });
+
+    socket.on("voice:leave", () => {
+      const channelId = socketToVoiceRoom.get(socket.id);
+      if (channelId) {
+        handleVoiceLeave(socket, channelId);
+      }
+    });
+
     socket.on("disconnect", () => {
+      const voiceChannelId = socketToVoiceRoom.get(socket.id);
+      if (voiceChannelId) {
+        handleVoiceLeave(socket, voiceChannelId);
+      }
       console.log("disconnected", socket.id);
     });
   });
@@ -98,3 +258,5 @@ export const getIO = () => {
   }
   return io;
 };
+
+export const initSocket = socketIntialise;

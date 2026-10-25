@@ -2,13 +2,15 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import ApiError from "../utils/ApiError.js";
-import redis from "../config/redis.js";
+import { isTokenBlocklisted } from "../services/tokenBlocklist.service.js";
 import jwt from "jsonwebtoken";
 import userModel from "../models/user.model.js";
 
 export const authMiddleware = async (req, res, next) => {
   try {
-    const token = req.cookies.accessToken;
+    const token =
+      req.cookies.accessToken ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
 
     if (!token) {
       throw new ApiError(401, "Access token not found from auth middleware");

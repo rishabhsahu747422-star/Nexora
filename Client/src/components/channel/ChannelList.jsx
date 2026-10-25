@@ -23,6 +23,7 @@ import {
   verifyNexPayment,
 } from "../../services/payment.service";
 import { leaveServer } from "../../redux/slices/serverSlice";
+import VoiceChannelOverlay from "../voice/VoiceChannelOverlay";
 
 export default function ChannelList({ onCloseMobile }) {
   const dispatch = useDispatch();
@@ -337,6 +338,9 @@ export default function ChannelList({ onCloseMobile }) {
           );
         })}
       </div>
+
+      {/* Connected Voice Channel Status Bar */}
+      <VoiceChannelOverlay />
     </div>
   );
 }

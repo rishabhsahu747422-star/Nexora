@@ -9,6 +9,7 @@ import {
   startConversation,
 } from "../../redux/slices/dmSlice";
 import { searchUsers } from "../../services/auth.service";
+import VoiceChannelOverlay from "../voice/VoiceChannelOverlay";
 
 export default function DmList({ onSelectConversation, selectedDmId }) {
   const dispatch = useDispatch();
@@ -228,6 +229,9 @@ export default function DmList({ onSelectConversation, selectedDmId }) {
           );
         })}
       </div>
+
+      {/* Connected Voice Channel Status Bar */}
+      <VoiceChannelOverlay />
     </div>
   );
 }

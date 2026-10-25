@@ -6,6 +6,7 @@ import { generateOtp } from "../utils/otp.js";
 import { generateToken } from "../utils/token.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { blocklistToken, isTokenBlocklisted } from "../services/tokenBlocklist.service.js";
 
 export const register = async (req, res, next) => {
   try {
@@ -191,18 +192,9 @@ export const googleAuth = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    try {
-      if (redis.status === "ready") {
-        if (accessToken) {
-          await redis.set(`Bearer:accessToken:${accessToken}`, "true", "EX", 3600);
-        }
-        if (refreshToken) {
-          await redis.set(`Bearer:refreshToken:${refreshToken}`, "true", "EX", 86400);
-        }
-      }
-    } catch (redisErr) {
-      console.warn("Redis blocklist on logout skipped:", redisErr.message);
-    }
+    const { accessToken, refreshToken } = req.cookies;
+    if (accessToken) await blocklistToken(accessToken, "accessToken", 3600);
+    if (refreshToken) await blocklistToken(refreshToken, "refreshToken", 86400);
 
     res.clearCookie("refreshToken");
     res.clearCookie("accessToken");
@@ -367,14 +359,7 @@ export const refreshToken = async (req, res) => {
     });
   }
 
-  let isBlacklisted = null;
-  try {
-    if (redis.status === "ready") {
-      isBlacklisted = await redis.get(`Bearer:refreshToken:${refreshToken}`);
-    }
-  } catch (redisErr) {
-    console.warn("Redis refreshToken blocklist check skipped:", redisErr.message);
-  }
+  const isBlacklisted = await isTokenBlocklisted(refreshToken, "refreshToken");
 
   if (isBlacklisted) {
     return res.status(401).json({
