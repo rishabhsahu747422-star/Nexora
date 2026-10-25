@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import ApiError from "../utils/ApiError.js";
 import userModel from "../models/user.model.js";
+import redis from "../config/redis.js";
 
 export const socketMiddleware = async (socket, next) => {
   try {
@@ -11,21 +12,30 @@ export const socketMiddleware = async (socket, next) => {
 
     const accessToken = cookies
       .split(";")
-      .find((cookie) => cookies.startsWith("accessToken="))
+      .map((c) => c.trim())
+      .find((cookie) => cookie.startsWith("accessToken="))
       ?.split("=")[1];
 
     if (!accessToken) {
       throw new ApiError(401, "unauthorized");
     }
 
-    const isBlocklisted = await redis.get(`Bearer:accessToken:${accessToken}`);
-    if (!isBlocklisted) {
-      throw new ApiError(403, "Token is Invalid");
+    let isBlocklisted = null;
+    try {
+      if (redis.status === "ready") {
+        isBlocklisted = await redis.get(`Bearer:accessToken:${accessToken}`);
+      }
+    } catch (err) {
+      console.warn("Redis socket blocklist check skipped:", err.message);
+    }
+    if (isBlocklisted) {
+      throw new ApiError(403, "Token is Invalid or Revoked");
     }
 
-    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET_KEY);
+    const secret = process.env.JWT_SECRET || process.env.JWT_SECRET_KEY;
+    const decoded = jwt.verify(accessToken, secret);
 
-    const user = await userModel.findById(decoded.id);
+    const user = await userModel.findById(decoded.id).select("-password");
 
     if (!user) {
       throw new ApiError(404, "user not found");

@@ -81,13 +81,35 @@ export const getChannelById = async (req, res, next) => {
 
 export const updateChannel = async (req, res, next) => {
   try {
-    const { serverId } = req.params;
+    const { serverId, channelId } = req.params;
+    const { name, type, position, isPrivate } = req.body;
     const server = await serverModel.findById(serverId);
 
     if (!server) throw new ApiError(404, "server not found");
 
-    if (!server.email.toString() !== req.user._id.toString())
+    const ownerId = server.email?.toString();
+    const currentUserId = req.user._id?.toString() || req.user.id?.toString();
+
+    if (ownerId !== currentUserId) {
       throw new ApiError(403, "only owner of the server can update channel");
+    }
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (type !== undefined) updateData.type = type;
+    if (position !== undefined) updateData.position = position;
+    if (isPrivate !== undefined) updateData.isPrivate = isPrivate;
+
+    const channel = await channelModel.findOneAndUpdate(
+      { _id: channelId, server: serverId },
+      updateData,
+      { new: true }
+    );
+    if (!channel) throw new ApiError(404, "channel not found");
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, channel, "channel updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -98,6 +120,13 @@ export const deleteChannel = async (req, res, next) => {
     const { serverId, channelId } = req.params;
     const server = await serverModel.findById(serverId);
     if (!server) throw new ApiError(404, "server not found");
+
+    const ownerId = server.email?.toString();
+    const currentUserId = req.user._id?.toString() || req.user.id?.toString();
+
+    if (ownerId !== currentUserId) {
+      throw new ApiError(403, "only owner of the server can delete channel");
+    }
 
     const channel = await channelModel.findOneAndDelete({
       _id: channelId,

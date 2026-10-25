@@ -91,22 +91,34 @@ export const deleteServer = async (req, res) => {
   try {
     const { serverId } = req.params;
 
-    const server = serverModel.findOne({ serverId });
+    const server = await serverModel.findById(serverId);
 
     if (!server) {
-      throw new ApiError(400, "Server not Exists");
+      throw new ApiError(404, "Server does not exist");
     }
 
-    await serverModel.findByIdAndDelete({ serverId });
-    await serverMemberModel.deleteMany({ server: server._id });
-    await channelModel.deleteMany({ server: server._id });
-    await roleModel.deleteMany({ server: server._id });
+    const ownerId = server.email?.toString();
+    const currentUserId = req.user._id?.toString() || req.user.id?.toString();
+
+    if (ownerId !== currentUserId) {
+      throw new ApiError(403, "Only server owner can delete server");
+    }
+
+    await serverModel.findByIdAndDelete(serverId);
+    await serverMemberModel.deleteMany({ server: serverId });
+    await channelModel.deleteMany({ server: serverId });
+    await roleModel.deleteMany({ server: serverId });
+    await userModel.updateMany({ server: serverId }, { $pull: { server: serverId } });
 
     return res
       .status(200)
-      .json(new ApiResponse(200, "Server Deleted successfully"));
+      .json(new ApiResponse(200, null, "Server deleted successfully"));
   } catch (error) {
     console.log(error.message);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 export const getSingleServer = async (req, res) => {
@@ -130,51 +142,75 @@ export const getSingleServer = async (req, res) => {
       .json(new ApiResponse(200, server, "Server Fetched Succcessfully"));
   } catch (error) {
     console.log(error.message);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 export const updateServer = async (req, res) => {
   try {
     const { serverId } = req.params;
     const { name, description, isPublic } = req.body;
-    const icon = req.files.icon[0];
-    const banner = req.files.banner[0];
 
-    const server = await serverModel.findByIdAndUpdate(
+    const server = await serverModel.findById(serverId);
+    if (!server) {
+      throw new ApiError(404, "Server not found");
+    }
+
+    const ownerId = server.email?.toString();
+    const currentUserId = req.user._id?.toString() || req.user.id?.toString();
+
+    if (ownerId !== currentUserId) {
+      throw new ApiError(403, "Only server owner can update server details");
+    }
+
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (isPublic !== undefined) updateData.isPublic = isPublic;
+
+    if (req.files?.icon?.[0]) {
+      const uploadIcon = await sendFiles(req.files.icon[0].buffer, req.files.icon[0].originalname);
+      updateData.icon = uploadIcon?.url || "";
+    }
+    if (req.files?.banner?.[0]) {
+      const uploadBanner = await sendFiles(req.files.banner[0].buffer, req.files.banner[0].originalname);
+      updateData.banner = uploadBanner?.url || "";
+    }
+
+    const updatedServer = await serverModel.findByIdAndUpdate(
       serverId,
-      { name, description, isPublic, icon, banner },
+      updateData,
       { new: true },
     );
 
-    if (!server) {
-      throw new ApiError(400, "Server not found");
-    }
-
-    if (server.email.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "only server owner can update server details");
-    }
     return res
       .status(200)
-      .json(new ApiResponse(200, server, "Server updated Successfully"));
+      .json(new ApiResponse(200, updatedServer, "Server updated successfully"));
   } catch (error) {
     console.log(error.message);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 export const getAllServer = async (req, res) => {
   try {
     const user = await userModel.findById(req.user._id).populate("server");
 
-    if (!user || user.server.length === 0) {
-      throw new ApiError(400, "User not joined to any server");
+    if (!user) {
+      throw new ApiError(404, "User not found");
     }
 
     return res.status(200).json({
       success: true,
       message: "Servers fetched successfully",
-      servers: user.server,
+      servers: user.server || [],
     });
   } catch (error) {
     console.log(error.message);
-
     return res.status(error.statusCode || 500).json({
       success: false,
       message: error.message,
@@ -183,7 +219,7 @@ export const getAllServer = async (req, res) => {
 };
 export const joinServer = async (req, res) => {
   try {
-    const inviteCode = req.params.inviteCode.trim();
+    const inviteCode = req.params.inviteCode?.trim();
 
     const server = await serverModel.findOne({ inviteCode });
 
@@ -191,62 +227,85 @@ export const joinServer = async (req, res) => {
       throw new ApiError(404, "Invalid Invite Code");
     }
 
-    const user = await userModel.findById(req.user.id);
+    const user = await userModel.findById(req.user._id);
 
     if (!user) throw new ApiError(404, "User not found");
-
-    // const alreadyExists = user.server.some((serverId) => {
-    //   serverId.toString() === server._id.toString();
-    // });
 
     const alreadyExists = await serverMemberModel.exists({
       user: req.user._id,
       server: server._id,
     });
 
-    if (!alreadyExists) {
-      throw new ApiError(400, "Already Member");
+    if (alreadyExists) {
+      throw new ApiError(400, "You are already a member of this server");
     }
-    const memberRole = await roleModel.findOne({
+
+    let memberRole = await roleModel.findOne({
       server: server._id,
       name: "member",
     });
 
+    if (!memberRole) {
+      memberRole = await roleModel.create({
+        name: "member",
+        server: server._id,
+        permissions: [],
+        position: 10,
+      });
+    }
+
     await createServerMember(req.user._id, server._id, [memberRole._id]);
+
+    await userModel.findByIdAndUpdate(req.user._id, {
+      $addToSet: { server: server._id },
+    });
 
     return res
       .status(200)
-      .json(new ApiResponse(200, server, "server join successfully"));
+      .json(new ApiResponse(200, server, "Joined server successfully"));
   } catch (error) {
     console.log(error.message);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 export const leaveServer = async (req, res) => {
   try {
     const { serverId } = req.params;
 
-    const server = serverModel.findById(serverId);
+    const server = await serverModel.findById(serverId);
     if (!server) {
-      throw new ApiError(400, "server not found");
+      throw new ApiError(404, "Server not found");
     }
 
-    if (server.email.toString() === req.user.if.toString()) {
-      throw new ApiError(403, "only server owner can't leave the server");
+    if (server.email.toString() === req.user._id.toString()) {
+      throw new ApiError(403, "Server owner cannot leave the server");
     }
 
-    const member = await serverMemberModel.findByIdAndDelete({
+    const member = await serverMemberModel.findOneAndDelete({
       server: server._id,
       user: req.user._id,
     });
 
     if (!member) {
-      throw new ApiError(404, "you are not the menber of server");
+      throw new ApiError(404, "You are not a member of this server");
     }
+
+    await userModel.findByIdAndUpdate(req.user._id, {
+      $pull: { server: server._id },
+    });
+
     return res
       .status(200)
       .json(new ApiResponse(200, null, "User left successfully"));
   } catch (error) {
     console.log(error.message);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };
 export const createInvite = async (req, res) => {
@@ -254,7 +313,7 @@ export const createInvite = async (req, res) => {
     const { serverId } = req.params;
     const server = await serverModel.findById(serverId);
     if (!server) {
-      throw new ApiError(404, "server not found");
+      throw new ApiError(404, "Server not found");
     }
 
     if (
@@ -263,7 +322,7 @@ export const createInvite = async (req, res) => {
         user: req.user._id,
       }))
     ) {
-      throw new ApiError(403, "you are not a member of this server");
+      throw new ApiError(403, "You are not a member of this server");
     }
 
     return res
@@ -272,10 +331,14 @@ export const createInvite = async (req, res) => {
         new ApiResponse(
           200,
           { inviteCode: server.inviteCode },
-          "Invite creaated successfully",
+          "Invite created successfully",
         ),
       );
   } catch (error) {
     console.log(error.message);
+    return res.status(error.statusCode || 500).json({
+      success: false,
+      message: error.message,
+    });
   }
 };

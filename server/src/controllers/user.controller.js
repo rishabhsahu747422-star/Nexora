@@ -18,15 +18,18 @@ export const getMe = async (req, res, next) => {
 
 export const updateProfile = async (req, res, next) => {
   try {
-    const { username, fullname, mobile_no } = req.body;
+    const { username, fullname, mobile_no, bio, customStatus } = req.body;
     const updateData = {};
 
     if (username !== undefined) updateData.username = username;
     if (fullname !== undefined) updateData.fullname = fullname;
     if (mobile_no !== undefined) updateData.mobile_no = mobile_no;
+    if (bio !== undefined) updateData.bio = bio;
+    if (customStatus !== undefined) updateData.customStatus = customStatus;
 
+    const targetUserId = req.user?.id || req.user?._id;
     const updatedUser = await userModel
-      .findByIdAndUpdate(req.user.id, updateData, {
+      .findByIdAndUpdate(targetUserId, updateData, {
         new: true,
         runValidators: true,
       })
@@ -60,22 +63,22 @@ export const getUserProfile = async (req, res, next) => {
 
 export const searchUser = async (req, res, next) => {
   try {
-    const user = await userModel
+    const query = req.query.query || req.query.q || req.query.search || req.query.username || "";
+    const currentUserId = req.user._id || req.user.id;
+
+    const users = await userModel
       .find({
+        _id: { $ne: currentUserId },
         $or: [
-          { username: { $regex: req.query, $options: 1 } },
-          { fullname: { $regex: req.query, $options: 1 } },
+          { username: { $regex: query, $options: "i" } },
+          { fullname: { $regex: query, $options: "i" } },
         ],
       })
       .select("username fullname profile_pic");
 
-    if (!useSyncExternalStore.length) {
-      throw new ApiError(404, "user not found");
-    }
-
     return res
       .status(200)
-      .json(new ApiResponse(200, useSyncExternalStore, "users fetched"));
+      .json(new ApiResponse(200, users, "users fetched"));
   } catch (error) {
     next(error);
   }
@@ -85,7 +88,7 @@ export const changePassword = async (req, res, next) => {
   try {
     const { password, newPassword } = req.body;
     if (password === newPassword) {
-      throw new ApiError(409, "new password");
+      throw new ApiError(409, "new password cannot be same as old password");
     }
 
     const user = await userModel.findById(req.user.id).select("+password");
@@ -98,7 +101,7 @@ export const changePassword = async (req, res, next) => {
 
     user.password = newPassword;
     await user.save();
-    return res.status(200).json(new ApiResponse(200, null, "Password"));
+    return res.status(200).json(new ApiResponse(200, null, "Password updated successfully"));
   } catch (error) {
     next(error);
   }
@@ -107,7 +110,7 @@ export const changePassword = async (req, res, next) => {
 export const updateProfilePicture = async (req, res, next) => {
   try {
     if (!req.file) {
-      throw new ApiError(400, "Profile updated");
+      throw new ApiError(400, "Profile image required");
     }
     const user = await userModel.findById(req.user.id);
     if (!user) {
@@ -117,6 +120,10 @@ export const updateProfilePicture = async (req, res, next) => {
     const uploadFile = await sendFiles(req.file.buffer, req.file.originalname);
     user.profile_pic = uploadFile.url;
     await user.save();
+
+    return res
+      .status(200)
+      .json(new ApiResponse(200, { profile_pic: user.profile_pic }, "Profile picture updated successfully"));
   } catch (error) {
     next(error);
   }

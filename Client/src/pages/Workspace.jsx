@@ -71,6 +71,12 @@ export default function Workspace() {
 
   // Determine current mode based on route
   const isDmMode = location.pathname.startsWith("/app/messages");
+
+  useEffect(() => {
+    if (isDmMode && !dmId && activeDmId) {
+      navigate(`/app/messages/${activeDmId}`, { replace: true });
+    }
+  }, [isDmMode, dmId, activeDmId, navigate]);
   const isServerMode = location.pathname.startsWith("/app/server");
   const isHubMode =
     location.pathname === "/app" || location.pathname === "/app/";

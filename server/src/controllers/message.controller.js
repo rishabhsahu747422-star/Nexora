@@ -2,6 +2,7 @@ import { getIO } from "../config/soocket.js";
 import channelModel from "../models/channel.model.js";
 import messageModel from "../models/message.model.js";
 import serverMemberModel from "../models/serverMember.model.js";
+import sendFiles from "../services/storage.service.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
@@ -24,13 +25,16 @@ export const createMessage = async (req, res, next) => {
       throw new ApiError(403, "You are not a member of the server");
     }
 
-    if (!content || (!content.trim() && !req.files) || req.files.length === 0) {
-      throw new ApiError(404, "Message must contain text or an attachment");
+    const hasText = content && content.trim().length > 0;
+    const hasFiles = req.files && req.files.length > 0;
+
+    if (!hasText && !hasFiles) {
+      throw new ApiError(400, "Message must contain text or an attachment");
     }
 
     let attachments = [];
 
-    if (req.files && req.files.lenth > 0) {
+    if (hasFiles) {
       attachments = await Promise.all(
         req.files.map(async (file) => {
           const uploadedFile = await sendFiles(file.buffer, file.originalname);
@@ -50,17 +54,20 @@ export const createMessage = async (req, res, next) => {
 
     const message = await messageModel.create({
       content: content?.trim() || "",
-      author: req.user._id,
-      channel: channelId,
+      author_id: req.user._id,
+      channel_id: channelId,
       attachments,
     });
 
     const messageDetails = await messageModel
       .findById(message._id)
-      .populate("author_id", "profile_pic username");
-    const io = getIO();
+      .populate("author_id", "profile_pic username fullname");
 
-    io.to(`channel:${channelId}`).emit("message:new", messageDetails);
+    const io = getIO();
+    if (io) {
+      io.to(`channel:${channelId}`).emit("message:new", messageDetails);
+    }
+
     return res
       .status(200)
       .json(
@@ -89,38 +96,14 @@ export const getAllChannelMessage = async (req, res, next) => {
       throw new ApiError(403, "You are not the member of this server");
     }
 
-    const message = await messageModel.aggregate([
-      {
-        $match: {
-          channel_id: channel._id,
-        },
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "author_id",
-          foreignField: "_id",
-          as: "auhtor_details",
-        },
-      },
-      {
-        $unwind: "$author_details",
-      },
-      {
-        $project: {
-          content: 1,
-          createdAt: 1,
-          "author_details.username": 1,
-        },
-      },
-      {
-        $sort: {
-          createdAt: -1,
-        },
-      },
-    ]);
+    const messages = await messageModel
+      .find({ channel_id: channel._id })
+      .populate("author_id", "username fullname profile_pic")
+      .sort({ createdAt: 1 });
 
-    return res.status(200).json(200, message, "message fetched sccesfully");
+    return res
+      .status(200)
+      .json(new ApiResponse(200, messages, "Messages fetched successfully"));
   } catch (error) {
     next(error);
   }
@@ -161,7 +144,7 @@ export const updateMessage = async (req, res, next) => {
     return res
       .status(200)
       .json(
-        new ApiResponse(200, updatedMessage, "message updated ssuccessfully"),
+        new ApiResponse(200, updatedMessage, "message updated successfully"),
       );
   } catch (error) {
     next(error);
@@ -178,13 +161,13 @@ export const deleteMessage = async (req, res, next) => {
 
     if (!message) throw new ApiError(404, "message not found");
 
-    if (message.author_id.toString() !== req.user._id)
-      throw new ApiError(403, "only author can delete the messsage");
+    if (message.author_id.toString() !== req.user._id.toString())
+      throw new ApiError(403, "only author can delete the message");
     await messageModel.findByIdAndDelete(message._id);
 
     return res
       .status(200)
-      .json(new ApiResponse(200, null, "messsage deleted successfullly"));
+      .json(new ApiResponse(200, null, "message deleted successfully"));
   } catch (error) {
     next(error);
   }

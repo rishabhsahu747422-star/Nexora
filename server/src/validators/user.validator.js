@@ -22,6 +22,16 @@ export const updateProfileValidator = [
     .optional()
     .isISO8601()
     .withMessage("Date of birth must be a valid date"),
+  body("bio")
+    .optional()
+    .trim()
+    .isLength({ max: 300 })
+    .withMessage("Bio cannot exceed 300 characters"),
+  body("customStatus")
+    .optional()
+    .trim()
+    .isLength({ max: 100 })
+    .withMessage("Custom status cannot exceed 100 characters"),
 ];
 
 export const usernameValidator = [

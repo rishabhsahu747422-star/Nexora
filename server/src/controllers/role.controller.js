@@ -3,7 +3,7 @@ import serverModel from "../models/server.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
-export const createRole = async (req, resizeBy, next) => {
+export const createRole = async (req, res, next) => {
   try {
     const { serverId } = req.params;
 
@@ -12,17 +12,19 @@ export const createRole = async (req, resizeBy, next) => {
     const server = await serverModel.findById(serverId);
 
     if (!server) {
-      throw new ApiError(404, "servernot found");
+      throw new ApiError(404, "Server not found");
     }
 
-    if (server.email.toString() !== req.user.id.tostring()) {
+    if (server.email.toString() !== req.user._id.toString()) {
       throw new ApiError(403, "Only owner can create roles");
     }
 
     const role = await roleModel.create({
       name,
       server: serverId,
-      user: userId,
+      permissions: permission || [],
+      color: color || "#ffffff",
+      position: position || 0,
     });
 
     return res
@@ -45,7 +47,7 @@ export const getServerRoles = async (req, res, next) => {
 
     const roles = await roleModel
       .find({ server: serverId })
-      .Sort({ position: -1 });
+      .sort({ position: -1 });
 
     return res
       .status(200)
@@ -109,18 +111,18 @@ export const updateRole = async (req, res, next) => {
   }
 };
 
-export const deleteRole = async (re, res, next) => {
+export const deleteRole = async (req, res, next) => {
   try {
     const { serverId, roleId } = req.params;
 
-    const server = serverModel.find(serverId);
+    const server = await serverModel.findById(serverId);
 
     if (!server) {
       throw new ApiError(404, "Server not found");
     }
 
     if (server.email.toString() !== req.user._id.toString()) {
-      throw new ApiError(403, "Only owner can delete server");
+      throw new ApiError(403, "Only owner can delete roles");
     }
 
     const role = await roleModel.findOne({ _id: roleId, server: serverId });

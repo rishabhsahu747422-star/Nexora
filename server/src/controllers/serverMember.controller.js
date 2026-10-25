@@ -14,14 +14,14 @@ export const getServerMembers = async (req, res, next) => {
     }
 
     const members = await serverMemberModel
-      .find({ server: severId })
+      .find({ server: serverId })
       .populate("user", "username fullname profile_pic")
       .populate("roles", "name permissions color position");
 
     return res
       .status(200)
       .json(
-        new ApiResponse(200, members, "server members fetched succesfully"),
+        new ApiResponse(200, members, "server members fetched successfully"),
       );
   } catch (error) {
     next(error);
@@ -32,13 +32,13 @@ export const removeMember = async (req, res, next) => {
   try {
     const { serverId, userId } = req.params;
 
-    const server = await serverModel.find(serverId);
+    const server = await serverModel.findById(serverId);
 
     if (!server) {
       throw new ApiError(404, "Server not found");
     }
 
-    if (server.email.toString() !== req.user.id.toString()) {
+    if (server.email.toString() !== req.user._id.toString()) {
       throw new ApiError(403, "Only server owner can remove member");
     }
 
@@ -50,8 +50,8 @@ export const removeMember = async (req, res, next) => {
     if (!member) {
       throw new ApiError(404, "Member not found");
     }
-    if (server.email.toString() !== userId.toString()) {
-      throw new ApiError(404, "server owner can't be removed");
+    if (server.email.toString() === userId.toString()) {
+      throw new ApiError(400, "Server owner cannot be removed");
     }
 
     await serverMemberModel.findByIdAndDelete(member._id);
@@ -66,17 +66,17 @@ export const removeMember = async (req, res, next) => {
 
 export const updateMemberRoles = async (req, res, next) => {
   try {
-    const { serverId, userID } = req.params;
+    const { serverId, userId } = req.params;
     const { roles } = req.body;
 
     const server = await serverModel.findById(serverId);
 
     if (!server) {
-      throw new ApiError(404, "server not found");
+      throw new ApiError(404, "Server not found");
     }
 
     if (server.email.toString() !== req.user._id.toString()) {
-      throw new ApiResponse(403, "Only Owner can update roles");
+      throw new ApiError(403, "Only owner can update roles");
     }
 
     const member = await serverMemberModel.findOne({
@@ -88,8 +88,8 @@ export const updateMemberRoles = async (req, res, next) => {
       throw new ApiError(404, "Member not found");
     }
 
-    if (server.email.toString() !== userID.toString()) {
-      throw new ApiError(404, "server owner's roles cannot be changed");
+    if (server.email.toString() === userId.toString()) {
+      throw new ApiError(400, "Server owner's roles cannot be changed");
     }
 
     const validRoles = await roleModel.find({
@@ -98,7 +98,7 @@ export const updateMemberRoles = async (req, res, next) => {
     });
 
     if (validRoles.length !== roles.length) {
-      throw new ApiError(400, "roles are invalid");
+      throw new ApiError(400, "Roles are invalid");
     }
 
     member.roles = roles;
@@ -107,12 +107,12 @@ export const updateMemberRoles = async (req, res, next) => {
     const updatedMember = await serverMemberModel
       .findById(member._id)
       .populate("user", "username fullname profile_pic")
-      .populate("roles", "name permissioon color position");
+      .populate("roles", "name permissions color position");
 
     return res
       .status(200)
       .json(
-        new ApiResponse(200, updatedMember, "Member roles updated succesfully"),
+        new ApiResponse(200, updatedMember, "Member roles updated successfully"),
       );
   } catch (error) {
     next(error);

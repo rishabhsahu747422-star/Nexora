@@ -13,17 +13,25 @@ import { closeModal, addToast } from '../../redux/slices/uiSlice';
 export default function MemberProfileModal({ isOpen, onClose, user }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const servers = useSelector((state) => state.servers.servers);
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const servers = useSelector((state) => state.server.servers || []);
+  const currentUser = useSelector((state) => state.auth.user);
 
   if (!user) return null;
 
-  const isMe = user.id === currentUser?.id;
+  const isMe = (user.id || user._id) === (currentUser?._id || currentUser?.id);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     dispatch(closeModal());
-    dispatch(openOrCreateDm(user));
-    navigate('/app/messages');
+    try {
+      const conv = await dispatch(openOrCreateDm(user));
+      if (conv?._id || conv?.id) {
+        navigate(`/app/messages/${conv._id || conv.id}`);
+      } else {
+        navigate('/app/messages');
+      }
+    } catch {
+      navigate('/app/messages');
+    }
   };
 
   const handleAddFriend = () => {

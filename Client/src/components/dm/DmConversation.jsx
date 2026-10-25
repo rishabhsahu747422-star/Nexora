@@ -1,26 +1,54 @@
 import React, { useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Shield, PhoneCall, Video, User } from "lucide-react";
+import { Shield, Loader2 } from "lucide-react";
 import Avatar from "../common/Avatar";
 import MessageItem from "../chat/MessageItem";
 import MessageComposer from "../chat/MessageComposer";
 import { openModal } from "../../redux/slices/uiSlice";
+import { fetchDmMessages, sendDm } from "../../redux/slices/dmSlice";
 
 export default function DmConversation({ dmId }) {
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
+  const currentUser = useSelector((state) => state.auth.user);
   const conversation = useSelector((state) =>
-    state.dms.conversations.find((c) => c.id === dmId),
+    state.dms.conversations.find((c) => (c._id || c.id) === dmId)
   );
-  const messages = useSelector((state) => state.messages.messages || []);
+  const messages = useSelector((state) => state.dms.messages || []);
+  const messagesLoading = useSelector((state) => state.dms.messagesLoading);
   const density = useSelector((state) => state.ui.messageDensity);
+
+  useEffect(() => {
+    if (dmId) {
+      dispatch(fetchDmMessages(dmId));
+    }
+  }, [dmId, dispatch]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.length, dmId]);
 
-  if (!conversation) {
+  const otherUser = conversation?.participants?.find(
+    (p) => (p._id || p.id || p).toString() !== (currentUser?._id || currentUser?.id)?.toString()
+  ) || conversation?.participants?.[0] || {};
+
+  const name = otherUser.fullname || otherUser.username || "Encrypted Transmission";
+  const username = otherUser.username || "agent";
+  const avatar = otherUser.profile_pic || "";
+
+  const handleSendMessage = (payload) => {
+    if (!dmId) return;
+    dispatch(
+      sendDm({
+        conversationId: dmId,
+        content: payload.content,
+        files: payload.files,
+      })
+    );
+  };
+
+  if (!dmId) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[#07080C] text-slate-500 text-xs font-mono">
         Select a transmission thread to start messaging
@@ -39,30 +67,30 @@ export default function DmConversation({ dmId }) {
                 type: "PROFILE",
                 props: {
                   user: {
-                    id: conversation.recipientId,
-                    name: conversation.name,
-                    username: conversation.username,
-                    avatar: conversation.avatar,
-                    status: conversation.status,
+                    id: otherUser._id || otherUser.id,
+                    name,
+                    username,
+                    avatar,
+                    status: "online",
                   },
                 },
-              }),
+              })
             )
           }
           className="flex items-center gap-3 cursor-pointer hover:opacity-90"
         >
           <Avatar
-            src={conversation.avatar}
-            name={conversation.name}
+            src={avatar}
+            name={name}
             size="sm"
-            status={conversation.status}
+            status="online"
           />
           <div>
             <h3 className="font-display font-semibold text-sm text-slate-100 flex items-center gap-1.5">
-              <span>{conversation.name}</span>
+              <span>{name}</span>
             </h3>
             <span className="text-[10px] font-mono text-cyan-400">
-              @{conversation.username}
+              @{username}
             </span>
           </div>
         </div>
@@ -80,24 +108,31 @@ export default function DmConversation({ dmId }) {
         {/* DM Starter Card */}
         <div className="p-6 text-center border-b border-white/5 mb-4">
           <Avatar
-            src={conversation.avatar}
-            name={conversation.name}
+            src={avatar}
+            name={name}
             size="lg"
-            status={conversation.status}
+            status="online"
             className="mx-auto mb-2"
           />
           <h4 className="font-display font-bold text-base text-white">
-            {conversation.name}
+            {name}
           </h4>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
             This is the very beginning of your direct transmission history with{" "}
-            <span className="text-cyan-400">@{conversation.username}</span>.
+            <span className="text-cyan-400">@{username}</span>.
           </p>
         </div>
 
+        {messagesLoading && messages.length === 0 && (
+          <div className="flex items-center justify-center py-8 text-xs font-mono text-slate-500 gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Decrypting messages...</span>
+          </div>
+        )}
+
         {messages.map((message) => (
           <MessageItem
-            key={message.id}
+            key={message._id || message.id}
             message={message}
             contextId={dmId}
             density={density}
@@ -109,7 +144,8 @@ export default function DmConversation({ dmId }) {
       {/* Composer */}
       <MessageComposer
         contextId={dmId}
-        placeholder={`Message @${conversation.username}...`}
+        placeholder={`Message @${username}...`}
+        onSend={handleSendMessage}
       />
     </div>
   );

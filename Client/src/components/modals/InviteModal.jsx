@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Copy, RefreshCw, Check, Link as LinkIcon, Shield } from "lucide-react";
 import Modal from "../common/Modal";
 import Button from "../common/Button";
-// import { regenerateInvite } from '../../redux/slices/serverSlice';
+import { regenerateInvite } from "../../redux/slices/serverSlice";
 import { addToast } from "../../redux/slices/uiSlice";
 
 export default function InviteModal({ isOpen, onClose, server }) {
@@ -30,7 +30,8 @@ export default function InviteModal({ isOpen, onClose, server }) {
   };
 
   const handleRegenerate = () => {
-    dispatch(regenerateInvite(server.id));
+    const sId = server._id || server.id;
+    dispatch(regenerateInvite(sId));
     dispatch(
       addToast({
         type: "info",

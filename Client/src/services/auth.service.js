@@ -24,3 +24,13 @@ export const refreshSession = async () => {
   const response = await api.post("/auth/refresh");
   return response.data;
 };
+
+export const updateUserProfile = async (data) => {
+  const response = await api.patch("/user/me", data);
+  return response.data.data;
+};
+
+export const searchUsers = async (query) => {
+  const response = await api.get(`/user/search?query=${encodeURIComponent(query)}`);
+  return response.data.data;
+};

@@ -5,11 +5,27 @@ import {
   getServers,
   getServer,
   joinServer,
+  leaveServer,
+  updateServer,
+  deleteServer,
+  createInvite,
+  getServerMembers,
 } from "../../services/server.service.js";
 
 const getErrorMessage = (error) => {
   return error.response?.data?.message || "Something went wrong";
 };
+
+export const fetchServerMembers = createAsyncThunk(
+  "server/fetchServerMembers",
+  async (serverId, { rejectWithValue }) => {
+    try {
+      return await getServerMembers(serverId);
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
 
 export const fetchServers = createAsyncThunk(
   "server/fetchServers",
@@ -55,9 +71,56 @@ export const joinServerAsync = createAsyncThunk(
   },
 );
 
+export const leaveServerAsync = createAsyncThunk(
+  "server/leaveServer",
+  async (serverId, { rejectWithValue }) => {
+    try {
+      await leaveServer(serverId);
+      return serverId;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const updateServerAsync = createAsyncThunk(
+  "server/updateServer",
+  async ({ id, data }, { rejectWithValue }) => {
+    try {
+      return await updateServer(id, data);
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const deleteServerAsync = createAsyncThunk(
+  "server/deleteServer",
+  async (serverId, { rejectWithValue }) => {
+    try {
+      await deleteServer(serverId);
+      return serverId;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const regenerateInvite = createAsyncThunk(
+  "server/regenerateInvite",
+  async (serverId, { rejectWithValue }) => {
+    try {
+      return await createInvite(serverId);
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
 const initialState = {
   servers: [],
   selectedServer: null,
+  members: [],
   loading: false,
   error: null,
 };
@@ -73,6 +136,9 @@ const serverSlice = createSlice({
         (item) => item._id === action.payload || item.id === action.payload,
       );
 
+      if (state.selectedServer?._id !== server?._id) {
+        state.members = [];
+      }
       state.selectedServer = server || null;
     },
 
@@ -82,6 +148,7 @@ const serverSlice = createSlice({
 
     clearSelectedServer: (state) => {
       state.selectedServer = null;
+      state.members = [];
     },
   },
 
@@ -144,11 +211,58 @@ const serverSlice = createSlice({
 
       .addCase(joinServerAsync.rejected, (state, action) => {
         state.error = action.payload;
+      })
+
+      // LEAVE SERVER
+      .addCase(leaveServerAsync.fulfilled, (state, action) => {
+        state.servers = state.servers.filter(
+          (s) => (s._id || s.id) !== action.payload,
+        );
+        if ((state.selectedServer?._id || state.selectedServer?.id) === action.payload) {
+          state.selectedServer = state.servers[0] || null;
+        }
+      })
+
+      // DELETE SERVER
+      .addCase(deleteServerAsync.fulfilled, (state, action) => {
+        state.servers = state.servers.filter(
+          (s) => (s._id || s.id) !== action.payload,
+        );
+        if ((state.selectedServer?._id || state.selectedServer?.id) === action.payload) {
+          state.selectedServer = state.servers[0] || null;
+        }
+      })
+
+      // UPDATE SERVER
+      .addCase(updateServerAsync.fulfilled, (state, action) => {
+        if (action.payload) {
+          const index = state.servers.findIndex(
+            (s) => (s._id || s.id) === (action.payload._id || action.payload.id),
+          );
+          if (index !== -1) {
+            state.servers[index] = action.payload;
+          }
+          if ((state.selectedServer?._id || state.selectedServer?.id) === (action.payload._id || action.payload.id)) {
+            state.selectedServer = action.payload;
+          }
+        }
+      })
+
+      // FETCH SERVER MEMBERS
+      .addCase(fetchServerMembers.fulfilled, (state, action) => {
+        state.members = action.payload || [];
       });
   },
 });
 
 export const { selectServer, clearServerError, clearSelectedServer } =
   serverSlice.actions;
+
+// Aliases for component compatibility
+export {
+  leaveServerAsync as leaveServer,
+  deleteServerAsync as deleteServer,
+  updateServerAsync as updateServer,
+};
 
 export default serverSlice.reducer;

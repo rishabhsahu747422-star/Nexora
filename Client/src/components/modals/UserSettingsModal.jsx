@@ -18,7 +18,7 @@ import Modal from "../common/Modal";
 import Input from "../common/Input";
 import Button from "../common/Button";
 import Avatar from "../common/Avatar";
-// import { updateProfile } from "../../redux/slices/authSlice";
+import { updateProfile } from "../../redux/slices/authSlice";
 import {
   setTheme,
   setMessageDensity,
@@ -41,21 +41,30 @@ export default function UserSettingsModal({ isOpen, onClose }) {
     currentUser?.customStatus || "",
   );
 
-  const handleSaveProfile = (e) => {
+  const handleSaveProfile = async (e) => {
     e.preventDefault();
-    dispatch(
-      updateProfile({
-        fullname: fullname.trim(),
-        bio: bio.trim(),
-        customStatus: customStatus.trim(),
-      }),
-    );
-    dispatch(
-      addToast({
-        type: "success",
-        message: "Profile parameters updated and persisted.",
-      }),
-    );
+    try {
+      await dispatch(
+        updateProfile({
+          fullname: name.trim(),
+          bio: bio.trim(),
+          customStatus: customStatus.trim(),
+        }),
+      ).unwrap();
+      dispatch(
+        addToast({
+          type: "success",
+          message: "Profile parameters updated and persisted.",
+        }),
+      );
+    } catch (err) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: typeof err === "string" ? err : "Failed to update profile.",
+        }),
+      );
+    }
   };
 
   const handleThemeChange = (newTheme) => {

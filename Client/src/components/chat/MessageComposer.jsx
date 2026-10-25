@@ -20,12 +20,16 @@ const EMOJI_PALETTE = [
   '❤️', '💡', '🤖', '⚡', '👀', '😎', '💻', '🎮', '💯', '🛡️'
 ];
 
-export default function MessageComposer({ contextId, placeholder = 'Transmit to channel...' }) {
+export default function MessageComposer({
+  contextId,
+  placeholder = 'Transmit to channel...',
+  onSend,
+}) {
   const dispatch = useDispatch();
   const textareaRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.auth.user);
   const replyTarget = useSelector((state) => state.messages.replyTarget);
 
   const [text, setText] = useState('');
@@ -61,15 +65,23 @@ export default function MessageComposer({ contextId, placeholder = 'Transmit to 
   const handleSend = () => {
     if (!text.trim() && attachments.length === 0) return;
 
-    dispatch(
-      sendMessage({
-        contextId,
+    if (onSend) {
+      onSend({
         content: text.trim(),
-        author: currentUser,
-        replyTo: replyTarget,
+        files: attachments.map((a) => a.file).filter(Boolean),
         attachments,
-      })
-    );
+      });
+    } else {
+      dispatch(
+        sendMessage({
+          contextId,
+          content: text.trim(),
+          author: currentUser,
+          replyTo: replyTarget,
+          attachments,
+        })
+      );
+    }
 
     setText('');
     setAttachments([]);
@@ -137,6 +149,7 @@ export default function MessageComposer({ contextId, placeholder = 'Transmit to 
         {
           id: 'att_' + Date.now() + Math.random(),
           name: file.name,
+          file,
           type: isImg ? 'image' : 'document',
           url: objectUrl,
           size: sizeStr,

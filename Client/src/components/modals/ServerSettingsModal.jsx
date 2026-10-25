@@ -16,7 +16,7 @@ import Modal from "../common/Modal";
 import Input from "../common/Input";
 import Button from "../common/Button";
 import Badge from "../common/Badge";
-// import { updateServer, deleteServer } from '../../redux/slices/serverSlice';
+import { updateServer, deleteServer } from "../../redux/slices/serverSlice";
 import { addToast, closeModal } from "../../redux/slices/uiSlice";
 
 export default function ServerSettingsModal({ isOpen, onClose, server }) {
@@ -30,11 +30,13 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
 
   if (!server) return null;
 
+  const sId = server._id || server.id;
+
   const handleSaveOverview = (e) => {
     e.preventDefault();
     dispatch(
       updateServer({
-        id: server.id,
+        id: sId,
         data: {
           name: serverName.trim(),
           description: serverDesc.trim(),
@@ -56,7 +58,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
         `Are you sure you want to completely purge and delete "${server.name}"? This action cannot be undone.`,
       )
     ) {
-      dispatch(deleteServer(server.id));
+      dispatch(deleteServer(sId));
       dispatch(closeModal());
       dispatch(
         addToast({

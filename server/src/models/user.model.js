@@ -35,6 +35,14 @@ const userSchema = new mongoose.Schema(
     profile_pic: {
       type: String,
     },
+    bio: {
+      type: String,
+      default: "",
+    },
+    customStatus: {
+      type: String,
+      default: "",
+    },
     googleId: {
       type: String,
       unique: true,

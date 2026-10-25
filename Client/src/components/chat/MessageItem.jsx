@@ -35,13 +35,27 @@ export default function MessageItem({
   density = 'comfortable',
 }) {
   const dispatch = useDispatch();
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const currentUser = useSelector((state) => state.auth.user);
+
+  const msgId = message._id || message.id;
+  const authorName =
+    message.author_id?.fullname ||
+    message.author_id?.username ||
+    message.authorName ||
+    "Operative";
+  const authorAvatar =
+    message.author_id?.profile_pic ||
+    message.authorAvatar;
+  const authorId =
+    message.author_id?._id ||
+    message.author_id ||
+    message.authorId;
+  const isAuthor =
+    Boolean(currentUser && (currentUser._id === authorId || currentUser.id === authorId));
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(message.content);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-
-  const isAuthor = message.authorId === currentUser?.id;
 
   const handleCopyText = () => {
     navigator.clipboard.writeText(message.content);
@@ -105,7 +119,7 @@ export default function MessageItem({
 
   return (
     <motion.div
-      id={`msg-${message.id}`}
+      id={`msg-${msgId}`}
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className={`group relative rounded-2xl transition-all duration-300 ${
@@ -150,7 +164,7 @@ export default function MessageItem({
         {/* Pin Trigger */}
         <button
           onClick={() => {
-            dispatch(togglePinMessage({ contextId, messageId: message.id }));
+            dispatch(togglePinMessage({ contextId, messageId: msgId }));
             dispatch(
               addToast({
                 type: 'info',
@@ -237,8 +251,8 @@ export default function MessageItem({
       {/* Message Row Body */}
       <div className="flex items-start gap-3">
         <Avatar
-          src={message.authorAvatar}
-          name={message.authorName}
+          src={authorAvatar}
+          name={authorName}
           size={density === 'compact' ? 'sm' : 'md'}
           className="mt-0.5"
         />
@@ -247,7 +261,7 @@ export default function MessageItem({
           {/* Header: Author + Role Pill + Timestamp + Pinned Badge */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-display font-semibold text-sm text-slate-100 hover:underline cursor-pointer">
-              {message.authorName}
+              {authorName}
             </span>
 
             {message.authorRole && (

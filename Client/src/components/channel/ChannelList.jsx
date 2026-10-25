@@ -22,7 +22,7 @@ import {
   createOrder,
   verifyNexPayment,
 } from "../../services/payment.service";
-// import { leaveServer } from '../../redux/slices/serverSlice';
+import { leaveServer } from "../../redux/slices/serverSlice";
 
 export default function ChannelList({ onCloseMobile }) {
   const dispatch = useDispatch();

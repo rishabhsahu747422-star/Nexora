@@ -25,13 +25,13 @@ export const joinServer = async (inviteCode) =>
   data(await api.post(`/server/join/${inviteCode}`));
 
 export const leaveServer = async (serverId) =>
-  data(await api.post(`/server/${serverId}/leave`));
+  data(await api.delete(`/server/${serverId}/leave`));
 
-export const getServerMembers = async (serverId, userId) =>
-  data(await api.get(`/server/${serverId}/members/${userId}`));
+export const getServerMembers = async (serverId) =>
+  data(await api.get(`/serverMembers/${serverId}/members`));
 
 export const removeServerMember = async (serverId, userId) =>
-  data(await api.post(`/server/${serverId}/members/${userId}`));
+  data(await api.delete(`/serverMembers/${serverId}/members/${userId}`));
 
 export const updateMemberRoles = async (serverId, userId, roles) =>
-  data(await api.post(`/server/${serverId}/members/${userId}/roles/${roles}`));
+  data(await api.patch(`/serverMembers/${serverId}/members/${userId}/roles`, { roles }));

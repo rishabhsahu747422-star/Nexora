@@ -7,7 +7,7 @@ import { validate } from "../middlewares/validatte.middleware.js";
 const router = express.Router();
 
 router.post(
-  "/:serverId.roles",
+  "/:serverId/roles",
   authMiddleware,
   createRoleValidator,
   validate,

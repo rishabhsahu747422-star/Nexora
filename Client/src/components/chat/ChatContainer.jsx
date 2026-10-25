@@ -4,14 +4,14 @@ import ChannelHeader from "../channel/ChannelHeader";
 import MessageItem from "./MessageItem";
 import MessageComposer from "./MessageComposer";
 import PinnedMessagesModal from "./PinnedMessagesModal";
-import { setHighlightedMessageId } from "../../redux/slices/messageSlice";
+import { setHighlightedMessageId, fetchMessages } from "../../redux/slices/messageSlice";
 
 export default function ChatContainer({ channel }) {
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
 
-  const contextId = channel?.id;
+  const contextId = channel?._id || channel?.id;
   const messages = useSelector((state) => state.messages.messages || []);
   const density = useSelector((state) => state.ui.messageDensity);
   const highlightedMessageId = useSelector(
@@ -19,6 +19,13 @@ export default function ChatContainer({ channel }) {
   );
 
   const [isPinnedOpen, setIsPinnedOpen] = useState(false);
+
+  // Fetch messages from backend when active channel changes
+  useEffect(() => {
+    if (contextId) {
+      dispatch(fetchMessages(contextId));
+    }
+  }, [contextId, dispatch]);
 
   // Auto-scroll to bottom when new messages arrive
   const scrollToBottom = (smooth = true) => {

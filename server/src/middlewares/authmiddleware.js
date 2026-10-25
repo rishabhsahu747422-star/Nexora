@@ -14,9 +14,12 @@ export const authMiddleware = async (req, res, next) => {
       throw new ApiError(401, "Access token not found from auth middleware");
     }
 
-    const isTokenBlacklisted = await redis.get(`Bearer:accessToken:${token}`);
+    const revoked = await isTokenBlocklisted(token, "accessToken");
+    if (revoked) {
+      throw new ApiError(401, "Token has been revoked");
+    }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || process.env.JWT_SECRET_KEY);
 
     const user = await userModel.findById(decoded.id).select("-password");
 

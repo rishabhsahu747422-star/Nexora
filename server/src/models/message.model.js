@@ -8,12 +8,12 @@ const messageSchema = new mongoose.Schema(
     },
     channel_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "channels",
+      ref: "channel",
       required: true,
     },
     author_id: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+      ref: "users",
       required: true,
     },
     attachments: [
@@ -24,7 +24,7 @@ const messageSchema = new mongoose.Schema(
         },
         type: {
           type: String,
-          enu: ["image", "video", "file"],
+          enum: ["image", "video", "file"],
         },
       },
     ],

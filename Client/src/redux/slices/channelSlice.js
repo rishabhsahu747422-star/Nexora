@@ -1,6 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-import { getChannels, createChannel } from "../../services/channel.service.js";
+import {
+  getChannels,
+  createChannel,
+  updateChannel,
+  deleteChannel,
+} from "../../services/channel.service.js";
 
 const getErrorMessage = (error) => {
   return error.response?.data?.message || "Unable to load channels";
@@ -22,6 +27,29 @@ export const createChannelAsync = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       return await createChannel(payload);
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const updateChannelAsync = createAsyncThunk(
+  "channels/updateChannel",
+  async (payload, { rejectWithValue }) => {
+    try {
+      return await updateChannel(payload);
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
+export const deleteChannelAsync = createAsyncThunk(
+  "channels/deleteChannel",
+  async (payload, { rejectWithValue }) => {
+    try {
+      await deleteChannel(payload);
+      return payload.channelId;
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));
     }
@@ -100,6 +128,31 @@ const channelSlice = createSlice({
       .addCase(createChannelAsync.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // UPDATE CHANNEL
+      .addCase(updateChannelAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        const updated = action.payload;
+        if (!updated) return;
+        state.channels = state.channels.map((ch) =>
+          (ch._id === updated._id || ch.id === updated._id) ? updated : ch
+        );
+        if (state.selectedChannel?._id === updated._id || state.selectedChannel?.id === updated._id) {
+          state.selectedChannel = updated;
+        }
+      })
+
+      // DELETE CHANNEL
+      .addCase(deleteChannelAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        const deletedId = action.payload;
+        state.channels = state.channels.filter(
+          (ch) => ch._id !== deletedId && ch.id !== deletedId
+        );
+        if (state.selectedChannel?._id === deletedId || state.selectedChannel?.id === deletedId) {
+          state.selectedChannel = state.channels[0] || null;
+        }
       });
   },
 });

@@ -5,6 +5,7 @@ import sendFiles from "../services/storage.service.js";
 import { generateOtp } from "../utils/otp.js";
 import { generateToken } from "../utils/token.js";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 export const register = async (req, res, next) => {
   try {
@@ -129,12 +130,11 @@ export const login = async (req, res, next) => {
 export const googleAuth = async (req, res, next) => {
   try {
     const { email, name, given_name, picture, sub } = req.user._json;
-    console.log(req.user);
     const user = await userModel.findOne({ email });
 
-    if (!user) {
-      if (!user.googleID) {
-        user.googleID = sub;
+    if (user) {
+      if (!user.googleId) {
+        user.googleId = sub;
         await user.save();
       }
 
@@ -144,27 +144,27 @@ export const googleAuth = async (req, res, next) => {
       res.cookie("accessToken", accessToken, {
         httpOnly: true,
         maxAge: 15 * 60 * 1000,
+        sameSite: "strict",
       });
 
-      res.cookiie("refreshToken", refreshToken, {
+      res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         maxAge: 24 * 60 * 60 * 1000,
+        sameSite: "strict",
       });
 
-      return res.status(200).json({
-        success: true,
-        message: "User Loggedin Successfully",
-        user,
-      });
+      const clientUrl = process.env.CLIENT_URL || "https://nexora-umber-nine.vercel.app";
+      return res.redirect(`${clientUrl}/app`);
     }
 
     const newUser = await userModel.create({
-      username: given_name,
+      username: given_name || name?.replace(/\s+/g, "_").toLowerCase(),
       fullname: name,
       email,
+      mobile_no: "0000000000",
       profile_pic: picture,
       googleId: sub,
-      authProvider: req.user.provider,
+      authProvider: req.user.provider || "google",
     });
 
     const accessToken = await generateToken(newUser._id, "10min");
@@ -172,18 +172,18 @@ export const googleAuth = async (req, res, next) => {
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      maxAge: 10 * 60 * 1000,
+      maxAge: 15 * 60 * 1000,
+      sameSite: "strict",
     });
 
-    res.cookiie("refreshToken", refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
+      sameSite: "strict",
     });
-    return res.status(201).json({
-      success: true,
-      message: "User Loggedin Successfully",
-      newUser,
-    });
+
+    const clientUrl = process.env.CLIENT_URL || "https://nexora-umber-nine.vercel.app";
+    return res.redirect(`${clientUrl}/app`);
   } catch (error) {
     next(error);
   }
@@ -191,13 +191,17 @@ export const googleAuth = async (req, res, next) => {
 
 export const logout = async (req, res, next) => {
   try {
-    const { refreshToken, accessToken } = req.cookies;
-
-    if (accessToken) {
-      await redis.set(`Bearer:accessToken:${accessToken}`, "true");
-    }
-    if (refreshToken) {
-      await redis.set(`Bearer:refreshToken:${refreshToken}`, "true");
+    try {
+      if (redis.status === "ready") {
+        if (accessToken) {
+          await redis.set(`Bearer:accessToken:${accessToken}`, "true", "EX", 3600);
+        }
+        if (refreshToken) {
+          await redis.set(`Bearer:refreshToken:${refreshToken}`, "true", "EX", 86400);
+        }
+      }
+    } catch (redisErr) {
+      console.warn("Redis blocklist on logout skipped:", redisErr.message);
     }
 
     res.clearCookie("refreshToken");
@@ -216,7 +220,7 @@ export const forgetPassword = async (req, res, next) => {
   try {
     const { email } = req.body;
     if (!email)
-      return redis.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "Email is Required",
       });
@@ -359,43 +363,55 @@ export const refreshToken = async (req, res) => {
   if (!refreshToken) {
     return res.status(401).json({
       success: false,
-      message: "unauthorise",
+      message: "unauthorized",
     });
   }
 
-  const isBlacklisted = await redis.get(`Bearer:refreshToken:${refreshToken}`);
+  let isBlacklisted = null;
+  try {
+    if (redis.status === "ready") {
+      isBlacklisted = await redis.get(`Bearer:refreshToken:${refreshToken}`);
+    }
+  } catch (redisErr) {
+    console.warn("Redis refreshToken blocklist check skipped:", redisErr.message);
+  }
 
   if (isBlacklisted) {
     return res.status(401).json({
       success: false,
-      message: "Refresh Token has ben revoked",
+      message: "Refresh Token has been revoked",
     });
   }
 
-  const decoded = JsonWebTokenError.verify(
-    refreshToken,
-    process.env.JWT_SECRET_KEY,
-  );
-  const user = await userModel.findById(decoded.id);
+  try {
+    const secret = process.env.JWT_SECRET || process.env.JWT_SECRET_KEY;
+    const decoded = jwt.verify(refreshToken, secret);
+    const user = await userModel.findById(decoded.id);
 
-  if (!user) {
-    return res.status(404).json({
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "user not found",
+      });
+    }
+
+    const accessToken = generateToken(user._id, "10m");
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      maxAge: 15 * 60 * 1000,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Access token regenerated successfully",
+    });
+  } catch (err) {
+    return res.status(401).json({
       success: false,
-      message: "user not found",
+      message: "Invalid or expired refresh token",
     });
   }
-
-  const accessToken = generateToken(user._id, "10m");
-
-  res.cookie("accessToken", accessToken, {
-    httpOnly,
-    maxAge: 15 * 60 * 1000,
-    secure: false,
-    samesite: "strict",
-  });
-
-  return res.status(200).json({
-    success: true,
-    message: "Access token regeneration successfully",
-  });
 };

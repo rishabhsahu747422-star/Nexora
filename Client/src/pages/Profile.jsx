@@ -18,7 +18,7 @@ import Avatar from "../components/common/Avatar";
 import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import Input from "../components/common/Input";
-// import { updateProfile } from "../redux/slices/authSlice";
+import { updateProfile } from "../redux/slices/authSlice";
 import { addToast } from "../redux/slices/uiSlice";
 
 export default function Profile() {
@@ -35,22 +35,31 @@ export default function Profile() {
     currentUser?.customStatus || "",
   );
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    dispatch(
-      updateProfile({
-        name: name.trim(),
-        bio: bio.trim(),
-        customStatus: customStatus.trim(),
-      }),
-    );
-    setIsEditing(false);
-    dispatch(
-      addToast({
-        type: "success",
-        message: "Profile parameters updated.",
-      }),
-    );
+    try {
+      await dispatch(
+        updateProfile({
+          fullname: name.trim(),
+          bio: bio.trim(),
+          customStatus: customStatus.trim(),
+        }),
+      ).unwrap();
+      setIsEditing(false);
+      dispatch(
+        addToast({
+          type: "success",
+          message: "Profile parameters updated.",
+        }),
+      );
+    } catch (err) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: typeof err === "string" ? err : "Failed to update profile.",
+        }),
+      );
+    }
   };
 
   const userServers = servers.filter((s) =>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { AnimatePresence } from "framer-motion";
 
 // Pages
@@ -17,20 +17,26 @@ import StartupScreen from "./components/loading/StartupScreen";
 import ToastContainer from "./components/common/ToastContainer";
 import ModalManager from "./components/modals/ModalManager";
 import GlobalSearchModal from "./components/layout/GlobalSearchModal";
+import SocketManager from "./socket/SocketManager";
+import { getMeAsync } from "./redux/slices/authSlice";
 
 function RootRedirect() {
-  const isAuthenticated = useSelector((state) => state.auth.user);
-  return <Navigate to={isAuthenticated ? "/app" : "/login"} replace />;
+  const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
+  if (loading) return null;
+  return <Navigate to={isAuthenticated && user ? "/app" : "/login"} replace />;
 }
 
 export default function App() {
+  const dispatch = useDispatch();
   const [hasStartedUp, setHasStartedUp] = useState(() => {
-    // Check if previously loaded in session to prevent annoying re-load on refreshes if desired,
-    // or let it run on first load. Let's run StartupScreen for full branded delight.
     return sessionStorage.getItem("nexora_booted") === "true";
   });
 
   const theme = useSelector((state) => state.ui.theme);
+
+  useEffect(() => {
+    dispatch(getMeAsync());
+  }, [dispatch]);
 
   useEffect(() => {
     const root = document.documentElement;
@@ -130,6 +136,7 @@ export default function App() {
       </Routes>
 
       {/* Global Modals, Search & Toasts */}
+      <SocketManager />
       <ModalManager />
       <GlobalSearchModal />
       <ToastContainer />

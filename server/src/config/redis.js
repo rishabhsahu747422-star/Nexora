@@ -7,6 +7,9 @@ const redis = new Redis({
 });
 
 redis.on("connect", () => {
-  console.log("Reedis Connected");
+  console.log("Redis Connected");
+});
+redis.on("error", (err) => {
+  console.error("Redis connection error:", err.message);
 });
 export default redis;

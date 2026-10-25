@@ -1,21 +1,51 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Shield, Sparkles } from "lucide-react";
 import Avatar from "../common/Avatar";
 import { openModal } from "../../redux/slices/uiSlice";
-import { MOCK_USERS } from "../../data/mockUsers";
+import { fetchServerMembers } from "../../redux/slices/serverSlice";
 
 export default function MemberList({ onCloseMobile }) {
   const dispatch = useDispatch();
 
   const activeServer = useSelector((state) => state.server.selectedServer);
-  const activeServerId = activeServer?._id;
+  const rawMembers = useSelector((state) => state.server.members);
+  const currentUser = useSelector((state) => state.auth.user);
+  const activeServerId = activeServer?._id || activeServer?.id;
 
-  // Filter members belonging to this active server
-  const serverMemberIds = activeServer?.members || ["usr_me"];
-  const serverMembers = MOCK_USERS.filter((u) =>
-    serverMemberIds.includes(u.id),
-  );
+  useEffect(() => {
+    if (activeServerId) {
+      dispatch(fetchServerMembers(activeServerId));
+    }
+  }, [dispatch, activeServerId]);
+
+  // Normalize backend populated server members
+  const serverMembers = (rawMembers && rawMembers.length > 0)
+    ? rawMembers.map((m) => {
+        const u = m.user || {};
+        return {
+          id: u._id || m._id,
+          name: u.fullname || u.username || "Community Member",
+          username: u.username || "member",
+          avatar: u.profile_pic || "",
+          status: "online",
+          customStatus: u.customStatus || "",
+          roles: Array.isArray(m.roles) ? m.roles.map((r) => r.name || r) : [],
+        };
+      })
+    : currentUser
+    ? [
+        {
+          id: currentUser._id || currentUser.id,
+          name: currentUser.fullname || currentUser.username || "Owner",
+          username: currentUser.username || "user",
+          avatar: currentUser.profile_pic || "",
+          status: "online",
+          customStatus: currentUser.customStatus || "",
+          roles: ["Member"],
+        },
+      ]
+    : [];
 
   // Group by status
   const onlineMembers = serverMembers.filter(

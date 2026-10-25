@@ -1,17 +1,88 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { MessageSquare, Plus, UserCheck, Clock } from 'lucide-react';
-import Avatar from '../common/Avatar';
-import Badge from '../common/Badge';
-import { selectDm } from '../../redux/slices/dmSlice';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { MessageSquare, Plus, Search, X, Loader2 } from "lucide-react";
+import Avatar from "../common/Avatar";
+import Badge from "../common/Badge";
+import {
+  selectDm,
+  fetchConversations,
+  startConversation,
+} from "../../redux/slices/dmSlice";
+import { searchUsers } from "../../services/auth.service";
 
 export default function DmList({ onSelectConversation, selectedDmId }) {
   const dispatch = useDispatch();
-  const dms = useSelector((state) => state.dms.conversations);
 
-  const handleSelect = (dmId) => {
-    dispatch(selectDm(dmId));
-    if (onSelectConversation) onSelectConversation(dmId);
+  const dms = useSelector((state) => state.dms.conversations || []);
+  const loading = useSelector((state) => state.dms.loading);
+  const currentUser = useSelector((state) => state.auth.user);
+
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  useEffect(() => {
+    dispatch(fetchConversations());
+  }, [dispatch]);
+
+  const handleSearchChange = async (e) => {
+    const q = e.target.value;
+    setSearchQuery(q);
+
+    if (q.trim().length >= 2) {
+      setIsSearching(true);
+      try {
+        const users = await searchUsers(q.trim());
+        setSearchResults(users || []);
+      } catch (err) {
+        console.error("User search failed:", err);
+      } finally {
+        setIsSearching(false);
+      }
+    } else {
+      setSearchResults([]);
+    }
+  };
+
+  const handleStartWithUser = async (user) => {
+    try {
+      const conv = await dispatch(startConversation(user._id || user.id)).unwrap();
+      setShowSearch(false);
+      setSearchQuery("");
+      setSearchResults([]);
+      const convId = conv._id || conv.id;
+      if (onSelectConversation) onSelectConversation(convId);
+    } catch (err) {
+      console.error("Failed to start DM:", err);
+    }
+  };
+
+  const handleSelect = (convId) => {
+    dispatch(selectDm(convId));
+    if (onSelectConversation) onSelectConversation(convId);
+  };
+
+  const getOtherParticipant = (conv) => {
+    if (!conv?.participants || !Array.isArray(conv.participants)) return {};
+    const myId = (currentUser?._id || currentUser?.id)?.toString();
+    return (
+      conv.participants.find((p) => (p._id || p.id || p).toString() !== myId) ||
+      conv.participants[0] ||
+      {}
+    );
+  };
+
+  const formatTimestamp = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return "";
+    const now = new Date();
+    const diffHours = (now - date) / (1000 * 60 * 60);
+    if (diffHours < 24) {
+      return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    }
+    return date.toLocaleDateString([], { month: "short", day: "numeric" });
   };
 
   return (
@@ -24,49 +95,133 @@ export default function DmList({ onSelectConversation, selectedDmId }) {
           </h3>
           <p className="text-[11px] text-slate-400">Encrypted 1-on-1 channels</p>
         </div>
+        <button
+          onClick={() => setShowSearch(!showSearch)}
+          className={`p-1.5 rounded-lg border transition-colors ${
+            showSearch
+              ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
+              : "text-slate-400 hover:text-white hover:bg-white/5 border-white/5"
+          }`}
+          title="New Transmission"
+        >
+          {showSearch ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+        </button>
       </div>
+
+      {/* User Search Bar */}
+      {showSearch && (
+        <div className="p-2 border-b border-white/10 bg-[#131822] space-y-2">
+          <div className="relative">
+            <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Find user to message..."
+              className="w-full bg-[#0C0F15] border border-white/10 rounded-xl text-xs text-white pl-8 pr-3 py-1.5 focus:outline-none focus:border-cyan-500/50"
+              autoFocus
+            />
+          </div>
+
+          {isSearching && (
+            <div className="flex items-center justify-center p-2 text-xs text-slate-400 gap-1.5">
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              <span>Scanning frequency...</span>
+            </div>
+          )}
+
+          {searchResults.length > 0 && (
+            <div className="space-y-1 max-h-48 overflow-y-auto">
+              {searchResults.map((user) => (
+                <div
+                  key={user._id}
+                  onClick={() => handleStartWithUser(user)}
+                  className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-white/5 cursor-pointer text-xs"
+                >
+                  <Avatar
+                    src={user.profile_pic}
+                    name={user.fullname || user.username}
+                    size="xs"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-slate-200 font-semibold truncate">
+                      {user.fullname}
+                    </p>
+                    <p className="text-[10px] font-mono text-cyan-400 truncate">
+                      @{user.username}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!isSearching && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
+            <div className="text-[11px] text-slate-500 text-center py-2">
+              No operative found
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Conversations List */}
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
+        {loading && dms.length === 0 && (
+          <div className="flex items-center justify-center p-8 text-xs font-mono text-slate-500">
+            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+            Loading transmissions...
+          </div>
+        )}
+
+        {!loading && dms.length === 0 && (
+          <div className="p-6 text-center text-slate-500 space-y-3">
+            <MessageSquare className="w-8 h-8 mx-auto opacity-30 text-cyan-400" />
+            <p className="text-xs">No direct transmissions yet.</p>
+            <p className="text-[11px] text-slate-600">
+              Click the <span className="text-cyan-400 font-bold">+</span> button above to initiate contact.
+            </p>
+          </div>
+        )}
+
         {dms.map((conv) => {
-          const isSelected = conv.id === selectedDmId;
+          const convId = conv._id || conv.id;
+          const isSelected = convId === selectedDmId;
+          const otherUser = getOtherParticipant(conv);
+          const name = otherUser.fullname || otherUser.username || "Transmission Thread";
+          const timestamp = formatTimestamp(conv.lastMessage?.createdAt || conv.updatedAt);
+          const lastMsg = conv.lastMessage?.content || "Conversation created";
 
           return (
             <div
-              key={conv.id}
-              onClick={() => handleSelect(conv.id)}
+              key={convId}
+              onClick={() => handleSelect(convId)}
               className={`flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all ${
                 isSelected
-                  ? 'bg-gradient-to-r from-cyan-500/20 to-indigo-500/10 text-cyan-200 border border-cyan-500/30'
-                  : 'hover:bg-white/5 text-slate-300'
+                  ? "bg-gradient-to-r from-cyan-500/20 to-indigo-500/10 text-cyan-200 border border-cyan-500/30 shadow-lg shadow-cyan-500/5"
+                  : "hover:bg-white/5 text-slate-300"
               }`}
             >
               <Avatar
-                src={conv.avatar}
-                name={conv.name}
+                src={otherUser.profile_pic}
+                name={name}
                 size="md"
-                status={conv.status}
+                status="online"
               />
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-semibold text-slate-100 truncate">
-                    {conv.name}
+                    {name}
                   </span>
                   <span className="text-[10px] font-mono text-slate-500">
-                    {conv.timestamp}
+                    {timestamp}
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between mt-0.5">
                   <p className="text-[11px] text-slate-400 truncate pr-2">
-                    {conv.lastMessage}
+                    {lastMsg}
                   </p>
-                  {conv.unreadCount > 0 && (
-                    <Badge variant="unread" size="xs">
-                      {conv.unreadCount}
-                    </Badge>
-                  )}
                 </div>
               </div>
             </div>

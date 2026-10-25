@@ -68,30 +68,30 @@ export const messageSlice = createSlice({
   },
   reducers: {
     addMessage: (state, action) => {
-      if (
-        !state.messages.some(
-          (message) =>
-            (message._id || message.id) ===
-            (action.payload._id || action, payload.id),
-        )
-      )
+      const newId = action.payload?._id || action.payload?.id;
+      if (!newId) return;
+
+      const exists = state.messages.some(
+        (message) => (message._id || message.id) === newId,
+      );
+      if (!exists) {
         state.messages.push(action.payload);
+      }
     },
     updateMessage: (state, action) => {
+      const targetId = action.payload?._id || action.payload?.id;
       const index = state.messages.findIndex(
-        (message) =>
-          (message.id || message._id) === action.payload.id ||
-          action.payload._id,
+        (message) => (message._id || message.id) === targetId,
       );
-      if (index !== -1)
+      if (index !== -1) {
         state.messages[index] = { ...state.messages[index], ...action.payload };
+      }
     },
 
     removeMessage: (state, action) => {
+      const targetId = action.payload?._id || action.payload?.id;
       state.messages = state.messages.filter(
-        (message) =>
-          (message._id || message.id) ===
-          (action.payload._id || action.payload.id),
+        (message) => (message._id || message.id) !== targetId,
       );
     },
     setHighlightedMessageId: (state, action) => {
@@ -237,6 +237,17 @@ export const messageSlice = createSlice({
         state.error = action.payload;
       })
 
+      .addCase(sendMessage.fulfilled, (state, action) => {
+        const newId = action.payload?._id || action.payload?.id;
+        if (newId) {
+          const exists = state.messages.some(
+            (m) => (m._id || m.id) === newId,
+          );
+          if (!exists) {
+            state.messages.push(action.payload);
+          }
+        }
+      })
       .addCase(sendMessage.rejected, (state, action) => {
         state.error = action.payload;
       });

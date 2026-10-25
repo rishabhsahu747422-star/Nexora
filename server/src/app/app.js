@@ -16,6 +16,7 @@ import cors from "cors";
 import { errorMiddleware } from "../middlewares/error.middleware.js";
 import channelRoutes from "../routes/channel.routes.js";
 import paymentRoutes from "../routes/payment.routes.js";
+import conversationRoutes from "../routes/conversation.routes.js";
 
 const app = express();
 export const server = http.createServer(app);
@@ -25,9 +26,21 @@ app.use(passport.initialize());
 app.use(express.json());
 app.use(cookieParser());
 
+const allowedOrigins = [
+  "https://nexora-umber-nine.vercel.app",
+  "http://localhost:5173",
+  "http://localhost:3000",
+];
+
 app.use(
   cors({
-    origin: "https://nexora-umber-nine.vercel.app",
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
     credentials: true,
   }),
 );
@@ -53,6 +66,7 @@ app.use("/api/channel", channelRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/conversations", conversationRoutes);
 
 app.use(errorMiddleware);
 export default app;

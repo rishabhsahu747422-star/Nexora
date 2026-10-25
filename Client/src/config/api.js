@@ -1,7 +1,13 @@
 import axios from "axios";
 
+const apiBaseURL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (typeof window !== "undefined" && window.location.hostname === "localhost"
+    ? "http://localhost:5000/api"
+    : "https://nexora-ikwc.onrender.com/api");
+
 const api = axios.create({
-  baseURL: "https://nexora-ikwc.onrender.com/api",
+  baseURL: apiBaseURL,
   withCredentials: true,
 });
 

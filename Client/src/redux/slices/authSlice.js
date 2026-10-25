@@ -4,6 +4,7 @@ import {
   loginUser,
   logoutUser,
   registerUser,
+  updateUserProfile,
 } from "../../services/auth.service.js";
 
 const responseData = (response) => response?.data ?? response?.user ?? response;
@@ -55,6 +56,19 @@ export const logoutUserAsync = createAsyncThunk(
     } catch (error) {
       return (
         rejectWithValue(error.response?.data?.message) || "Unable to sign out"
+      );
+    }
+  },
+);
+
+export const updateProfile = createAsyncThunk(
+  "auth/updateProfile",
+  async (data, { rejectWithValue }) => {
+    try {
+      return await updateUserProfile(data);
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Unable to update profile",
       );
     }
   },
@@ -140,6 +154,12 @@ export const authSlice = createSlice({
       })
       .addCase(logoutUserAsync.pending, (state) => {
         state.loading = true;
+      });
+    builder
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.user = { ...state.user, ...action.payload };
+        }
       });
   },
 });
