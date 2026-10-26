@@ -140,7 +140,7 @@ export default function VoiceStage({ channel }) {
 
   // Remote audio elements playing remote peers
   const renderRemoteAudioElements = () => {
-    return Object.entries(remoteStreams).map(([socketId, stream]) => (
+    return Object.entries(remoteStreams ?? {}).map(([socketId, stream]) => (
       <audio
         key={socketId}
         ref={(audioEl) => {

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useNavigate, Link, useLocation, Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import { Mail, Lock, LogIn, ArrowRight } from "lucide-react";
 import NexoraLogo from "../assets/logo/NexoraLogo";
@@ -13,6 +13,9 @@ import { addToast } from "../redux/slices/uiSlice";
 export default function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const { isAuthenticated, loading } = useSelector((state) => state.auth);
+
   const [isLoading, setIsLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -24,31 +27,39 @@ export default function Login() {
     mode: "onBlur",
   });
 
+  if (!loading && isAuthenticated) {
+    const destination = location.state?.from?.pathname || "/app";
+    const search = location.state?.from?.search || "";
+    return <Navigate to={`${destination}${search}`} replace />;
+  }
+
   const handleGoogleLogin = () => {
     setGoogleLoading(true);
 
-    window.location.href = "http://localhost:3000/api/auth/google";
-    setGoogleLoading(false);
-    dispatch(
-      addToast({
-        type: "success",
-        message: "Signed in successfully with Google account.",
-      }),
-    );
+    const rawApiUrl =
+      import.meta.env.VITE_API_BASE_URL ||
+      (typeof window !== "undefined" && window.location.hostname === "localhost"
+        ? "http://localhost:5000/api"
+        : "https://nexora-ikwc.onrender.com/api");
+    const apiBase = typeof rawApiUrl === "string" ? rawApiUrl.trim().replace(/\/+$/, "") : rawApiUrl;
+    window.location.href = `${apiBase}/auth/google`;
   };
 
   const onSubmit = async (data) => {
+    setIsLoading(true);
     try {
       const user = await dispatch(loginUserAsync(data)).unwrap();
 
       dispatch(
         addToast({
           type: "success",
-          message: `Welcome back, ${user.fullname}!`,
+          message: `Welcome back, ${user.fullname || user.username || "Operative"}!`,
         }),
       );
 
-      navigate("/app");
+      const destination = location.state?.from?.pathname || "/app";
+      const search = location.state?.from?.search || "";
+      navigate(`${destination}${search}`, { replace: true });
     } catch (error) {
       dispatch(
         addToast({
@@ -56,8 +67,11 @@ export default function Login() {
           message: error || "Unable to sign in",
         }),
       );
+    } finally {
+      setIsLoading(false);
     }
   };
+
 
   // const handleGoogleLogin = () => {
   //   setGoogleLoading(true);

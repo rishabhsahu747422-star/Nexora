@@ -10,11 +10,13 @@ import {
   User,
   ArrowRight,
   X,
+  Loader2,
 } from "lucide-react";
 import { closeGlobalSearch, openModal } from "../../redux/slices/uiSlice";
 import { selectServer } from "../../redux/slices/serverSlice";
 import { selectChannel } from "../../redux/slices/channelSlice";
 import { setHighlightedMessageId } from "../../redux/slices/messageSlice";
+import { searchUsers } from "../../services/auth.service";
 import Avatar from "../common/Avatar";
 import CommunityAvatar from "../common/CommunityAvatar";
 
@@ -26,12 +28,15 @@ export default function GlobalSearchModal() {
   const servers = useSelector((state) => state.server.servers);
   const channels = useSelector((state) => state.channels.channels);
   const messagesByContext = useSelector(
-    (state) => state.messages.messagesByContext,
+    (state) => state.messages?.messagesByContext,
   );
-  const currentUser = useSelector((state) => state.auth.currentUser);
+  const rawMessages = useSelector((state) => state.messages?.messages);
+  const currentUser = useSelector((state) => state.auth.user);
 
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all"); // 'all' | 'messages' | 'channels' | 'servers' | 'users'
+  const [searchedUsers, setSearchedUsers] = useState([]);
+  const [isSearchingUsers, setIsSearchingUsers] = useState(false);
 
   // Global key listener for Ctrl+K / Cmd+K
   useEffect(() => {
@@ -53,99 +58,109 @@ export default function GlobalSearchModal() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, dispatch]);
 
+  // Debounced real backend user search with stale request cancellation
+  useEffect(() => {
+    const q = query.trim();
+    if (!q) {
+      setSearchedUsers([]);
+      setIsSearchingUsers(false);
+      return;
+    }
+
+    let isCurrent = true;
+    setIsSearchingUsers(true);
+
+    const timer = setTimeout(async () => {
+      try {
+        const users = await searchUsers(q);
+        if (isCurrent) {
+          const userList = Array.isArray(users) ? users : [];
+          const myId = (currentUser?._id || currentUser?.id)?.toString();
+          const filtered = userList.filter(
+            (u) => (u._id || u.id)?.toString() !== myId,
+          );
+          setSearchedUsers(filtered);
+        }
+      } catch (err) {
+        if (isCurrent) {
+          setSearchedUsers([]);
+        }
+      } finally {
+        if (isCurrent) {
+          setIsSearchingUsers(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      isCurrent = false;
+      clearTimeout(timer);
+    };
+  }, [query, currentUser]);
+
   // Aggregate results across all categories
   const searchResults = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return { messages: [], channels: [], servers: [], users: [] };
 
+    const safeServers = Array.isArray(servers) ? servers : [];
+    const safeChannels = Array.isArray(channels) ? channels : [];
+
     // Search Servers
-    const matchedServers = servers.filter(
+    const matchedServers = safeServers.filter(
       (s) =>
-        s.name.toLowerCase().includes(q) ||
-        s.description.toLowerCase().includes(q) ||
-        s.tag.toLowerCase().includes(q),
+        s.name?.toLowerCase().includes(q) ||
+        s.description?.toLowerCase().includes(q) ||
+        s.tag?.toLowerCase().includes(q),
     );
 
     // Search Channels
-    const matchedChannels = channels.filter(
+    const matchedChannels = safeChannels.filter(
       (c) =>
-        c.name.toLowerCase().includes(q) ||
+        c.name?.toLowerCase().includes(q) ||
         (c.topic && c.topic.toLowerCase().includes(q)),
     );
 
     // Search Messages across all channels
     const matchedMessages = [];
-    Object.entries(messagesByContext).forEach(([contextId, msgs]) => {
-      if (Array.isArray(msgs)) {
-        msgs.forEach((m) => {
-          if (m.content.toLowerCase().includes(q)) {
-            // Find channel details
-            const chan = channels.find((c) => c.id === contextId);
-            matchedMessages.push({
-              ...m,
-              channelName: chan ? chan.name : "transmission",
-              serverId: chan ? chan.serverId : null,
-            });
-          }
-        });
-      }
-    });
+    if (messagesByContext && typeof messagesByContext === "object") {
+      Object.entries(messagesByContext ?? {}).forEach(([contextId, msgs]) => {
+        if (Array.isArray(msgs)) {
+          msgs.forEach((m) => {
+            if (m.content?.toLowerCase().includes(q)) {
+              const chan = safeChannels.find((c) => (c._id || c.id) === contextId);
+              matchedMessages.push({
+                ...m,
+                channelName: chan ? chan.name : "transmission",
+                serverId: chan ? chan.serverId : null,
+              });
+            }
+          });
+        }
+      });
+    }
 
-    // Mock Users for search
-    const matchedUsers = [
-      {
-        id: "usr_elena",
-        name: "Dr. Elena Rostova",
-        username: "elena_ai",
-        avatar:
-          "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&auto=format&fit=crop&q=80",
-        status: "online",
-      },
-      {
-        id: "usr_marcus",
-        name: "Marcus Vance",
-        username: "marcus_v",
-        avatar:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
-        status: "online",
-      },
-      {
-        id: "usr_sora",
-        name: "Sora Takahashi",
-        username: "sora_t",
-        avatar:
-          "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=150&auto=format&fit=crop&q=80",
-        status: "idle",
-      },
-      {
-        id: "usr_kai",
-        name: "Kai Thorne",
-        username: "kaithorne",
-        avatar:
-          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
-        status: "online",
-      },
-      {
-        id: "usr_anya",
-        name: "Anya Sharma",
-        username: "anyasharma",
-        avatar:
-          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-        status: "dnd",
-      },
-    ].filter(
-      (u) =>
-        u.name.toLowerCase().includes(q) ||
-        u.username.toLowerCase().includes(q),
-    );
+    if (Array.isArray(rawMessages)) {
+      rawMessages.forEach((m) => {
+        if (m.content?.toLowerCase().includes(q)) {
+          const chanId = m.channel_id?._id || m.channel_id || m.channelId;
+          const chan = safeChannels.find((c) => (c._id || c.id) === chanId);
+          matchedMessages.push({
+            ...m,
+            channelName: chan ? chan.name : "transmission",
+            serverId: chan ? chan.serverId : null,
+          });
+        }
+      });
+    }
 
     return {
       servers: matchedServers,
       channels: matchedChannels,
       messages: matchedMessages,
-      users: matchedUsers,
+      users: searchedUsers,
     };
-  }, [query, servers, channels, messagesByContext]);
+  }, [query, servers, channels, messagesByContext, rawMessages, searchedUsers]);
 
   const totalResults =
     searchResults.servers.length +
@@ -173,10 +188,11 @@ export default function GlobalSearchModal() {
   const handleSelectServer = (server) => {
     dispatch(closeGlobalSearch());
     dispatch(selectServer(server.id));
-    const def = channels.find((c) => c.serverId === server.id);
+    const safeChannels = Array.isArray(channels) ? channels : [];
+    const def = safeChannels.find((c) => (c.serverId || c.server_id) === server.id);
     if (def) {
-      dispatch(selectChannel(def.id));
-      navigate(`/app/server/${server.id}/channel/${def.id}`);
+      dispatch(selectChannel(def._id || def.id));
+      navigate(`/app/server/${server.id}/channel/${def._id || def.id}`);
     } else {
       navigate(`/app/server/${server.id}`);
     }
@@ -184,8 +200,21 @@ export default function GlobalSearchModal() {
 
   const handleSelectUser = (user) => {
     dispatch(closeGlobalSearch());
-    dispatch(openModal({ type: "PROFILE", props: { user } }));
+    dispatch(
+      openModal({
+        type: "PROFILE",
+        props: {
+          user: {
+            ...user,
+            id: user._id || user.id,
+            name: user.fullname || user.name || user.username,
+            avatar: user.profile_pic || user.avatar,
+          },
+        },
+      }),
+    );
   };
+
 
   if (!isOpen) return null;
 
@@ -388,42 +417,58 @@ export default function GlobalSearchModal() {
                 )}
 
               {/* Members */}
-              {(activeCategory === "all" || activeCategory === "users") &&
-                searchResults.users.length > 0 && (
+              {(activeCategory === "all" || activeCategory === "users") && (
+                isSearchingUsers ? (
+                  <div className="flex items-center justify-center p-4 text-xs text-slate-400 gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-[var(--accent)]" />
+                    <span>Searching network operatives...</span>
+                  </div>
+                ) : searchResults.users.length > 0 ? (
                   <div>
                     <h4 className="text-[11px] font-mono uppercase text-slate-400 px-2 mb-1.5 flex items-center gap-1.5">
                       <User className="w-3.5 h-3.5 text-emerald-400" />
                       Members
                     </h4>
                     <div className="space-y-1">
-                      {searchResults.users.map((u) => (
-                        <div
-                          key={u.id}
-                          onClick={() => handleSelectUser(u)}
-                          className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors group"
-                        >
-                          <div className="flex items-center gap-3">
-                            <Avatar
-                              src={u.avatar}
-                              name={u.name}
-                              size="xs"
-                              status={u.status}
-                            />
-                            <div>
-                              <p className="text-xs font-semibold text-slate-200">
-                                {u.name}
-                              </p>
-                              <p className="text-[10px] font-mono text-[var(--accent)]">
-                                @{u.username}
-                              </p>
+                      {searchResults.users.map((u) => {
+                        const userId = u._id || u.id;
+                        const displayName = u.fullname || u.name || u.username;
+                        const handle = u.username;
+                        const avatarUrl = u.profile_pic || u.avatar;
+                        return (
+                          <div
+                            key={userId}
+                            onClick={() => handleSelectUser(u)}
+                            className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors group"
+                          >
+                            <div className="flex items-center gap-3">
+                              <Avatar
+                                src={avatarUrl}
+                                name={displayName}
+                                size="xs"
+                                status={u.status || "online"}
+                              />
+                              <div>
+                                <p className="text-xs font-semibold text-slate-200">
+                                  {displayName}
+                                </p>
+                                <p className="text-[10px] font-mono text-[var(--accent)]">
+                                  @{handle}
+                                </p>
+                              </div>
                             </div>
+                            <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
                           </div>
-                          <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors flex-shrink-0" />
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
-                )}
+                ) : activeCategory === "users" && query.trim() !== "" ? (
+                  <div className="py-8 text-center text-slate-500 text-xs">
+                    No members found matching "{query}"
+                  </div>
+                ) : null
+              )}
             </>
           )}
         </div>

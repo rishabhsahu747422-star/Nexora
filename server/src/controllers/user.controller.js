@@ -81,18 +81,33 @@ export const getUserProfile = async (req, res, next) => {
 
 export const searchUser = async (req, res, next) => {
   try {
-    const query = req.query.query || req.query.q || req.query.search || req.query.username || "";
-    const currentUserId = req.user._id || req.user.id;
+    const rawQuery = (
+      req.query.query ||
+      req.query.q ||
+      req.query.search ||
+      req.query.username ||
+      ""
+    ).trim();
+
+    if (!rawQuery) {
+      return res
+        .status(200)
+        .json(new ApiResponse(200, [], "users fetched"));
+    }
+
+    const currentUserId = req.user?._id || req.user?.id;
+    const escapedQuery = rawQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
     const users = await userModel
       .find({
-        _id: { $ne: currentUserId },
+        ...(currentUserId ? { _id: { $ne: currentUserId } } : {}),
         $or: [
-          { username: { $regex: query, $options: "i" } },
-          { fullname: { $regex: query, $options: "i" } },
+          { username: { $regex: escapedQuery, $options: "i" } },
+          { fullname: { $regex: escapedQuery, $options: "i" } },
         ],
       })
-      .select("username fullname profile_pic");
+      .select("username fullname profile_pic bio customStatus appearance")
+      .limit(25);
 
     return res
       .status(200)

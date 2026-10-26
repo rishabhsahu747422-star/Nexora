@@ -27,23 +27,48 @@ export default function DmList({ onSelectConversation, selectedDmId }) {
     dispatch(fetchConversations());
   }, [dispatch]);
 
-  const handleSearchChange = async (e) => {
-    const q = e.target.value;
-    setSearchQuery(q);
-
-    if (q.trim().length >= 2) {
-      setIsSearching(true);
-      try {
-        const users = await searchUsers(q.trim());
-        setSearchResults(users || []);
-      } catch (err) {
-        console.error("User search failed:", err);
-      } finally {
-        setIsSearching(false);
-      }
-    } else {
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length < 2) {
       setSearchResults([]);
+      setIsSearching(false);
+      return;
     }
+
+    let isCurrent = true;
+    setIsSearching(true);
+
+    const timer = setTimeout(async () => {
+      try {
+        const users = await searchUsers(q);
+        if (isCurrent) {
+          const userList = Array.isArray(users) ? users : [];
+          const myId = (currentUser?._id || currentUser?.id)?.toString();
+          setSearchResults(
+            userList.filter(
+              (u) => (u._id || u.id)?.toString() !== myId,
+            ),
+          );
+        }
+      } catch (err) {
+        if (isCurrent) {
+          setSearchResults([]);
+        }
+      } finally {
+        if (isCurrent) {
+          setIsSearching(false);
+        }
+      }
+    }, 300);
+
+    return () => {
+      isCurrent = false;
+      clearTimeout(timer);
+    };
+  }, [searchQuery, currentUser]);
+
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
   };
 
   const handleStartWithUser = async (user) => {

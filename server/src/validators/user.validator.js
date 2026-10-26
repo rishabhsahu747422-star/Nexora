@@ -68,9 +68,13 @@ export const usernameValidator = [
 
 export const searchUserValidator = [
   query("query")
+    .optional()
     .trim()
-    .notEmpty()
-    .withMessage("Search query is required")
+    .isLength({ max: 50 })
+    .withMessage("Search query is too long"),
+  query("q")
+    .optional()
+    .trim()
     .isLength({ max: 50 })
     .withMessage("Search query is too long"),
 ];

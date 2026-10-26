@@ -39,7 +39,11 @@ export const getMeAsync = createAsyncThunk(
   "/auth/me",
   async (_, { rejectWithValue }) => {
     try {
-      return await getMe();
+      const user = await getMe();
+      if (!user) {
+        return rejectWithValue("No active session");
+      }
+      return user;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "your session has expired",
@@ -117,7 +121,8 @@ export const authSlice = createSlice({
       })
       .addCase(getMeAsync.fulfilled, (state, action) => {
         state.user = action.payload;
-        ((state.isAuthenticated = true), (state.error = null));
+        state.isAuthenticated = !!action.payload;
+        state.error = null;
         state.loading = false;
       })
       .addCase(getMeAsync.rejected, (state, action) => {

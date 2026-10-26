@@ -92,8 +92,17 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        {/* Server & Channels Routes */}
         <Route
           path="/app/server/:serverId"
+          element={
+            <ProtectedRoute>
+              <Workspace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/servers/:serverId"
           element={
             <ProtectedRoute>
               <Workspace />
@@ -109,7 +118,41 @@ export default function App() {
           }
         />
         <Route
+          path="/app/servers/:serverId/channel/:channelId"
+          element={
+            <ProtectedRoute>
+              <Workspace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/server/:serverId/channels/:channelId"
+          element={
+            <ProtectedRoute>
+              <Workspace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/servers/:serverId/channels/:channelId"
+          element={
+            <ProtectedRoute>
+              <Workspace />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Direct Messages & Conversations Routes */}
+        <Route
           path="/app/messages"
+          element={
+            <ProtectedRoute>
+              <Workspace />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/app/dms"
           element={
             <ProtectedRoute>
               <Workspace />
@@ -124,6 +167,16 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/app/dms/:conversationId"
+          element={
+            <ProtectedRoute>
+              <Workspace />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* User Profile and Settings */}
         <Route
           path="/app/profile"
           element={

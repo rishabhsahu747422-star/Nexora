@@ -242,7 +242,7 @@ export const applyTheme = (appearance = {}) => {
 
   // Accent variables
   const accentVars = generateAccentVariables(prefs.accentColor);
-  Object.entries(accentVars).forEach(([key, val]) => {
+  Object.entries(accentVars ?? {}).forEach(([key, val]) => {
     root.style.setProperty(key, val);
   });
 

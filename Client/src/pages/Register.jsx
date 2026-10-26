@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useNavigate, Link } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useNavigate, Link, useLocation, Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { motion } from "framer-motion";
 import {
   User,
@@ -22,7 +22,10 @@ import { addToast } from "../redux/slices/uiSlice";
 export default function Register() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const location = useLocation();
+  const { isAuthenticated, loading } = useSelector((state) => state.auth);
   const [isLoading, setIsLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const {
     register,
@@ -38,6 +41,13 @@ export default function Register() {
       confirmPassword: "",
     },
   });
+
+  if (!loading && isAuthenticated) {
+    const destination = location.state?.from?.pathname || "/app";
+    const search = location.state?.from?.search || "";
+    return <Navigate to={`${destination}${search}`} replace />;
+  }
+
 
   const passwordVal = watch("password", "");
 
@@ -81,7 +91,9 @@ export default function Register() {
         }),
       );
 
-      navigate("/app");
+      const destination = location.state?.from?.pathname || "/app";
+      const search = location.state?.from?.search || "";
+      navigate(`${destination}${search}`, { replace: true });
     } catch (error) {
       dispatch(
         addToast({
@@ -92,19 +104,16 @@ export default function Register() {
     }
   };
 
-  const [googleLoading, setGoogleLoading] = useState(false);
-
   const handleGoogleRegister = () => {
     setGoogleLoading(true);
 
-    window.location.href = "http://localhost:3000/api/auth/google";
-    setGoogleLoading(false);
-    dispatch(
-      addToast({
-        type: "success",
-        message: "Register successfully with Google account.",
-      }),
-    );
+    const rawApiUrl =
+      import.meta.env.VITE_API_BASE_URL ||
+      (typeof window !== "undefined" && window.location.hostname === "localhost"
+        ? "http://localhost:5000/api"
+        : "https://nexora-ikwc.onrender.com/api");
+    const apiBase = typeof rawApiUrl === "string" ? rawApiUrl.trim().replace(/\/+$/, "") : rawApiUrl;
+    window.location.href = `${apiBase}/auth/google`;
   };
 
   return (

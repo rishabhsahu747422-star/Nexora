@@ -33,7 +33,8 @@ export default function Workspace() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { serverId, channelId, dmId } = useParams();
+  const { serverId, channelId, dmId, conversationId } = useParams();
+  const effectiveDmId = dmId || conversationId;
 
   const servers = useSelector((state) => state.server.servers);
 
@@ -66,20 +67,28 @@ export default function Workspace() {
   }, [channelId, dispatch]);
 
   useEffect(() => {
-    if (dmId && dmId !== activeDmId) {
-      dispatch(selectDm(dmId));
+    if (effectiveDmId && effectiveDmId !== activeDmId) {
+      dispatch(selectDm(effectiveDmId));
     }
-  }, [dmId, activeDmId, dispatch]);
+  }, [effectiveDmId, activeDmId, dispatch]);
 
   // Determine current mode based on route
-  const isDmMode = location.pathname.startsWith("/app/messages");
+  const isDmMode =
+    location.pathname.startsWith("/app/messages") ||
+    location.pathname.startsWith("/app/dms");
 
   useEffect(() => {
-    if (isDmMode && !dmId && activeDmId) {
-      navigate(`/app/messages/${activeDmId}`, { replace: true });
+    if (isDmMode && !effectiveDmId && activeDmId) {
+      const dmPrefix = location.pathname.startsWith("/app/dms")
+        ? "/app/dms"
+        : "/app/messages";
+      navigate(`${dmPrefix}/${activeDmId}`, { replace: true });
     }
-  }, [isDmMode, dmId, activeDmId, navigate]);
-  const isServerMode = location.pathname.startsWith("/app/server");
+  }, [isDmMode, effectiveDmId, activeDmId, navigate, location.pathname]);
+
+  const isServerMode =
+    location.pathname.startsWith("/app/server") ||
+    location.pathname.startsWith("/app/servers");
   const isHubMode =
     location.pathname === "/app" || location.pathname === "/app/";
 
@@ -129,14 +138,19 @@ export default function Workspace() {
             {/* DMs Conversation List Deck */}
             <div className="hidden sm:flex">
               <DmList
-                selectedDmId={dmId || activeDmId}
-                onSelectConversation={(id) => navigate(`/app/messages/${id}`)}
+                selectedDmId={effectiveDmId || activeDmId}
+                onSelectConversation={(id) => {
+                  const dmPrefix = location.pathname.startsWith("/app/dms")
+                    ? "/app/dms"
+                    : "/app/messages";
+                  navigate(`${dmPrefix}/${id}`);
+                }}
               />
             </div>
 
             {/* DM Chat Conversation Area */}
             <div className="flex-1 flex flex-col min-w-0 bg-[var(--workspace-bg)] h-full">
-              <DmConversation dmId={dmId || activeDmId} />
+              <DmConversation dmId={effectiveDmId || activeDmId} />
             </div>
           </>
         )}
