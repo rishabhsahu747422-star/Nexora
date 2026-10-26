@@ -142,7 +142,7 @@ export default function CreateServerModal({ isOpen, onClose }) {
           <label className="text-xs font-medium text-slate-300 block mb-2">
             Community Emblem
           </label>
-          <div className="flex items-center gap-4 p-3 bg-[#0C0F15] border border-white/10 rounded-2xl">
+          <div className="flex items-center gap-4 p-3 bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-2xl">
             {/* Live Community Avatar or Uploaded Preview */}
             <div className="relative group flex-shrink-0">
               <CommunityAvatar
@@ -175,7 +175,7 @@ export default function CreateServerModal({ isOpen, onClose }) {
               />
               <label
                 htmlFor="community-emblem-upload"
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#151A23] hover:bg-[#1C2331] text-cyan-300 hover:text-cyan-200 border border-cyan-500/30 hover:border-cyan-500/50 rounded-xl text-xs font-medium cursor-pointer transition-all shadow-sm"
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)] text-[var(--accent)] border border-[var(--accent-border)] rounded-xl text-xs font-medium cursor-pointer transition-all shadow-sm"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span>{selectedFile ? "Replace Image" : "Upload Image"}</span>
@@ -214,7 +214,7 @@ export default function CreateServerModal({ isOpen, onClose }) {
           </label>
           <select
             {...register("category")}
-            className="w-full bg-[#0C0F15] border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500/50"
+            className="w-full bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-[var(--accent-border)]"
           >
             <option value="Technology & AI">Technology & AI</option>
             <option value="Gaming & 3D">Gaming & 3D</option>

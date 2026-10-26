@@ -14,7 +14,7 @@ export default function Badge({
     emerald: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/30',
     amber: 'bg-amber-500/10 text-amber-300 border-amber-500/30',
     rose: 'bg-rose-500/10 text-rose-300 border-rose-500/30',
-    unread: 'bg-gradient-to-r from-cyan-500 to-indigo-600 text-white font-bold border-transparent shadow-sm shadow-cyan-500/30',
+    unread: 'bg-[var(--accent)] text-[var(--accent-contrast)] font-bold border-transparent shadow-sm shadow-[var(--accent-glow)]',
   };
 
   const sizeStyles = {

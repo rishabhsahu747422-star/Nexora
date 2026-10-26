@@ -47,7 +47,7 @@ export default function PinnedMessagesModal({
           pinnedMessages.map((msg) => (
             <div
               key={msg.id}
-              className="bg-[#0C0F15] border border-white/10 rounded-xl p-3.5 flex flex-col gap-2 relative group hover:border-indigo-500/40 transition-colors"
+              className="bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl p-3.5 flex flex-col gap-2 relative group hover:border-[var(--accent-border)] transition-colors"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export default function PinnedMessagesModal({
                 <div className="flex items-center gap-1">
                   <button
                     onClick={() => handleJump(msg.id)}
-                    className="p-1 rounded-md text-slate-400 hover:text-cyan-400 hover:bg-white/5 transition-colors text-xs flex items-center gap-1"
+                    className="p-1 rounded-md text-slate-400 hover:text-[var(--accent)] hover:bg-white/5 transition-colors text-xs flex items-center gap-1"
                     title="Jump to message"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />

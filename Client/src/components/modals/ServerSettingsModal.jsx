@@ -144,7 +144,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
     >
       <div className="flex flex-col sm:flex-row min-h-[420px]">
         {/* Left Subnav */}
-        <div className="w-full sm:w-52 bg-[#0C0F15] border-b sm:border-b-0 sm:border-r border-white/5 p-3 space-y-1 select-none">
+        <div className="w-full sm:w-52 bg-[var(--surface-primary)] border-b sm:border-b-0 sm:border-r border-[var(--border-subtle)] p-3 space-y-1 select-none">
           <div className="text-[10px] font-mono uppercase text-slate-500 px-2 py-1">
             Community Config
           </div>
@@ -159,7 +159,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
                   activeTab === tab.id
                     ? isDanger
                       ? "bg-rose-500/15 text-rose-300 border border-rose-500/30"
-                      : "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                      : "bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)]"
                     : isDanger
                       ? "text-rose-400 hover:bg-rose-500/10"
                       : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
@@ -181,7 +181,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
               </h3>
 
               {/* Community Emblem Preview & Upload */}
-              <div className="flex items-center gap-4 p-3 bg-[#0C0F15] border border-white/10 rounded-2xl">
+              <div className="flex items-center gap-4 p-3 bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-2xl">
                 <div className="relative group flex-shrink-0">
                   <CommunityAvatar
                     src={previewUrl || server.icon}
@@ -212,7 +212,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
                   />
                   <label
                     htmlFor="settings-emblem-upload"
-                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#151A23] hover:bg-[#1C2331] text-cyan-300 hover:text-cyan-200 border border-cyan-500/30 hover:border-cyan-500/50 rounded-xl text-xs font-medium cursor-pointer transition-all shadow-sm"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)] text-[var(--accent)] border border-[var(--accent-border)] rounded-xl text-xs font-medium cursor-pointer transition-all shadow-sm"
                   >
                     <Upload className="w-3.5 h-3.5" />
                     <span>{selectedFile ? "Replace Emblem" : "Change Community Emblem"}</span>
@@ -246,7 +246,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
                     type="text"
                     disabled
                     value={server.category}
-                    className="w-full bg-[#0C0F15] border border-white/5 rounded-xl px-3 py-2.5 text-xs text-slate-400 opacity-60"
+                    className="w-full bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl px-3 py-2.5 text-xs text-slate-400 opacity-60"
                   />
                 </div>
               </div>
@@ -284,7 +284,7 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
                 {server.roles?.map((role) => (
                   <div
                     key={role.id}
-                    className="flex items-center justify-between p-3 rounded-xl bg-[#0C0F15] border border-white/5"
+                    className="flex items-center justify-between p-3 rounded-xl bg-[var(--surface-secondary)] border border-[var(--border-subtle)]"
                   >
                     <div className="flex items-center gap-2.5">
                       <span
@@ -334,12 +334,12 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
                 ].map((item, idx) => (
                   <label
                     key={idx}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-[#0C0F15] border border-white/5 cursor-pointer"
+                    className="flex items-start gap-3 p-3 rounded-xl bg-[var(--surface-secondary)] border border-[var(--border-subtle)] cursor-pointer"
                   >
                     <input
                       type="checkbox"
                       defaultChecked={item.checked}
-                      className="mt-0.5 w-4 h-4 rounded bg-[#07080C] border-white/10 text-cyan-500 focus:ring-cyan-500/20"
+                      className="mt-0.5 w-4 h-4 rounded bg-[var(--app-bg)] border-[var(--border-subtle)] text-[var(--accent)] focus:ring-[var(--accent-soft)]"
                     />
                     <div>
                       <p className="text-xs font-semibold text-slate-200">

@@ -100,12 +100,12 @@ export default function FriendsHub() {
   };
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#07080C] select-none overflow-hidden">
+    <div className="flex-1 flex flex-col h-full bg-[var(--workspace-bg)] select-none overflow-hidden">
       {/* Top Tabs Bar */}
-      <div className="h-14 bg-[#10141C] border-b border-white/10 px-4 flex items-center justify-between z-10 flex-shrink-0">
+      <div className="h-14 bg-[var(--surface-primary)] border-b border-[var(--border-subtle)] px-4 flex items-center justify-between z-10 flex-shrink-0">
         <div className="flex items-center gap-2 sm:gap-4 overflow-x-auto">
           <div className="flex items-center gap-2 text-slate-300 font-semibold text-sm mr-2">
-            <Users className="w-4 h-4 text-cyan-400" />
+            <Users className="w-4 h-4 text-[var(--accent)]" />
             <span>Connections</span>
           </div>
 
@@ -120,7 +120,7 @@ export default function FriendsHub() {
               onClick={() => dispatch(setActiveTab(tab.id))}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-all whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30'
+                  ? 'bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)]'
                   : 'text-slate-400 hover:text-slate-200 hover:bg-white/5'
               }`}
             >
@@ -146,9 +146,9 @@ export default function FriendsHub() {
               </h3>
               <p className="text-xs text-slate-400 mt-1">
                 You can add connections using their unique Nexora handle (e.g.{' '}
-                <span className="text-cyan-400 font-mono">elena_ai</span>,{' '}
-                <span className="text-cyan-400 font-mono">marcus_v</span>,{' '}
-                <span className="text-cyan-400 font-mono">sora_t</span>).
+                <span className="text-[var(--accent)] font-mono">elena_ai</span>,{' '}
+                <span className="text-[var(--accent)] font-mono">marcus_v</span>,{' '}
+                <span className="text-[var(--accent)] font-mono">sora_t</span>).
               </p>
             </div>
 
@@ -181,7 +181,7 @@ export default function FriendsHub() {
                 {MOCK_USERS.slice(1, 5).map((user) => (
                   <div
                     key={user.id}
-                    className="flex items-center justify-between p-3 rounded-xl bg-[#10141C] border border-white/5"
+                    className="flex items-center justify-between p-3 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-subtle)]"
                   >
                     <div className="flex items-center gap-3">
                       <Avatar
@@ -194,7 +194,7 @@ export default function FriendsHub() {
                         <p className="text-xs font-semibold text-slate-200">
                           {user.name}
                         </p>
-                        <p className="text-[10px] font-mono text-cyan-400">
+                        <p className="text-[10px] font-mono text-[var(--accent)]">
                           @{user.username}
                         </p>
                       </div>
@@ -235,7 +235,7 @@ export default function FriendsHub() {
               requests.map((req) => (
                 <div
                   key={req.id}
-                  className="flex items-center justify-between p-3.5 rounded-xl bg-[#10141C] border border-white/10"
+                  className="flex items-center justify-between p-3.5 rounded-xl bg-[var(--surface-primary)] border border-[var(--border-subtle)]"
                 >
                   <div className="flex items-center gap-3">
                     <Avatar src={req.avatar} name={req.name} size="md" />
@@ -243,7 +243,7 @@ export default function FriendsHub() {
                       <p className="text-xs font-semibold text-slate-100">
                         {req.name}
                       </p>
-                      <p className="text-[11px] font-mono text-cyan-400">
+                      <p className="text-[11px] font-mono text-[var(--accent)]">
                         @{req.username} • {req.type === 'incoming' ? 'Incoming' : 'Outgoing'}
                       </p>
                     </div>
@@ -304,7 +304,7 @@ export default function FriendsHub() {
                 placeholder="Filter connections..."
                 value={filterQuery}
                 onChange={(e) => setFilterQuery(e.target.value)}
-                className="w-full bg-[#10141C] border border-white/10 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500/50"
+                className="w-full bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl pl-10 pr-4 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-[var(--accent-border)]"
               />
             </div>
 
@@ -322,7 +322,7 @@ export default function FriendsHub() {
                 displayedFriends.map((friend) => (
                   <div
                     key={friend.id}
-                    className="flex items-center justify-between p-3 rounded-2xl bg-[#10141C] hover:bg-[#151A23] border border-white/5 transition-all group"
+                    className="flex items-center justify-between p-3 rounded-2xl bg-[var(--surface-primary)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] transition-all group"
                   >
                     <div
                       onClick={() =>
@@ -351,7 +351,7 @@ export default function FriendsHub() {
                         status={friend.status}
                       />
                       <div className="min-w-0">
-                        <p className="text-xs font-semibold text-slate-100 group-hover:text-cyan-300 transition-colors truncate">
+                        <p className="text-xs font-semibold text-slate-100 group-hover:text-[var(--accent)] transition-colors truncate">
                           {friend.name}
                         </p>
                         <p className="text-[11px] font-mono text-slate-400 truncate">
@@ -363,7 +363,7 @@ export default function FriendsHub() {
                     <div className="flex items-center gap-1.5">
                       <button
                         onClick={() => handleStartDm(friend)}
-                        className="p-2 rounded-xl bg-white/5 hover:bg-cyan-500/15 text-slate-300 hover:text-cyan-300 transition-colors"
+                        className="p-2 rounded-xl bg-white/5 hover:bg-[var(--accent-soft)] text-slate-300 hover:text-[var(--accent)] transition-colors"
                         title="Direct Message"
                       >
                         <MessageSquare className="w-4 h-4" />

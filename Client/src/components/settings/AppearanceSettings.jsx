@@ -206,7 +206,7 @@ export default function AppearanceSettings() {
                 className={`relative flex items-center gap-2.5 p-2.5 rounded-xl border transition-all text-left group ${
                   isSelected
                     ? "bg-white/[0.08] border-white/40 shadow-sm"
-                    : "bg-[#141416] border-white/5 hover:border-white/20 hover:bg-white/[0.03]"
+                    : "bg-[var(--surface-primary)] border-white/5 hover:border-white/20 hover:bg-white/[0.03]"
                 }`}
               >
                 <div
@@ -246,7 +246,7 @@ export default function AppearanceSettings() {
           className={`p-3 rounded-xl border transition-all ${
             isCustomAccent
               ? "bg-white/[0.08] border-white/30"
-              : "bg-[#141416] border-white/5"
+              : "bg-[var(--surface-primary)] border-white/5"
           }`}
         >
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -288,7 +288,7 @@ export default function AppearanceSettings() {
                   value={customHexInput}
                   onChange={(e) => handleCustomHexChange(e.target.value)}
                   placeholder="#E10600"
-                  className={`pl-7 pr-3 py-1.5 w-32 rounded-lg bg-[#0B0B0D] border text-xs font-mono uppercase tracking-wider text-white focus:outline-none focus:ring-1 ${
+                  className={`pl-7 pr-3 py-1.5 w-32 rounded-lg bg-[var(--app-bg)] border text-xs font-mono uppercase tracking-wider text-white focus:outline-none focus:ring-1 ${
                     customHexError
                       ? "border-rose-500 focus:ring-rose-500"
                       : "border-white/10 focus:border-white/30 focus:ring-white/20"
@@ -356,7 +356,7 @@ export default function AppearanceSettings() {
                 className={`flex flex-col items-center text-center p-3.5 rounded-xl border cursor-pointer transition-all ${
                   isSelected
                     ? "bg-[var(--accent-soft)] border-[var(--accent-border)] text-white shadow-sm"
-                    : "bg-[#141416] border-white/10 text-slate-400 hover:text-white hover:border-white/20"
+                    : "bg-[var(--surface-primary)] border-white/10 text-slate-400 hover:text-white hover:border-white/20"
                 }`}
               >
                 <Icon
@@ -395,7 +395,7 @@ export default function AppearanceSettings() {
                 className={`p-3.5 rounded-xl border text-left transition-all relative ${
                   isSelected
                     ? "bg-[var(--accent-soft)] border-[var(--accent-border)] shadow-sm"
-                    : "bg-[#141416] border-white/10 hover:border-white/20"
+                    : "bg-[var(--surface-primary)] border-white/10 hover:border-white/20"
                 }`}
               >
                 <div className="flex items-center justify-between mb-2">
@@ -474,7 +474,7 @@ export default function AppearanceSettings() {
                 className={`p-3.5 rounded-xl border text-left transition-all ${
                   isSelected
                     ? "bg-[var(--accent-soft)] border-[var(--accent-border)]"
-                    : "bg-[#141416] border-white/10 hover:border-white/20"
+                    : "bg-[var(--surface-primary)] border-white/10 hover:border-white/20"
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1.5">
@@ -498,7 +498,7 @@ export default function AppearanceSettings() {
       </div>
 
       {/* 5. Live Theme Preview Card */}
-      <div className="p-4 rounded-2xl border border-white/10 bg-[#0B0B0D] space-y-3">
+      <div className="p-4 rounded-2xl border border-white/10 bg-[var(--app-bg)] space-y-3">
         <div className="flex items-center justify-between border-b border-white/5 pb-2.5">
           <span className="text-xs font-mono uppercase tracking-wider text-slate-400 flex items-center gap-2">
             <Layers className="w-3.5 h-3.5" style={{ color: "var(--accent)" }} />
@@ -509,7 +509,7 @@ export default function AppearanceSettings() {
           </span>
         </div>
 
-        <div className="p-3.5 rounded-xl border border-white/5 bg-[#141416] space-y-3">
+        <div className="p-3.5 rounded-xl border border-white/5 bg-[var(--surface-primary)] space-y-3">
           {/* Mock Channel List Item */}
           <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--accent-soft)] border border-[var(--accent-border)]">
             <div className="flex items-center gap-2">
@@ -532,7 +532,7 @@ export default function AppearanceSettings() {
           </div>
 
           {/* Mock Message Item */}
-          <div className="flex items-start gap-3 p-2.5 rounded-xl bg-[#1B1B1F] border border-white/5">
+          <div className="flex items-start gap-3 p-2.5 rounded-xl bg-[var(--surface-secondary)] border border-white/5">
             <div
               className="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs"
               style={{

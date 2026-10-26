@@ -7,34 +7,34 @@ import { Server } from "lucide-react";
 const getCommunityPalette = (name = "") => {
   const palettes = [
     {
-      gradient: "from-cyan-950/80 via-[#0C1520] to-[#080B12]",
+      gradient: "from-cyan-950/60 via-[#111113] to-[#090909]",
       text: "text-cyan-300",
       border: "border-cyan-500/30",
       glow: "shadow-[0_0_15px_rgba(6,182,212,0.15)]",
     },
     {
-      gradient: "from-violet-950/80 via-[#130E20] to-[#080B12]",
+      gradient: "from-violet-950/60 via-[#111113] to-[#090909]",
       text: "text-violet-300",
       border: "border-violet-500/30",
       glow: "shadow-[0_0_15px_rgba(139,92,246,0.15)]",
     },
     {
-      gradient: "from-emerald-950/80 via-[#0B1A16] to-[#080B12]",
+      gradient: "from-emerald-950/60 via-[#111113] to-[#090909]",
       text: "text-emerald-300",
       border: "border-emerald-500/30",
       glow: "shadow-[0_0_15px_rgba(16,185,129,0.15)]",
     },
     {
-      gradient: "from-amber-950/80 via-[#1C140C] to-[#080B12]",
+      gradient: "from-amber-950/60 via-[#111113] to-[#090909]",
       text: "text-amber-300",
       border: "border-amber-500/30",
       glow: "shadow-[0_0_15px_rgba(245,158,11,0.15)]",
     },
     {
-      gradient: "from-blue-950/80 via-[#0D1626] to-[#080B12]",
-      text: "text-blue-300",
-      border: "border-blue-500/30",
-      glow: "shadow-[0_0_15px_rgba(59,130,246,0.15)]",
+      gradient: "from-rose-950/60 via-[#111113] to-[#090909]",
+      text: "text-rose-300",
+      border: "border-rose-500/30",
+      glow: "shadow-[0_0_15px_rgba(244,63,94,0.15)]",
     },
   ];
 

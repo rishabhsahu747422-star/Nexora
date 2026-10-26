@@ -21,12 +21,12 @@ export default function Landing() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#07080C] text-slate-100 flex flex-col selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--app-bg)] text-slate-100 flex flex-col selection:bg-[var(--accent-soft)] selection:text-[var(--text-primary)] overflow-x-hidden">
       {/* Dynamic Ambient Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] bg-gradient-to-tr from-cyan-500/10 via-indigo-600/10 to-violet-600/10 rounded-full blur-[140px]" />
-        <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-gradient-to-bl from-violet-600/10 via-purple-600/10 to-transparent rounded-full blur-[120px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(#151A23_1px,transparent_1px)] [background-size:32px_32px] opacity-40" />
+        <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] bg-[var(--accent-glow)] opacity-10 rounded-full blur-[140px]" />
+        <div className="absolute bottom-[-10%] right-[10%] w-[500px] h-[500px] bg-white/[0.02] rounded-full blur-[120px]" />
+        <div className="absolute inset-0 bg-[radial-gradient(var(--border-subtle)_1px,transparent_1px)] [background-size:32px_32px] opacity-40" />
       </div>
 
       {/* Top Navbar */}
@@ -34,9 +34,9 @@ export default function Landing() {
         <NexoraLogo size="md" showTagline onClick={() => navigate('/')} />
 
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
-          <a href="#features" className="hover:text-cyan-300 transition-colors">Features</a>
-          <a href="#architecture" className="hover:text-cyan-300 transition-colors">Architecture</a>
-          <a href="#communities" className="hover:text-cyan-300 transition-colors">Communities</a>
+          <a href="#features" className="hover:text-[var(--accent)] transition-colors">Features</a>
+          <a href="#architecture" className="hover:text-[var(--accent)] transition-colors">Architecture</a>
+          <a href="#communities" className="hover:text-[var(--accent)] transition-colors">Communities</a>
         </div>
 
         <div className="flex items-center gap-3">
@@ -55,7 +55,7 @@ export default function Landing() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-8"
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--accent)] text-xs font-mono mb-8"
         >
           <Sparkles className="w-3.5 h-3.5" />
           <span>NEXUS PROTOCOL 2.0 • ULTRA-LOW LATENCY STREAMING</span>
@@ -111,11 +111,11 @@ export default function Landing() {
           initial={{ opacity: 0, scale: 0.95, y: 40 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="mt-16 w-full max-w-5xl rounded-2xl p-1 bg-gradient-to-b from-white/15 via-white/5 to-transparent shadow-2xl shadow-cyan-500/10"
+          className="mt-16 w-full max-w-5xl rounded-2xl p-1 bg-gradient-to-b from-white/15 via-white/5 to-transparent shadow-2xl shadow-[var(--accent-glow)]/10"
         >
-          <div className="bg-[#0C0F15] rounded-[15px] border border-white/10 overflow-hidden flex flex-col text-left">
+          <div className="bg-[var(--surface-secondary)] rounded-[15px] border border-[var(--border-subtle)] overflow-hidden flex flex-col text-left">
             {/* Window bar */}
-            <div className="flex items-center justify-between px-4 py-3 bg-[#10141C] border-b border-white/5">
+            <div className="flex items-center justify-between px-4 py-3 bg-[var(--surface-primary)] border-b border-[var(--border-subtle)]">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-rose-500/70" />
                 <div className="w-3 h-3 rounded-full bg-amber-500/70" />
@@ -130,9 +130,9 @@ export default function Landing() {
 
             {/* Mock Workspace Content preview */}
             <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-[#151A23]/60 p-4 rounded-xl border border-white/5">
+              <div className="bg-[var(--surface-elevated)] p-4 rounded-xl border border-[var(--border-subtle)]">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center font-bold">
+                  <div className="w-8 h-8 rounded-lg bg-[var(--accent-soft)] text-[var(--accent)] flex items-center justify-center font-bold">
                     <Radio className="w-4 h-4" />
                   </div>
                   <div>
@@ -145,7 +145,7 @@ export default function Landing() {
                 </p>
               </div>
 
-              <div className="bg-[#151A23]/60 p-4 rounded-xl border border-white/5">
+              <div className="bg-[var(--surface-elevated)] p-4 rounded-xl border border-[var(--border-subtle)]">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
                     <Volume2 className="w-4 h-4" />
@@ -160,7 +160,7 @@ export default function Landing() {
                 </p>
               </div>
 
-              <div className="bg-[#151A23]/60 p-4 rounded-xl border border-white/5">
+              <div className="bg-[var(--surface-elevated)] p-4 rounded-xl border border-[var(--border-subtle)]">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-8 h-8 rounded-lg bg-violet-500/20 text-violet-400 flex items-center justify-center font-bold">
                     <ShieldCheck className="w-4 h-4" />
@@ -190,8 +190,8 @@ export default function Landing() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="p-6 rounded-2xl bg-[#10141C] border border-white/10 hover:border-cyan-500/40 transition-all duration-300">
-              <div className="w-12 h-12 rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center mb-5">
+            <div className="p-6 rounded-2xl bg-[var(--surface-primary)] border border-[var(--border-subtle)] hover:border-[var(--accent-border)] transition-all duration-300">
+              <div className="w-12 h-12 rounded-xl bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--accent)] flex items-center justify-center mb-5">
                 <Cpu className="w-6 h-6" />
               </div>
               <h3 className="font-display font-semibold text-lg text-white mb-2">Original Navigation Deck</h3>
@@ -200,7 +200,7 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-[#10141C] border border-white/10 hover:border-violet-500/40 transition-all duration-300">
+            <div className="p-6 rounded-2xl bg-[var(--surface-primary)] border border-[var(--border-subtle)] hover:border-[var(--accent-border)] transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-violet-500/15 border border-violet-500/30 text-violet-400 flex items-center justify-center mb-5">
                 <Layers className="w-6 h-6" />
               </div>
@@ -210,20 +210,20 @@ export default function Landing() {
               </p>
             </div>
 
-            <div className="p-6 rounded-2xl bg-[#10141C] border border-white/10 hover:border-emerald-500/40 transition-all duration-300">
+            <div className="p-6 rounded-2xl bg-[var(--surface-primary)] border border-[var(--border-subtle)] hover:border-[var(--accent-border)] transition-all duration-300">
               <div className="w-12 h-12 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-5">
                 <Compass className="w-6 h-6" />
               </div>
               <h3 className="font-display font-semibold text-lg text-white mb-2">Universal Command Search</h3>
               <p className="text-sm text-slate-400 leading-relaxed">
-                Instant keyboard-driven indexing with <span className="font-mono text-cyan-300">Ctrl + K</span> across messages, channels, servers, and members.
+                Instant keyboard-driven indexing with <span className="font-mono text-[var(--accent)]">Ctrl + K</span> across messages, channels, servers, and members.
               </p>
             </div>
           </div>
         </section>
 
         {/* Ready to connect CTA */}
-        <div className="mt-28 w-full p-10 rounded-3xl bg-gradient-to-r from-cyan-950/30 via-[#10141C] to-violet-950/30 border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 text-left">
+        <div className="mt-28 w-full p-10 rounded-3xl bg-gradient-to-r from-[var(--surface-secondary)] via-[var(--surface-primary)] to-[var(--surface-secondary)] border border-[var(--border-subtle)] flex flex-col md:flex-row items-center justify-between gap-6 text-left">
           <div>
             <h3 className="font-display font-bold text-2xl sm:text-3xl text-white">
               Ready to experience Nexora?

@@ -204,10 +204,10 @@ export default function MessageComposer({
     <div className="relative px-4 pb-4 select-none">
       {/* Reply Reference Preview Banner */}
       {replyTarget && (
-        <div className="flex items-center justify-between bg-[#151A23] border border-white/10 border-b-0 rounded-t-xl px-4 py-2 text-xs">
+        <div className="flex items-center justify-between bg-[var(--surface-elevated)] border border-[var(--border-subtle)] border-b-0 rounded-t-xl px-4 py-2 text-xs">
           <div className="flex items-center gap-2 text-slate-300 min-w-0">
-            <CornerDownRight className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-            <span className="font-semibold text-cyan-300">
+            <CornerDownRight className="w-3.5 h-3.5 text-[var(--accent)] flex-shrink-0" />
+            <span className="font-semibold text-[var(--accent)]">
               Replying to @{replyTarget.authorName}:
             </span>
             <span className="truncate italic text-slate-400">
@@ -225,9 +225,9 @@ export default function MessageComposer({
 
       {/* Main Composer Box */}
       <div
-        className={`relative bg-[#10141C] border ${
+        className={`relative bg-[var(--surface-primary)] border ${
           replyTarget ? 'rounded-b-2xl border-t-0' : 'rounded-2xl'
-        } border-white/10 focus-within:border-cyan-500/50 focus-within:ring-2 focus-within:ring-cyan-500/10 transition-all shadow-xl shadow-black/50`}
+        } border-[var(--border-subtle)] focus-within:border-[var(--accent-border)] focus-within:ring-2 focus-within:ring-[var(--accent-soft)] transition-all shadow-xl shadow-black/50`}
       >
         {/* Attachment Previews */}
         {attachments.length > 0 && (
@@ -235,7 +235,7 @@ export default function MessageComposer({
             {attachments.map((att) => (
               <div
                 key={att.id}
-                className="relative group bg-[#0C0F15] border border-white/10 rounded-xl overflow-hidden p-1.5 flex items-center gap-2 max-w-[200px]"
+                className="relative group bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl overflow-hidden p-1.5 flex items-center gap-2 max-w-[200px]"
               >
                 {att.type === 'image' ? (
                   <img
@@ -244,7 +244,7 @@ export default function MessageComposer({
                     className="w-10 h-10 object-cover rounded-lg"
                   />
                 ) : (
-                  <div className="w-10 h-10 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs">
+                  <div className="w-10 h-10 rounded-lg bg-[var(--surface-elevated)] text-[var(--text-secondary)] flex items-center justify-center font-bold text-xs">
                     {att.ext}
                   </div>
                 )}
@@ -326,7 +326,7 @@ export default function MessageComposer({
               type="button"
               onClick={handleSend}
               disabled={!text.trim() && attachments.length === 0}
-              className="p-2 bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white rounded-xl shadow-md shadow-cyan-500/20 disabled:opacity-40 disabled:pointer-events-none transition-all active:scale-95 ml-1"
+              className="p-2 btn-accent-primary text-white rounded-xl shadow-md shadow-[var(--accent-glow)]/20 disabled:opacity-40 disabled:pointer-events-none transition-all active:scale-95 ml-1"
               title="Transmit (Enter)"
             >
               <Send className="w-4 h-4" />
@@ -336,7 +336,7 @@ export default function MessageComposer({
 
         {/* Emoji Popover */}
         {showEmojiPicker && (
-          <div className="absolute bottom-full right-4 mb-2 bg-[#151A23] border border-white/10 rounded-2xl p-3 shadow-2xl shadow-black/80 z-30 w-64 animate-fadeIn">
+          <div className="absolute bottom-full right-4 mb-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] rounded-2xl p-3 shadow-2xl shadow-black/80 z-30 w-64 animate-fadeIn">
             <div className="text-[11px] font-mono text-slate-400 uppercase mb-2">
               Select Emoji
             </div>
@@ -357,7 +357,7 @@ export default function MessageComposer({
 
         {/* GIF Popover */}
         {showGifPicker && (
-          <div className="absolute bottom-full right-4 mb-2 bg-[#151A23] border border-white/10 rounded-2xl p-3 shadow-2xl shadow-black/80 z-30 w-80 animate-fadeIn">
+          <div className="absolute bottom-full right-4 mb-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] rounded-2xl p-3 shadow-2xl shadow-black/80 z-30 w-80 animate-fadeIn">
             <div className="flex items-center justify-between mb-2">
               <span className="text-[11px] font-mono text-slate-400 uppercase">
                 Nexora GIF Vault
@@ -380,7 +380,7 @@ export default function MessageComposer({
                   onClick={() => setGifCategory(cat)}
                   className={`px-2 py-0.5 rounded-lg text-[10px] font-medium whitespace-nowrap transition-colors ${
                     gifCategory === cat
-                      ? 'bg-violet-500/20 text-violet-300 border border-violet-500/40'
+                      ? 'bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)]'
                       : 'text-slate-400 hover:text-white hover:bg-white/5'
                   }`}
                 >
@@ -397,7 +397,7 @@ export default function MessageComposer({
                 <div
                   key={gif.id}
                   onClick={() => handleSelectGif(gif)}
-                  className="rounded-xl overflow-hidden border border-white/10 cursor-pointer hover:border-cyan-400/50 transition-colors h-24 bg-black/40"
+                  className="rounded-xl overflow-hidden border border-[var(--border-subtle)] cursor-pointer hover:border-[var(--accent-border)] transition-colors h-24 bg-black/40"
                 >
                   <img
                     src={gif.preview}
@@ -412,7 +412,7 @@ export default function MessageComposer({
 
         {/* @Mention Autocomplete Dropdown */}
         {mentionQuery !== null && matchedUsers.length > 0 && (
-          <div className="absolute bottom-full left-4 mb-2 bg-[#151A23] border border-white/10 rounded-2xl p-2 shadow-2xl shadow-black/80 z-30 w-64 animate-fadeIn">
+          <div className="absolute bottom-full left-4 mb-2 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] rounded-2xl p-2 shadow-2xl shadow-black/80 z-30 w-64 animate-fadeIn">
             <div className="text-[10px] font-mono text-slate-400 uppercase px-2 mb-1">
               Mention Member
             </div>
@@ -422,7 +422,7 @@ export default function MessageComposer({
                   key={user.id}
                   type="button"
                   onClick={() => handleSelectMention(user)}
-                  className="w-full flex items-center gap-2 p-1.5 rounded-xl hover:bg-cyan-500/10 text-left transition-colors"
+                  className="w-full flex items-center gap-2 p-1.5 rounded-xl hover:bg-[var(--accent-soft)] text-left transition-colors"
                 >
                   <img
                     src={user.avatar}
@@ -433,7 +433,7 @@ export default function MessageComposer({
                     <p className="text-xs font-semibold text-slate-200 truncate">
                       {user.name}
                     </p>
-                    <p className="text-[10px] font-mono text-cyan-400">
+                    <p className="text-[10px] font-mono text-[var(--accent)]">
                       @{user.username}
                     </p>
                   </div>

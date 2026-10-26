@@ -21,7 +21,7 @@ export default function Button({
     primary:
       'btn-accent-primary border border-white/10 font-semibold shadow-md',
     secondary:
-      'bg-[#151A23] hover:bg-[#1E2535] text-slate-200 border border-white/10 hover:border-white/20',
+      'bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)] text-slate-200 border border-[var(--border-subtle)] hover:border-white/20',
     ghost:
       'bg-transparent hover:bg-white/5 text-slate-300 hover:text-white',
     danger:

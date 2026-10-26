@@ -75,7 +75,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
     >
       <div className="flex flex-col sm:flex-row min-h-[440px]">
         {/* Left Subnav */}
-        <div className="w-full sm:w-52 bg-[#0C0F15] border-b sm:border-b-0 sm:border-r border-white/5 p-3 space-y-1 select-none">
+        <div className="w-full sm:w-52 bg-[var(--surface-primary)] border-b sm:border-b-0 sm:border-r border-[var(--border-subtle)] p-3 space-y-1 select-none">
           <div className="text-[10px] font-mono uppercase text-slate-500 px-2 py-1">
             User Settings
           </div>
@@ -87,7 +87,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                 onClick={() => setActiveTab(tab.id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors text-left ${
                   activeTab === tab.id
-                    ? "bg-cyan-500/15 text-cyan-300 border border-cyan-500/30"
+                    ? "bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)]"
                     : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
                 }`}
               >
@@ -123,7 +123,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                 Account Credentials
               </h3>
 
-              <div className="flex items-center gap-4 p-3 bg-[#0C0F15] rounded-xl border border-white/5">
+              <div className="flex items-center gap-4 p-3 bg-[var(--surface-secondary)] rounded-xl border border-[var(--border-subtle)]">
                 <Avatar
                   src={currentUser?.profile_pic}
                   name={currentUser?.fullname}
@@ -134,7 +134,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                   <h4 className="text-sm font-semibold text-white">
                     {currentUser?.fullname}
                   </h4>
-                  <p className="text-xs font-mono text-cyan-400">
+                  <p className="text-xs font-mono text-[var(--accent)]">
                     @{currentUser?.username}
                   </p>
                   <p className="text-[11px] text-slate-400">
@@ -203,12 +203,12 @@ export default function UserSettingsModal({ isOpen, onClose }) {
                 ].map((item, idx) => (
                   <label
                     key={idx}
-                    className="flex items-start gap-3 p-3 rounded-xl bg-[#0C0F15] border border-white/5 cursor-pointer"
+                    className="flex items-start gap-3 p-3 rounded-xl bg-[var(--surface-secondary)] border border-[var(--border-subtle)] cursor-pointer"
                   >
                     <input
                       type="checkbox"
                       defaultChecked={item.checked}
-                      className="mt-0.5 w-4 h-4 rounded bg-[#07080C] border-white/10 text-cyan-500 focus:ring-cyan-500/20"
+                      className="mt-0.5 w-4 h-4 rounded bg-[var(--app-bg)] border-[var(--border-subtle)] text-[var(--accent)] focus:ring-[var(--accent-soft)]"
                     />
                     <div>
                       <p className="text-xs font-semibold text-slate-200">
@@ -227,10 +227,10 @@ export default function UserSettingsModal({ isOpen, onClose }) {
               <h3 className="font-display font-semibold text-base text-slate-100">
                 Active Sessions
               </h3>
-              <div className="p-3 bg-[#0C0F15] rounded-xl border border-white/5 space-y-2">
+              <div className="p-3 bg-[var(--surface-secondary)] rounded-xl border border-[var(--border-subtle)] space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Laptop className="w-4 h-4 text-cyan-400" />
+                    <Laptop className="w-4 h-4 text-[var(--accent)]" />
                     <div>
                       <p className="text-xs font-semibold text-slate-200">
                         Windows Chrome • Current Session

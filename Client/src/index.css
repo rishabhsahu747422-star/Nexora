@@ -4,21 +4,22 @@
 
 /* ==========================================================================
    NEXORA GLOBAL THEME VARIABLES & CSS TOKENS
-   Default: Nexora Midnight (#0B0B0D) + Crimson Accent (#E10600)
+   Default: Nexora Midnight (#090909 canvas, #0B0B0D workspace) + Crimson (#E10600)
    ========================================================================== */
 
 :root {
   color-scheme: dark;
 
   /* Surfaces (Midnight Default) */
-  --app-bg: #0B0B0D;
-  --surface-primary: #141416;
-  --surface-secondary: #1B1B1F;
-  --surface-elevated: #252529;
-  --surface-hover: #303036;
+  --app-bg: #090909;
+  --workspace-bg: #0B0B0D;
+  --surface-primary: #111113;
+  --surface-secondary: #161619;
+  --surface-elevated: #1C1C20;
+  --surface-hover: #252529;
   --text-primary: #F5F5F5;
   --text-secondary: #A1A1AA;
-  --border-subtle: #303036;
+  --border-subtle: #2D2D32;
 
   /* Accent (Crimson Default) */
   --accent: #E10600;
@@ -36,19 +37,21 @@
 
 /* Surface Mode: Midnight */
 [data-surface="midnight"] {
-  --app-bg: #0B0B0D;
-  --surface-primary: #141416;
-  --surface-secondary: #1B1B1F;
-  --surface-elevated: #252529;
-  --surface-hover: #303036;
+  --app-bg: #090909;
+  --workspace-bg: #0B0B0D;
+  --surface-primary: #111113;
+  --surface-secondary: #161619;
+  --surface-elevated: #1C1C20;
+  --surface-hover: #252529;
   --text-primary: #F5F5F5;
   --text-secondary: #A1A1AA;
-  --border-subtle: #303036;
+  --border-subtle: #2D2D32;
 }
 
 /* Surface Mode: Graphite */
 [data-surface="graphite"] {
-  --app-bg: #131417;
+  --app-bg: #121215;
+  --workspace-bg: #151518;
   --surface-primary: #1B1C22;
   --surface-secondary: #24252C;
   --surface-elevated: #2D2F38;
@@ -61,6 +64,7 @@
 /* Surface Mode: OLED */
 [data-surface="oled"] {
   --app-bg: #000000;
+  --workspace-bg: #000000;
   --surface-primary: #0C0C0C;
   --surface-secondary: #141414;
   --surface-elevated: #1F1F1F;
@@ -75,6 +79,7 @@ html[data-theme="light"],
 html.light {
   color-scheme: light;
   --app-bg: #F6F7FB;
+  --workspace-bg: #FFFFFF;
   --surface-primary: #FFFFFF;
   --surface-secondary: #F0F2F6;
   --surface-elevated: #E5E7EB;
@@ -133,27 +138,27 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
 
 /* Glass panel styling respecting theme surfaces */
 .glass-panel {
-  background: var(--surface-primary, rgba(16, 20, 28, 0.75));
+  background: var(--surface-primary, #111113);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--border-subtle, #2D2D32);
 }
 
 .glass-dropdown {
-  background: var(--surface-secondary, rgba(21, 26, 35, 0.95));
+  background: var(--surface-elevated, #1C1C20);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
+  border: 1px solid var(--border-subtle, #2D2D32);
   box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 /* Nexora ambient subtle gradient grid background for landing / startup */
 .nexora-mesh-bg {
-  background-color: var(--app-bg, #0B0B0D);
+  background-color: var(--app-bg, #090909);
   background-image: 
     radial-gradient(at 0% 0%, var(--accent-soft, rgba(225, 6, 0, 0.08)) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
-    radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.04) 0px, transparent 60%);
+    radial-gradient(at 100% 100%, rgba(255, 255, 255, 0.02) 0px, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(255, 255, 255, 0.01) 0px, transparent 60%);
 }
 
 /* Audio wave pulsing animation for speaking voice participants */

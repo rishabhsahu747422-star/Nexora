@@ -21,7 +21,7 @@ export default function Tooltip({ children, text, position = 'top', className = 
       {children}
       {visible && (
         <div
-          className={`absolute ${positions[position]} z-50 px-2.5 py-1 text-xs font-medium text-slate-100 bg-[#151A23] border border-white/10 rounded-lg shadow-xl shadow-black/80 whitespace-nowrap pointer-events-none animate-fadeIn`}
+          className={`absolute ${positions[position]} z-50 px-2.5 py-1 text-xs font-medium text-slate-100 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] rounded-lg shadow-xl shadow-black/80 whitespace-nowrap pointer-events-none animate-fadeIn`}
         >
           {text}
         </div>

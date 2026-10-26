@@ -108,23 +108,22 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-[#07080C] text-slate-100 flex flex-col justify-center items-center p-4 relative overflow-hidden select-none py-12">
+    <div className="min-h-screen bg-[var(--app-bg)] text-[var(--text-primary)] flex flex-col justify-center items-center p-4 relative overflow-hidden select-none py-12">
       {/* Background ambient glow */}
-      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/4 -right-20 w-96 h-96 bg-[var(--accent-glow)] opacity-10 rounded-full blur-[140px] pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="w-full max-w-lg bg-[#10141C] border border-white/10 rounded-3xl p-8 shadow-2xl shadow-black/80 relative z-10"
+        className="w-full max-w-lg bg-[var(--surface-primary)] border border-[var(--border-subtle)] rounded-3xl p-8 shadow-2xl shadow-black/80 relative z-10"
       >
         <div className="flex flex-col items-center text-center mb-8">
           <NexoraLogo size="lg" showTagline onClick={() => navigate("/")} />
           <h2 className="font-display font-bold text-2xl text-white mt-6">
             Create Your Account
           </h2>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-[var(--text-secondary)] mt-1">
             Join the next generation of decentralized communities
           </p>
         </div>
@@ -215,7 +214,7 @@ export default function Register() {
                   {strength.text}
                 </span>
               </div>
-              <div className="h-1.5 w-full bg-[#0C0F15] rounded-full overflow-hidden border border-white/5">
+              <div className="h-1.5 w-full bg-[var(--surface-secondary)] rounded-full overflow-hidden border border-white/5">
                 <div
                   className={`h-full transition-all duration-300 ${strength.color}`}
                   style={{ width: `${strength.score}%` }}
@@ -256,7 +255,7 @@ export default function Register() {
           type="button"
           onClick={handleGoogleRegister}
           disabled={googleLoading || isLoading}
-          className="w-full flex items-center justify-center gap-3 bg-[#151A23] hover:bg-[#1E2535] border border-white/10 hover:border-white/20 text-slate-200 text-sm font-medium py-3 rounded-xl transition-all mb-6 active:scale-[0.99]"
+          className="w-full flex items-center justify-center gap-3 bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-white/20 text-slate-200 text-sm font-medium py-3 rounded-xl transition-all mb-6 active:scale-[0.99]"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path
@@ -283,7 +282,7 @@ export default function Register() {
           Already have an account?{" "}
           <Link
             to="/login"
-            className="text-cyan-400 hover:text-cyan-300 font-semibold inline-flex items-center gap-1"
+            className="text-[var(--accent)] hover:text-[var(--accent-hover)] font-semibold inline-flex items-center gap-1"
           >
             Sign in <ArrowRight className="w-3 h-3" />
           </Link>

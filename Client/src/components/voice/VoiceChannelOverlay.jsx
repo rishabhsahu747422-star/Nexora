@@ -75,7 +75,7 @@ export default function VoiceChannelOverlay() {
   return (
     <div
       onClick={handleReturnToStage}
-      className="p-2.5 bg-[#080B10] border-t border-emerald-500/20 flex items-center justify-between cursor-pointer hover:bg-[#0E131C] transition-colors select-none"
+      className="p-2.5 bg-[var(--surface-secondary)] border-t border-[var(--border-subtle)] flex items-center justify-between cursor-pointer hover:bg-[var(--surface-hover)] transition-colors select-none"
     >
       <div className="flex items-center gap-2 min-w-0 pr-2">
         <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />

@@ -50,16 +50,16 @@ export default function DmConversation({ dmId }) {
 
   if (!dmId) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#07080C] text-slate-500 text-xs font-mono">
+      <div className="flex-1 flex items-center justify-center bg-[var(--workspace-bg)] text-slate-500 text-xs font-mono">
         Select a transmission thread to start messaging
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#07080C] overflow-hidden">
+    <div className="flex-1 flex flex-col h-full bg-[var(--workspace-bg)] overflow-hidden">
       {/* DM Header */}
-      <div className="h-14 bg-[#10141C] border-b border-white/10 px-4 flex items-center justify-between z-10 flex-shrink-0">
+      <div className="h-14 bg-[var(--surface-primary)] border-b border-[var(--border-subtle)] px-4 flex items-center justify-between z-10 flex-shrink-0">
         <div
           onClick={() =>
             dispatch(
@@ -89,7 +89,7 @@ export default function DmConversation({ dmId }) {
             <h3 className="font-display font-semibold text-sm text-slate-100 flex items-center gap-1.5">
               <span>{name}</span>
             </h3>
-            <span className="text-[10px] font-mono text-cyan-400">
+            <span className="text-[10px] font-mono text-[var(--accent)]">
               @{username}
             </span>
           </div>
@@ -97,7 +97,7 @@ export default function DmConversation({ dmId }) {
 
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1 text-[11px] font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg">
-            <Shield className="w-3.5 h-3.5 text-cyan-400" />
+            <Shield className="w-3.5 h-3.5 text-[var(--accent)]" />
             <span className="hidden sm:inline">P2P Encrypted</span>
           </div>
         </div>
@@ -122,7 +122,7 @@ export default function DmConversation({ dmId }) {
           </h4>
           <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1">
             This is the very beginning of your direct transmission history with{" "}
-            <span className="text-cyan-400">@{username}</span>.
+            <span className="text-[var(--accent)]">@{username}</span>.
           </p>
         </div>
 

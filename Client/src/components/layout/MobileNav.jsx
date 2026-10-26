@@ -57,7 +57,7 @@ export default function MobileNav() {
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-10 w-72 bg-[#0C0F15] h-full shadow-2xl flex flex-col"
+              className="relative z-10 w-72 bg-[var(--surface-primary)] h-full shadow-2xl flex flex-col"
             >
               <div className="p-3 border-b border-white/5 flex items-center justify-between">
                 <span className="font-display font-bold text-sm text-white">
@@ -96,7 +96,7 @@ export default function MobileNav() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-              className="relative z-10 w-72 bg-[#0C0F15] h-full shadow-2xl flex flex-col"
+              className="relative z-10 w-72 bg-[var(--surface-primary)] h-full shadow-2xl flex flex-col"
             >
               <div className="p-3 border-b border-white/5 flex items-center justify-between">
                 <span className="font-display font-bold text-sm text-white">
@@ -119,11 +119,11 @@ export default function MobileNav() {
       </AnimatePresence>
 
       {/* Mobile Bottom Navigation Bar */}
-      <div className="h-14 bg-[#0C0F15] border-t border-white/10 md:hidden flex items-center justify-around px-2 z-20 flex-shrink-0 select-none">
+      <div className="h-14 bg-[var(--surface-primary)] border-t border-[var(--border-subtle)] md:hidden flex items-center justify-around px-2 z-20 flex-shrink-0 select-none">
         <button
           onClick={() => navigate('/app')}
           className={`flex flex-col items-center gap-1 p-1.5 rounded-xl transition-colors ${
-            activeTab === 'hub' ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
+            activeTab === 'hub' ? 'text-[var(--accent)] font-medium' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <Grid className="w-4 h-4" />
@@ -133,7 +133,7 @@ export default function MobileNav() {
         <button
           onClick={() => dispatch(setMobileDrawerOpen(true))}
           className={`flex flex-col items-center gap-1 p-1.5 rounded-xl transition-colors ${
-            activeTab === 'channels' ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
+            activeTab === 'channels' ? 'text-[var(--accent)] font-medium' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <Compass className="w-4 h-4" />
@@ -143,20 +143,20 @@ export default function MobileNav() {
         <button
           onClick={() => navigate('/app/messages')}
           className={`relative flex flex-col items-center gap-1 p-1.5 rounded-xl transition-colors ${
-            activeTab === 'dms' ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
+            activeTab === 'dms' ? 'text-[var(--accent)] font-medium' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <MessageSquare className="w-4 h-4" />
           <span className="text-[10px] font-medium">DMs</span>
           {unreadDmsCount > 0 && (
-            <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-cyan-400 ring-2 ring-[#0C0F15]" />
+            <span className="absolute top-1 right-2 w-2 h-2 rounded-full bg-[var(--accent)] ring-2 ring-[var(--surface-primary)]" />
           )}
         </button>
 
         <button
           onClick={() => navigate('/app/profile')}
           className={`flex flex-col items-center gap-1 p-1.5 rounded-xl transition-colors ${
-            activeTab === 'profile' ? 'text-cyan-400' : 'text-slate-400 hover:text-slate-200'
+            activeTab === 'profile' ? 'text-[var(--accent)] font-medium' : 'text-slate-400 hover:text-slate-200'
           }`}
         >
           <UserIcon className="w-4 h-4" />

@@ -26,16 +26,16 @@ export default function ChannelHeader({ channel, onOpenPinned }) {
   const isVoice = channel.type === "voice";
 
   return (
-    <div className="h-14 bg-[#10141C] border-b border-white/10 px-4 flex items-center justify-between z-10 flex-shrink-0">
+    <div className="h-14 bg-[var(--surface-primary)] border-b border-[var(--border-subtle)] px-4 flex items-center justify-between z-10 flex-shrink-0">
       {/* Left: Channel Indicator, Name, Topic */}
       <div className="flex items-center gap-2.5 min-w-0">
-        <div className="p-1.5 rounded-lg bg-white/5 text-cyan-400">
+        <div className="p-1.5 rounded-lg bg-white/5 text-[var(--text-secondary)]">
           {channel.type === "voice" ? (
             <Volume2 className="w-4 h-4 text-emerald-400" />
           ) : channel.type === "announcement" ? (
             <Megaphone className="w-4 h-4 text-indigo-400" />
           ) : (
-            <Hash className="w-4 h-4 text-cyan-400" />
+            <Hash className="w-4 h-4 text-[var(--text-secondary)]" />
           )}
         </div>
 

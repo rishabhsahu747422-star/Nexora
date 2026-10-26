@@ -9,22 +9,25 @@ export default {
     extend: {
       colors: {
         nexora: {
-          bg: '#07080C',        // Ultra-deep root canvas
-          secondary: '#0C0F15', // Secondary container layer
-          surface: '#10141C',   // Surface panels and cards
-          elevated: '#151A23',  // Elevated popovers, modals & decks
-          border: '#1E2535',    // Subtle structural separation
-          borderLight: 'rgba(255, 255, 255, 0.09)',
-          muted: '#8E9BB0',     // Readable secondary text
-          dim: '#4F5B70',       // Passive placeholders & counters
+          bg: '#090909',        // App background canvas
+          workspace: '#0B0B0D', // Main workspace
+          surface: '#111113',   // Primary panels and sidebars
+          secondary: '#161619', // Secondary container layer
+          elevated: '#1C1C20',  // Elevated popovers, modals & decks
+          hover: '#252529',     // Hover background
+          border: '#2D2D32',    // Borders and dividers
+          borderLight: 'rgba(255, 255, 255, 0.08)',
+          muted: '#A1A1AA',     // Secondary text
+          dim: '#71717A',       // Passive placeholders
           accent: {
-            cyan: '#00F0FF',
-            blue: '#3B82F6',
-            violet: '#8B5CF6',
-            purple: '#A855F7',
-            emerald: '#10B981',
-            amber: '#F59E0B',
-            rose: '#F43F5E',
+            crimson: '#E10600',
+            lavender: '#B69CFF',
+            blue: '#4D8DFF',
+            saffron: '#FFC247',
+            emerald: '#35D6A2',
+            rose: '#FF75B5',
+            cyan: '#40D9E8',
+            orange: '#FF8A4C',
           },
         },
       },

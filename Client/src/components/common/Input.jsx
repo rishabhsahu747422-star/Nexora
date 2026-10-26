@@ -45,10 +45,10 @@ const Input = forwardRef(
               ref={ref}
               id={inputId}
               rows={rows}
-              className={`w-full bg-[#0C0F15] border ${
+              className={`w-full bg-[var(--surface-secondary)] border ${
                 error
                   ? 'border-rose-500/60 focus:border-rose-500 focus:ring-rose-500/20'
-                  : 'border-white/10 focus:border-cyan-500/60 focus:ring-cyan-500/20'
+                  : 'border-[var(--border-subtle)] focus:border-[var(--accent-border)] focus:ring-[var(--accent-soft)]'
               } text-slate-100 placeholder:text-slate-500 rounded-xl px-3.5 py-2.5 text-sm transition-all focus:outline-none focus:ring-2 resize-none ${
                 Icon ? 'pl-10' : ''
               } ${className}`}
@@ -59,10 +59,10 @@ const Input = forwardRef(
               ref={ref}
               id={inputId}
               type={computedType}
-              className={`w-full bg-[#0C0F15] border ${
+              className={`w-full bg-[var(--surface-secondary)] border ${
                 error
                   ? 'border-rose-500/60 focus:border-rose-500 focus:ring-rose-500/20'
-                  : 'border-white/10 focus:border-cyan-500/60 focus:ring-cyan-500/20'
+                  : 'border-[var(--border-subtle)] focus:border-[var(--accent-border)] focus:ring-[var(--accent-soft)]'
               } text-slate-100 placeholder:text-slate-500 rounded-xl px-3.5 py-2.5 text-sm transition-all focus:outline-none focus:ring-2 ${
                 Icon ? 'pl-10' : ''
               } ${isPassword ? 'pr-10' : ''} ${className}`}

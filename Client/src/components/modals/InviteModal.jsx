@@ -51,7 +51,7 @@ export default function InviteModal({ isOpen, onClose, server }) {
     >
       <div className="space-y-4">
         {/* Community Info Header */}
-        <div className="flex items-center gap-3 p-3 bg-[#0C0F15] border border-white/10 rounded-2xl">
+        <div className="flex items-center gap-3 p-3 bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-2xl">
           <CommunityAvatar
             src={server.icon}
             name={server.name}
@@ -73,8 +73,8 @@ export default function InviteModal({ isOpen, onClose, server }) {
           <label className="text-xs font-medium text-slate-300 block mb-1.5">
             Community Invite Link
           </label>
-          <div className="flex items-center gap-2 bg-[#0C0F15] border border-white/10 rounded-xl p-2">
-            <LinkIcon className="w-4 h-4 text-cyan-400 ml-1.5 flex-shrink-0" />
+          <div className="flex items-center gap-2 bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl p-2">
+            <LinkIcon className="w-4 h-4 text-[var(--accent)] ml-1.5 flex-shrink-0" />
             <input
               type="text"
               readOnly
@@ -101,7 +101,7 @@ export default function InviteModal({ isOpen, onClose, server }) {
             <select
               value={expiry}
               onChange={(e) => setExpiry(e.target.value)}
-              className="w-full bg-[#0C0F15] border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+              className="w-full bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
             >
               <option value="30 minutes">30 minutes</option>
               <option value="1 day">1 day</option>
@@ -117,7 +117,7 @@ export default function InviteModal({ isOpen, onClose, server }) {
             <select
               value={maxUses}
               onChange={(e) => setMaxUses(e.target.value)}
-              className="w-full bg-[#0C0F15] border border-white/10 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
+              className="w-full bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none"
             >
               <option value="No limit">No limit</option>
               <option value="1 use">1 use</option>
@@ -132,7 +132,7 @@ export default function InviteModal({ isOpen, onClose, server }) {
           <span>Need a fresh token?</span>
           <button
             onClick={handleRegenerate}
-            className="flex items-center gap-1.5 text-cyan-400 hover:text-cyan-300 transition-colors font-medium"
+            className="flex items-center gap-1.5 text-[var(--accent)] hover:underline transition-colors font-medium"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Generate New Link</span>

@@ -85,7 +85,7 @@ export default function GlobalHeader() {
   };
 
   return (
-    <header className="h-14 bg-[#0C0F15] border-b border-white/10 px-3 sm:px-4 flex items-center justify-between z-30 select-none flex-shrink-0">
+    <header className="h-14 bg-[var(--surface-primary)] border-b border-[var(--border-subtle)] px-3 sm:px-4 flex items-center justify-between z-30 select-none flex-shrink-0">
       {/* Left: Mobile Drawer Trigger + Brand + Community Switcher */}
       <div className="flex items-center gap-2 sm:gap-3">
         {/* Mobile menu button */}
@@ -117,7 +117,7 @@ export default function GlobalHeader() {
         <Dropdown
           align="left"
           trigger={({ isOpen }) => (
-            <div className="flex items-center gap-2 bg-[#151A23] hover:bg-[#1C2331] border border-white/10 px-2.5 py-1.5 rounded-xl transition-all">
+            <div className="flex items-center gap-2 bg-[var(--surface-elevated)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] px-2.5 py-1.5 rounded-xl transition-all">
               <CommunityAvatar
                 src={activeServer?.icon}
                 name={activeServer?.name || "Community"}
@@ -177,7 +177,7 @@ export default function GlobalHeader() {
             <div className="border-t border-white/5 pt-1 mt-1">
               <button
                 onClick={() => dispatch(openModal({ type: "CREATE_SERVER" }))}
-                className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-xs font-medium text-cyan-400 hover:bg-cyan-500/10 transition-colors"
+                className="w-full flex items-center gap-2 px-2 py-2 rounded-lg text-xs font-medium text-[var(--accent)] hover:bg-[var(--accent-soft)] transition-colors"
               >
                 <Plus className="w-4 h-4" />
                 <span>Create New Community</span>
@@ -188,12 +188,12 @@ export default function GlobalHeader() {
       </div>
 
       {/* Center: High-Level Navigation Tabs (Desktop/Tablet) */}
-      <nav className="hidden lg:flex items-center gap-1 bg-[#10141C] p-1 rounded-xl border border-white/5">
+      <nav className="hidden lg:flex items-center gap-1 bg-[var(--surface-secondary)] p-1 rounded-xl border border-[var(--border-subtle)]">
         <button
           onClick={() => navigate("/app")}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
             activeTab === "hub"
-              ? "bg-[#151A23] text-cyan-300 shadow-sm border border-white/10"
+              ? "bg-[var(--surface-elevated)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)] font-medium"
               : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
           }`}
         >
@@ -209,7 +209,7 @@ export default function GlobalHeader() {
           }}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
             activeTab === "communities"
-              ? "bg-[#151A23] text-cyan-300 shadow-sm border border-white/10"
+              ? "bg-[var(--surface-elevated)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)] font-medium"
               : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
           }`}
         >
@@ -221,7 +221,7 @@ export default function GlobalHeader() {
           onClick={() => navigate("/app/messages")}
           className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all relative ${
             activeTab === "dms"
-              ? "bg-[#151A23] text-cyan-300 shadow-sm border border-white/10"
+              ? "bg-[var(--surface-elevated)] text-[var(--text-primary)] shadow-sm border border-[var(--border-subtle)] font-medium"
               : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
           }`}
         >
@@ -240,9 +240,9 @@ export default function GlobalHeader() {
         {/* Universal Command Search Trigger */}
         <button
           onClick={() => dispatch(openGlobalSearch())}
-          className="flex items-center gap-2 bg-[#151A23] hover:bg-[#1E2535] border border-white/10 text-slate-400 hover:text-slate-200 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs transition-all"
+          className="flex items-center gap-2 bg-[var(--surface-secondary)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] text-slate-400 hover:text-slate-200 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs transition-all"
         >
-          <Search className="w-3.5 h-3.5 text-cyan-400" />
+          <Search className="w-3.5 h-3.5 text-[var(--accent)]" />
           <span className="hidden md:inline text-slate-300 font-normal">
             Search Nexora...
           </span>
@@ -298,7 +298,7 @@ export default function GlobalHeader() {
             <div className="relative p-2 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-colors">
               <Bell className="w-4 h-4" />
               {unreadNotifsCount > 0 && (
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-cyan-400 ring-2 ring-[#0C0F15]" />
+                <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[var(--accent)] ring-2 ring-[var(--surface-primary)]" />
               )}
             </div>
           }
@@ -309,7 +309,7 @@ export default function GlobalHeader() {
                 Notifications
               </span>
               {unreadNotifsCount > 0 && (
-                <span className="text-[10px] font-mono text-cyan-400 font-medium">
+                <span className="text-[10px] font-mono text-[var(--accent)] font-medium">
                   {unreadNotifsCount} new
                 </span>
               )}
@@ -323,7 +323,7 @@ export default function GlobalHeader() {
                   }}
                   className={`p-2.5 rounded-lg cursor-pointer transition-colors text-left ${
                     !notif.read
-                      ? "bg-cyan-500/5 hover:bg-cyan-500/10"
+                      ? "bg-[var(--accent-soft)]/40 hover:bg-[var(--accent-soft)]"
                       : "hover:bg-white/5"
                   }`}
                 >
@@ -355,7 +355,7 @@ export default function GlobalHeader() {
         <Dropdown
           align="right"
           trigger={
-            <div className="flex items-center gap-2 bg-[#151A23] hover:bg-[#1E2535] border border-white/10 p-1 pr-2.5 rounded-2xl transition-all">
+            <div className="flex items-center gap-2 bg-[var(--surface-secondary)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] p-1 pr-2.5 rounded-2xl transition-all">
               <Avatar
                 src={currentUser?.profile_pic}
                 name={currentUser?.fullname}
@@ -374,7 +374,7 @@ export default function GlobalHeader() {
               <p className="text-xs font-semibold text-slate-100">
                 {currentUser?.fullname}
               </p>
-              <p className="text-[11px] font-mono text-cyan-400">
+              <p className="text-[11px] font-mono text-[var(--accent)]">
                 @{currentUser?.username}
               </p>
               <p className="text-[10px] text-slate-400 italic mt-0.5 truncate">
@@ -413,7 +413,7 @@ export default function GlobalHeader() {
                 onClick={() => navigate("/app/profile")}
                 className="w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs text-slate-300 hover:text-white hover:bg-white/5 transition-colors"
               >
-                <UserIcon className="w-3.5 h-3.5 text-cyan-400" />
+                <UserIcon className="w-3.5 h-3.5 text-[var(--accent)]" />
                 <span>My Profile</span>
               </button>
               <button

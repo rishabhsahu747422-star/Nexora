@@ -153,14 +153,14 @@ export default function ChannelList({ onCloseMobile }) {
           <Volume2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
         );
       default:
-        return <Hash className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />;
+        return <Hash className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />;
     }
   };
 
   return (
-    <div className="w-64 bg-[#0C0F15] border-r border-white/10 flex flex-col h-full select-none flex-shrink-0">
+    <div className="w-64 bg-[var(--surface-primary)] border-r border-[var(--border-subtle)] flex flex-col h-full select-none flex-shrink-0">
       {/* Community Deck Header */}
-      <div className="relative border-b border-white/10 bg-[#10141C] p-3 flex flex-col">
+      <div className="relative border-b border-[var(--border-subtle)] bg-[var(--surface-primary)] p-3 flex flex-col">
         {/* Server Dropdown Actions Menu */}
         <Dropdown
           align="left"
@@ -270,7 +270,7 @@ export default function ChannelList({ onCloseMobile }) {
         <button
           onClick={handlePayment}
           disabled={isLoading}
-          className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-gradient-to-r from-cyan-500/15 to-indigo-500/15 px-3 py-2 text-xs font-semibold text-cyan-200 transition-colors hover:border-cyan-300/50 hover:from-cyan-500/25 hover:to-indigo-500/25 disabled:cursor-wait disabled:opacity-60"
+          className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl border border-[var(--accent-border)] bg-[var(--accent-soft)] px-3 py-2 text-xs font-semibold text-[var(--accent)] transition-colors hover:bg-[var(--accent-soft-hover)] disabled:cursor-wait disabled:opacity-60"
           title="Explore Nex+"
         >
           <Sparkles className="h-3.5 w-3.5" />
@@ -302,7 +302,7 @@ export default function ChannelList({ onCloseMobile }) {
                       }),
                     )
                   }
-                  className="hover:text-cyan-400 transition-colors p-0.5"
+                  className="hover:text-[var(--accent)] transition-colors p-0.5"
                   title="Create Channel"
                 >
                   <Plus className="w-3.5 h-3.5" />
@@ -334,7 +334,7 @@ export default function ChannelList({ onCloseMobile }) {
                       <div className="flex items-center gap-1.5">
                         {chan.unread && (
                           <span
-                            className="w-2 h-2 rounded-full ring-2 ring-[#0C0F15]"
+                            className="w-2 h-2 rounded-full ring-2 ring-[var(--surface-primary)]"
                             style={{ backgroundColor: "var(--accent)" }}
                           />
                         )}

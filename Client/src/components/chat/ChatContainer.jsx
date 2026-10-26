@@ -62,7 +62,7 @@ export default function ChatContainer({ channel }) {
   }, [highlightedMessageId, dispatch]);
 
   return (
-    <div className="flex-1 flex flex-col h-full bg-[#07080C] overflow-hidden">
+    <div className="flex-1 flex flex-col h-full bg-[var(--workspace-bg)] overflow-hidden">
       {/* Channel Header */}
       <ChannelHeader
         channel={channel}

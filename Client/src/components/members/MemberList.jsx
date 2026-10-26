@@ -82,7 +82,7 @@ export default function MemberList({ onCloseMobile }) {
               />
               <div className="min-w-0 text-left">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-semibold text-slate-200 group-hover:text-cyan-300 transition-colors truncate">
+                  <span className="text-xs font-semibold text-slate-200 group-hover:text-[var(--accent)] transition-colors truncate">
                     {member.name}
                   </span>
                   {member.roles?.[0] && (
@@ -96,7 +96,7 @@ export default function MemberList({ onCloseMobile }) {
                     {member.customStatus}
                   </p>
                 ) : (
-                  <p className="text-[10px] font-mono text-cyan-500/80 truncate">
+                  <p className="text-[10px] font-mono text-[var(--accent)] opacity-80 truncate">
                     @{member.username}
                   </p>
                 )}
@@ -109,7 +109,7 @@ export default function MemberList({ onCloseMobile }) {
   };
 
   return (
-    <div className="w-60 bg-[#0C0F15] border-l border-white/10 flex flex-col h-full select-none flex-shrink-0 p-3 overflow-y-auto">
+    <div className="w-60 bg-[var(--surface-primary)] border-l border-[var(--border-subtle)] flex flex-col h-full select-none flex-shrink-0 p-3 overflow-y-auto">
       <div className="px-2 py-1 mb-2 text-xs font-semibold text-slate-300 flex items-center justify-between">
         <span>Community Roster</span>
         <span className="text-[10px] font-mono text-slate-500">

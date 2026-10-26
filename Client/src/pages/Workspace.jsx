@@ -93,7 +93,7 @@ export default function Workspace() {
     null;
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-[#07080C] text-slate-100 overflow-hidden select-none">
+    <div className="h-screen w-screen flex flex-col bg-[var(--app-bg)] text-[var(--text-primary)] overflow-hidden select-none">
       {/* Top Global Command Header */}
       <GlobalHeader />
 
@@ -108,7 +108,7 @@ export default function Workspace() {
             </div>
 
             {/* Main Channel Area (Chat or Voice Stage) */}
-            <div className="flex-1 flex flex-col min-w-0 bg-[#07080C] h-full">
+            <div className="flex-1 flex flex-col min-w-0 bg-[var(--workspace-bg)] h-full">
               {currentChannel?.type === "voice" ? (
                 <VoiceStage channel={currentChannel} />
               ) : (
@@ -135,7 +135,7 @@ export default function Workspace() {
             </div>
 
             {/* DM Chat Conversation Area */}
-            <div className="flex-1 flex flex-col min-w-0 bg-[#07080C] h-full">
+            <div className="flex-1 flex flex-col min-w-0 bg-[var(--workspace-bg)] h-full">
               <DmConversation dmId={dmId || activeDmId} />
             </div>
           </>
@@ -146,16 +146,16 @@ export default function Workspace() {
           <div className="flex-1 overflow-y-auto p-4 sm:p-8">
             <div className="max-w-6xl mx-auto space-y-8">
               {/* Hub Welcome Banner */}
-              <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-cyan-950/40 via-[#10141C] to-violet-950/40 border border-white/10 shadow-2xl overflow-hidden">
+              <div className="relative rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-[var(--surface-secondary)] via-[var(--surface-elevated)] to-[var(--surface-primary)] border border-[var(--border-subtle)] shadow-2xl overflow-hidden">
                 <div className="relative z-10 max-w-2xl">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-300 text-xs font-mono mb-3">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--accent)] text-xs font-mono mb-3">
                     <Sparkles className="w-3.5 h-3.5" />
                     <span>NEXORA </span>
                   </div>
                   <h1 className="font-display font-extrabold text-2xl sm:text-4xl text-white">
                     Welcome back, {currentUser?.fullname?.split(" ")[0]}
                   </h1>
-                  <p className="text-slate-400 text-xs sm:text-sm mt-2 leading-relaxed">
+                  <p className="text-[var(--text-secondary)] text-xs sm:text-sm mt-2 leading-relaxed">
                     You have active nodes connected across {servers.length}{" "}
                     communities. Jump into a transmission stream or check your
                     pending network connections below.
@@ -184,7 +184,7 @@ export default function Workspace() {
                 </div>
 
                 <div className="absolute right-[-20px] bottom-[-40px] opacity-10 pointer-events-none hidden md:block">
-                  <span className="font-mono text-[220px] font-black text-cyan-400">
+                  <span className="font-mono text-[220px] font-black text-white/5">
                     NX
                   </span>
                 </div>
@@ -197,7 +197,7 @@ export default function Workspace() {
                     <h2 className="font-display font-bold text-lg text-white">
                       Your Communities
                     </h2>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-[var(--text-secondary)]">
                       Decentralized networks you are actively contributing to
                     </p>
                   </div>
@@ -214,14 +214,14 @@ export default function Workspace() {
                 </div>
 
                 {servers.length === 0 ? (
-                  <div className="bg-[#10141C] border border-white/10 rounded-3xl p-8 text-center max-w-md mx-auto space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400">
+                  <div className="bg-[var(--surface-primary)] border border-[var(--border-subtle)] rounded-3xl p-8 text-center max-w-md mx-auto space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-[var(--accent-soft)] border border-[var(--accent-border)] flex items-center justify-center mx-auto text-[var(--accent)]">
                       <Server className="w-6 h-6" />
                     </div>
                     <h3 className="font-display font-semibold text-base text-white">
                       No Communities Joined Yet
                     </h3>
-                    <p className="text-xs text-slate-400 leading-relaxed">
+                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
                       Establish a new collective or ask a peer for an invite link to jump into real-time voice and transmission channels.
                     </p>
                     <div className="pt-2">
@@ -244,7 +244,7 @@ export default function Workspace() {
                           dispatch(selectServer(srv._id));
                           navigate(`/app/server/${srv._id}`);
                         }}
-                        className="group bg-[#10141C] hover:bg-[#151A23] border border-white/10 hover:border-cyan-500/40 rounded-2xl p-5 cursor-pointer transition-all duration-300 shadow-xl flex flex-col justify-between"
+                        className="group bg-[var(--surface-primary)] hover:bg-[var(--surface-hover)] border border-[var(--border-subtle)] hover:border-[var(--accent-border)] rounded-2xl p-5 cursor-pointer transition-all duration-300 shadow-xl flex flex-col justify-between"
                       >
                         <div>
                           <div className="flex items-center justify-between mb-3">
@@ -255,21 +255,21 @@ export default function Workspace() {
                               shape="rounded-xl"
                               className="ring-1 ring-white/10 group-hover:scale-105 transition-transform"
                             />
-                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)]">
                               {srv.tag || "NEXUS"}
                             </span>
                           </div>
-                          <h3 className="font-display font-bold text-base text-white group-hover:text-cyan-300 transition-colors">
+                          <h3 className="font-display font-bold text-base text-white group-hover:text-[var(--text-primary)] transition-colors">
                             {srv.name}
                           </h3>
-                          <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                          <p className="text-xs text-[var(--text-secondary)] mt-1 line-clamp-2 leading-relaxed">
                             {srv.description || "Active Nexora node community"}
                           </p>
                         </div>
 
-                        <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                        <div className="mt-4 pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] font-mono text-[var(--text-secondary)]">
                           <span>{srv.memberCount || 1} Members</span>
-                          <div className="flex items-center gap-1 text-cyan-400 group-hover:translate-x-1 transition-transform">
+                          <div className="flex items-center gap-1 text-[var(--accent)] group-hover:translate-x-1 transition-transform">
                             <span>Enter</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </div>
@@ -281,7 +281,7 @@ export default function Workspace() {
               </div>
 
               {/* Embedded Friends & Connections Hub */}
-              <div className="bg-[#10141C] border border-white/10 rounded-3xl overflow-hidden shadow-2xl min-h-[460px] flex flex-col">
+              <div className="bg-[var(--surface-primary)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden shadow-2xl min-h-[460px] flex flex-col">
                 <FriendsHub />
               </div>
             </div>

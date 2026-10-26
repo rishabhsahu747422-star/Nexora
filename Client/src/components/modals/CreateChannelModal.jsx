@@ -108,8 +108,8 @@ export default function CreateChannelModal({
                   key={t.id}
                   className={`flex flex-col items-center p-3 rounded-xl border cursor-pointer transition-all ${
                     selectedType === t.id
-                      ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-300"
-                      : "bg-[#0C0F15] border-white/10 text-slate-400 hover:text-slate-200"
+                      ? "bg-[var(--accent-soft)] border-[var(--accent-border)] text-[var(--accent)]"
+                      : "bg-[var(--surface-secondary)] border-[var(--border-subtle)] text-slate-400 hover:text-slate-200"
                   }`}
                 >
                   <input
@@ -145,10 +145,10 @@ export default function CreateChannelModal({
         />
 
         {/* Private Toggle */}
-        <label className="flex items-center gap-3 p-3 bg-[#0C0F15] border border-white/5 rounded-xl cursor-pointer">
+        <label className="flex items-center gap-3 p-3 bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl cursor-pointer">
           <input
             type="checkbox"
-            className="w-4 h-4 rounded bg-[#07080C] border-white/10 text-cyan-500 focus:ring-cyan-500/20"
+            className="w-4 h-4 rounded bg-[var(--app-bg)] border-[var(--border-subtle)] text-[var(--accent)] focus:ring-[var(--accent-soft)]"
             {...register("isPrivate")}
           />
           <div className="flex-1">

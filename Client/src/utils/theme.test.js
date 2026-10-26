@@ -83,12 +83,12 @@ console.log("✓ Derived accent variables verified.");
 // 5. Verify Surface Styles
 console.log("Testing Surface Styles...");
 assert.ok(SURFACE_STYLES.midnight, "Midnight surface must be defined");
-assert.strictEqual(SURFACE_STYLES.midnight.colors.appBg, "#0B0B0D");
-assert.strictEqual(SURFACE_STYLES.midnight.colors.surfacePrimary, "#141416");
-assert.strictEqual(SURFACE_STYLES.midnight.colors.surfaceElevated, "#252529");
+assert.strictEqual(SURFACE_STYLES.midnight.colors.appBg, "#090909");
+assert.strictEqual(SURFACE_STYLES.midnight.colors.surfacePrimary, "#111113");
+assert.strictEqual(SURFACE_STYLES.midnight.colors.surfaceElevated, "#1C1C20");
 
 assert.ok(SURFACE_STYLES.graphite, "Graphite surface must be defined");
-assert.strictEqual(SURFACE_STYLES.graphite.colors.appBg, "#131417");
+assert.strictEqual(SURFACE_STYLES.graphite.colors.appBg, "#121215");
 
 assert.ok(SURFACE_STYLES.oled, "OLED surface must be defined");
 assert.strictEqual(SURFACE_STYLES.oled.colors.appBg, "#000000");
@@ -147,7 +147,8 @@ assert.strictEqual(mockElement.style.getPropertyValue("--message-gap"), "12px");
 applyTheme(DEFAULT_APPEARANCE);
 assert.strictEqual(mockElement.getAttribute("data-surface"), "midnight");
 assert.strictEqual(mockElement.getAttribute("data-spacing"), "compact");
-assert.strictEqual(mockElement.style.getPropertyValue("--app-bg"), "#0B0B0D");
+assert.strictEqual(mockElement.style.getPropertyValue("--app-bg"), "#090909");
+assert.strictEqual(mockElement.style.getPropertyValue("--workspace-bg"), "#0B0B0D");
 assert.strictEqual(mockElement.style.getPropertyValue("--accent"), "#E10600");
 assert.strictEqual(mockElement.style.getPropertyValue("--message-gap"), "4px");
 console.log("✓ Mock DOM application and reset to default verified.");

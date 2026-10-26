@@ -20,14 +20,15 @@ export const SURFACE_STYLES = {
     name: "Midnight",
     desc: "Default deep charcoal-black",
     colors: {
-      appBg: "#0B0B0D",
-      surfacePrimary: "#141416",
-      surfaceSecondary: "#1B1B1F",
-      surfaceElevated: "#252529",
-      surfaceHover: "#303036",
+      appBg: "#090909",
+      workspaceBg: "#0B0B0D",
+      surfacePrimary: "#111113",
+      surfaceSecondary: "#161619",
+      surfaceElevated: "#1C1C20",
+      surfaceHover: "#252529",
       textPrimary: "#F5F5F5",
       textSecondary: "#A1A1AA",
-      borderSubtle: "#303036",
+      borderSubtle: "#2D2D32",
     },
   },
   graphite: {
@@ -35,7 +36,8 @@ export const SURFACE_STYLES = {
     name: "Graphite",
     desc: "Slightly lighter charcoal surfaces",
     colors: {
-      appBg: "#131417",
+      appBg: "#121215",
+      workspaceBg: "#151518",
       surfacePrimary: "#1B1C22",
       surfaceSecondary: "#24252C",
       surfaceElevated: "#2D2F38",
@@ -51,6 +53,7 @@ export const SURFACE_STYLES = {
     desc: "Pure-black primary background",
     colors: {
       appBg: "#000000",
+      workspaceBg: "#000000",
       surfacePrimary: "#0C0C0C",
       surfaceSecondary: "#141414",
       surfaceElevated: "#1F1F1F",
@@ -64,6 +67,7 @@ export const SURFACE_STYLES = {
 
 export const LIGHT_SURFACE = {
   appBg: "#F6F7FB",
+  workspaceBg: "#FFFFFF",
   surfacePrimary: "#FFFFFF",
   surfaceSecondary: "#F0F2F6",
   surfaceElevated: "#E5E7EB",
@@ -227,6 +231,7 @@ export const applyTheme = (appearance = {}) => {
 
   // Set CSS custom properties on root
   root.style.setProperty("--app-bg", surfaceColors.appBg);
+  root.style.setProperty("--workspace-bg", surfaceColors.workspaceBg || surfaceColors.appBg);
   root.style.setProperty("--surface-primary", surfaceColors.surfacePrimary);
   root.style.setProperty("--surface-secondary", surfaceColors.surfaceSecondary);
   root.style.setProperty("--surface-elevated", surfaceColors.surfaceElevated);

@@ -204,11 +204,11 @@ export default function GlobalSearchModal() {
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: -10 }}
         transition={{ duration: 0.2 }}
-        className="relative z-10 w-full max-w-2xl bg-[#10141C] border border-white/10 rounded-2xl shadow-2xl shadow-black/90 overflow-hidden flex flex-col"
+        className="relative z-10 w-full max-w-2xl bg-[var(--surface-elevated)] border border-[var(--border-subtle)] rounded-2xl shadow-2xl shadow-black/90 overflow-hidden flex flex-col"
       >
         {/* Search Input Bar */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-white/10 bg-[#151A23]">
-          <Search className="w-5 h-5 text-cyan-400 flex-shrink-0" />
+        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[var(--border-subtle)] bg-[var(--surface-primary)]">
+          <Search className="w-5 h-5 text-[var(--accent)] flex-shrink-0" />
           <input
             type="text"
             value={query}
@@ -231,7 +231,7 @@ export default function GlobalSearchModal() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex items-center gap-2 px-4 py-2 border-b border-white/5 bg-[#0C0F15] text-xs">
+        <div className="flex items-center gap-2 px-4 py-2 border-b border-[var(--border-subtle)] bg-[var(--surface-secondary)] text-xs">
           {[
             { id: "all", label: "All Results" },
             {
@@ -253,7 +253,7 @@ export default function GlobalSearchModal() {
               onClick={() => setActiveCategory(tab.id)}
               className={`px-2.5 py-1 rounded-lg transition-colors font-medium ${
                 activeCategory === tab.id
-                  ? "bg-cyan-500/15 text-cyan-300"
+                  ? "bg-[var(--accent-soft)] text-[var(--accent)]"
                   : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
               }`}
             >
@@ -279,7 +279,7 @@ export default function GlobalSearchModal() {
                 searchResults.messages.length > 0 && (
                   <div>
                     <h4 className="text-[11px] font-mono uppercase text-slate-400 px-2 mb-1.5 flex items-center gap-1.5">
-                      <MessageSquare className="w-3.5 h-3.5 text-cyan-400" />
+                      <MessageSquare className="w-3.5 h-3.5 text-[var(--accent)]" />
                       Transmissions
                     </h4>
                     <div className="space-y-1">
@@ -300,7 +300,7 @@ export default function GlobalSearchModal() {
                                 <span className="text-xs font-semibold text-slate-200">
                                   {msg.authorName}
                                 </span>
-                                <span className="text-[10px] text-cyan-400 font-mono">
+                                <span className="text-[10px] text-[var(--accent)] font-mono">
                                   #{msg.channelName}
                                 </span>
                               </div>
@@ -309,7 +309,7 @@ export default function GlobalSearchModal() {
                               </p>
                             </div>
                           </div>
-                          <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
+                          <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-[var(--accent)] transition-colors flex-shrink-0" />
                         </div>
                       ))}
                     </div>
@@ -413,7 +413,7 @@ export default function GlobalSearchModal() {
                               <p className="text-xs font-semibold text-slate-200">
                                 {u.name}
                               </p>
-                              <p className="text-[10px] font-mono text-cyan-400">
+                              <p className="text-[10px] font-mono text-[var(--accent)]">
                                 @{u.username}
                               </p>
                             </div>

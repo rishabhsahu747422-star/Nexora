@@ -67,7 +67,7 @@ export default function Profile() {
   );
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-[#07080C] text-slate-100 overflow-hidden">
+    <div className="h-screen w-screen flex flex-col bg-[var(--app-bg)] text-[var(--text-primary)] overflow-hidden">
       <GlobalHeader />
 
       <div className="flex-1 overflow-y-auto p-4 sm:p-8">
@@ -75,16 +75,16 @@ export default function Profile() {
           {/* Back button */}
           <button
             onClick={() => navigate("/app")}
-            className="flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-cyan-400 transition-colors"
+            className="flex items-center gap-2 text-xs font-mono text-slate-400 hover:text-[var(--accent)] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Return to Workspace</span>
           </button>
 
           {/* Profile Card Frame */}
-          <div className="bg-[#10141C] border border-white/10 rounded-3xl overflow-hidden shadow-2xl shadow-black/80">
+          <div className="bg-[var(--surface-primary)] border border-[var(--border-subtle)] rounded-3xl overflow-hidden shadow-2xl shadow-black/80">
             {/* Banner */}
-            <div className="h-44 w-full bg-gradient-to-r from-cyan-900/60 via-indigo-950/80 to-violet-950/60 relative">
+            <div className="h-44 w-full bg-gradient-to-r from-[var(--surface-secondary)] via-[var(--surface-elevated)] to-[var(--surface-primary)] border-b border-[var(--border-subtle)] relative">
               {currentUser?.banner && (
                 <img
                   src={currentUser.banner}
@@ -102,7 +102,7 @@ export default function Profile() {
                   name={currentUser?.fullname}
                   size="xl"
                   status={currentUser?.status}
-                  className="ring-4 ring-[#10141C]"
+                  className="ring-4 ring-[var(--surface-primary)]"
                 />
 
                 <Button

@@ -157,7 +157,7 @@ export default function VoiceStage({ channel }) {
   // If not connected to this channel
   if (!isThisChannelConnected) {
     return (
-      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[#07080C] select-none">
+      <div className="flex-1 flex flex-col items-center justify-center p-8 text-center bg-[var(--workspace-bg)] select-none">
         <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center mb-4">
           <Volume2 className="w-8 h-8 animate-pulse" />
         </div>
@@ -201,12 +201,12 @@ export default function VoiceStage({ channel }) {
   ];
 
   return (
-    <div className="flex-1 flex flex-col bg-[#07080C] select-none overflow-hidden relative">
+    <div className="flex-1 flex flex-col bg-[var(--workspace-bg)] select-none overflow-hidden relative">
       {/* Hidden Audio Elements for WebRTC playback */}
       {renderRemoteAudioElements()}
 
       {/* Stage Header Info */}
-      <div className="px-6 py-4 border-b border-white/5 bg-[#0C0F15] flex items-center justify-between">
+      <div className="px-6 py-4 border-b border-[var(--border-subtle)] bg-[var(--surface-primary)] flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
           <div>
@@ -245,10 +245,10 @@ export default function VoiceStage({ channel }) {
                 layout
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className={`relative bg-[#10141C] border ${
+                className={`relative bg-[var(--surface-primary)] border ${
                   p.isSpeaking
                     ? "border-emerald-500/80 shadow-lg shadow-emerald-500/20"
-                    : "border-white/10"
+                    : "border-[var(--border-subtle)]"
                 } rounded-2xl p-4 flex flex-col items-center justify-center transition-all duration-300 min-h-[200px] overflow-hidden`}
               >
                 {/* Video rendering or Avatar */}
@@ -293,7 +293,7 @@ export default function VoiceStage({ channel }) {
                 <div className="mt-1 text-center">
                   <span className="font-display font-semibold text-sm text-slate-100 flex items-center justify-center gap-1.5">
                     {name}
-                    {p.isMe && <span className="text-[10px] text-cyan-400 font-mono">(You)</span>}
+                    {p.isMe && <span className="text-[10px] text-[var(--accent)] font-mono">(You)</span>}
                   </span>
                   <span className="text-[11px] font-mono text-slate-400">
                     @{username}
@@ -325,14 +325,14 @@ export default function VoiceStage({ channel }) {
       </div>
 
       {/* Voice Controls Dock Bar */}
-      <div className="p-4 bg-[#0C0F15] border-t border-white/10 flex items-center justify-center gap-3">
+      <div className="p-4 bg-[var(--surface-primary)] border-t border-[var(--border-subtle)] flex items-center justify-center gap-3">
         {/* Toggle Mute */}
         <button
           onClick={handleToggleMute}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
             voice.isMuted
               ? "bg-rose-500/20 text-rose-300 border border-rose-500/40 hover:bg-rose-500/30"
-              : "bg-[#151A23] text-slate-200 border border-white/10 hover:bg-[#1E2535]"
+              : "bg-[var(--surface-elevated)] text-slate-200 border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
           }`}
         >
           {voice.isMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4 text-emerald-400" />}
@@ -344,11 +344,11 @@ export default function VoiceStage({ channel }) {
           onClick={handleToggleVideo}
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
             voice.isVideo
-              ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-500/30"
-              : "bg-[#151A23] text-slate-200 border border-white/10 hover:bg-[#1E2535]"
+              ? "bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)] hover:bg-[var(--accent-soft-hover)]"
+              : "bg-[var(--surface-elevated)] text-slate-200 border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
           }`}
         >
-          {voice.isVideo ? <Video className="w-4 h-4 text-cyan-400" /> : <VideoOff className="w-4 h-4" />}
+          {voice.isVideo ? <Video className="w-4 h-4 text-[var(--accent)]" /> : <VideoOff className="w-4 h-4" />}
           <span>{voice.isVideo ? "Stop Video" : "Camera"}</span>
         </button>
 
@@ -358,7 +358,7 @@ export default function VoiceStage({ channel }) {
           className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-semibold transition-all ${
             voice.isDeafened
               ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 hover:bg-amber-500/30"
-              : "bg-[#151A23] text-slate-200 border border-white/10 hover:bg-[#1E2535]"
+              : "bg-[var(--surface-elevated)] text-slate-200 border border-[var(--border-subtle)] hover:bg-[var(--surface-hover)]"
           }`}
         >
           <Headphones className="w-4 h-4" />

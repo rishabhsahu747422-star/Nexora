@@ -67,7 +67,7 @@ export default function MemberProfileModal({ isOpen, onClose, user }) {
       showClose
     >
       {/* Banner */}
-      <div className="h-28 w-full bg-gradient-to-r from-cyan-900/60 via-indigo-950/80 to-violet-950/60 relative">
+      <div className="h-28 w-full bg-gradient-to-r from-[var(--surface-secondary)] via-[var(--surface-elevated)] to-[var(--surface-primary)] border-b border-[var(--border-subtle)] relative">
         {user.banner && (
           <img
             src={user.banner}
@@ -85,7 +85,7 @@ export default function MemberProfileModal({ isOpen, onClose, user }) {
             name={user.name}
             size="xl"
             status={user.status}
-            className="ring-4 ring-[#10141C]"
+            className="ring-4 ring-[var(--surface-elevated)]"
           />
 
           {!isMe && (
@@ -112,7 +112,7 @@ export default function MemberProfileModal({ isOpen, onClose, user }) {
         <div>
           <h3 className="font-display font-bold text-xl text-white">{user.name}</h3>
           <div className="flex items-center gap-2 mt-0.5">
-            <span className="font-mono text-xs text-cyan-400">@{user.username}</span>
+            <span className="font-mono text-xs text-[var(--accent)]">@{user.username}</span>
             <button
               onClick={handleCopyUsername}
               className="text-slate-500 hover:text-slate-300 transition-colors"

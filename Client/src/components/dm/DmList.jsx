@@ -87,9 +87,9 @@ export default function DmList({ onSelectConversation, selectedDmId }) {
   };
 
   return (
-    <div className="w-72 bg-[#0C0F15] border-r border-white/10 flex flex-col h-full select-none flex-shrink-0">
+    <div className="w-72 bg-[var(--surface-primary)] border-r border-[var(--border-subtle)] flex flex-col h-full select-none flex-shrink-0">
       {/* Header */}
-      <div className="p-4 border-b border-white/10 bg-[#10141C] flex items-center justify-between">
+      <div className="p-4 border-b border-[var(--border-subtle)] bg-[var(--surface-primary)] flex items-center justify-between">
         <div>
           <h3 className="font-display font-bold text-sm text-slate-100">
             Direct Transmissions
@@ -100,7 +100,7 @@ export default function DmList({ onSelectConversation, selectedDmId }) {
           onClick={() => setShowSearch(!showSearch)}
           className={`p-1.5 rounded-lg border transition-colors ${
             showSearch
-              ? "bg-cyan-500/20 text-cyan-300 border-cyan-500/40"
+              ? "bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)]"
               : "text-slate-400 hover:text-white hover:bg-white/5 border-white/5"
           }`}
           title="New Transmission"
@@ -111,7 +111,7 @@ export default function DmList({ onSelectConversation, selectedDmId }) {
 
       {/* User Search Bar */}
       {showSearch && (
-        <div className="p-2 border-b border-white/10 bg-[#131822] space-y-2">
+        <div className="p-2 border-b border-[var(--border-subtle)] bg-[var(--surface-secondary)] space-y-2">
           <div className="relative">
             <Search className="w-3.5 h-3.5 absolute left-2.5 top-2.5 text-slate-400" />
             <input
@@ -119,7 +119,7 @@ export default function DmList({ onSelectConversation, selectedDmId }) {
               value={searchQuery}
               onChange={handleSearchChange}
               placeholder="Find user to message..."
-              className="w-full bg-[#0C0F15] border border-white/10 rounded-xl text-xs text-white pl-8 pr-3 py-1.5 focus:outline-none focus:border-cyan-500/50"
+              className="w-full bg-[var(--surface-primary)] border border-[var(--border-subtle)] rounded-xl text-xs text-white pl-8 pr-3 py-1.5 focus:outline-none focus:border-[var(--accent-border)]"
               autoFocus
             />
           </div>
@@ -198,7 +198,7 @@ export default function DmList({ onSelectConversation, selectedDmId }) {
               onClick={() => handleSelect(convId)}
               className={`flex items-center gap-3 p-2.5 rounded-xl cursor-pointer transition-all ${
                 isSelected
-                  ? "bg-gradient-to-r from-cyan-500/20 to-indigo-500/10 text-cyan-200 border border-cyan-500/30 shadow-lg shadow-cyan-500/5"
+                  ? "bg-[var(--accent-soft)] text-white font-medium border border-[var(--accent-border)] shadow-sm"
                   : "hover:bg-white/5 text-slate-300"
               }`}
             >

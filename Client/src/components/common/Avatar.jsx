@@ -49,7 +49,7 @@ export default function Avatar({
       } transition-transform ${className}`}
     >
       <div
-        className={`${sizeMap[size] || sizeMap.md} rounded-2xl overflow-hidden bg-slate-800 border ${
+        className={`${sizeMap[size] || sizeMap.md} rounded-2xl overflow-hidden bg-[var(--surface-elevated)] border ${
           ringColor ? 'border-2' : 'border-white/10'
         } flex items-center justify-center`}
         style={ringColor ? { borderColor: ringColor } : {}}
@@ -66,7 +66,7 @@ export default function Avatar({
           />
         ) : null}
         <span
-          className={`w-full h-full font-mono text-cyan-200 font-semibold bg-gradient-to-br from-slate-800 to-slate-900 items-center justify-center ${
+          className={`w-full h-full font-mono text-white font-semibold bg-[var(--surface-elevated)] items-center justify-center ${
             src ? 'hidden' : 'flex'
           }`}
         >
@@ -77,7 +77,7 @@ export default function Avatar({
       {/* Online Status Dot */}
       {status && (
         <span
-          className={`absolute ${statusSizeMap[size] || statusSizeMap.md} rounded-full border-[#0C0F15] ${
+          className={`absolute ${statusSizeMap[size] || statusSizeMap.md} rounded-full border-[var(--surface-primary)] ${
             statusColorMap[status] || statusColorMap.offline
           } ring-1`}
           title={`Status: ${status}`}

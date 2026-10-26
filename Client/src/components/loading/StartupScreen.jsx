@@ -40,14 +40,14 @@ export default function StartupScreen({ onComplete }) {
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.02 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#07080C] nexora-mesh-bg overflow-hidden select-none"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[var(--app-bg)] nexora-mesh-bg overflow-hidden select-none"
     >
       {/* Ambient background orbital rings */}
-      <div className="absolute w-[500px] h-[500px] rounded-full border border-cyan-500/10 animate-[spin_20s_linear_infinite] pointer-events-none" />
-      <div className="absolute w-[750px] h-[750px] rounded-full border border-violet-500/10 animate-[spin_35s_linear_infinite_reverse] pointer-events-none" />
+      <div className="absolute w-[500px] h-[500px] rounded-full border border-white/5 animate-[spin_20s_linear_infinite] pointer-events-none" />
+      <div className="absolute w-[750px] h-[750px] rounded-full border border-white/5 animate-[spin_35s_linear_infinite_reverse] pointer-events-none" />
       
       {/* Background glow orb */}
-      <div className="absolute w-96 h-96 bg-gradient-to-tr from-cyan-500/15 via-indigo-600/10 to-violet-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute w-96 h-96 bg-[var(--accent-glow)] opacity-15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Main branding container */}
       <div className="relative z-10 flex flex-col items-center">
@@ -58,7 +58,7 @@ export default function StartupScreen({ onComplete }) {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative mb-6"
         >
-          <div className="absolute -inset-4 bg-gradient-to-r from-cyan-500/20 to-violet-500/20 rounded-full blur-xl animate-pulse" />
+          <div className="absolute -inset-4 bg-[var(--accent-glow)] opacity-20 rounded-full blur-xl animate-pulse" />
           <NexoraSymbol size={72} className="relative z-10" />
         </motion.div>
 
@@ -69,19 +69,19 @@ export default function StartupScreen({ onComplete }) {
           transition={{ delay: 0.3, duration: 0.6 }}
           className="text-center"
         >
-          <h1 className="font-display font-extrabold text-3xl sm:text-4xl tracking-[0.3em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-300">
+          <h1 className="font-display font-extrabold text-3xl sm:text-4xl tracking-[0.3em] uppercase text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-300">
             Nexora
           </h1>
-          <p className="text-xs font-mono tracking-[0.25em] text-cyan-400/80 uppercase mt-1">
+          <p className="text-xs font-mono tracking-[0.25em] text-[var(--accent)] opacity-80 uppercase mt-1">
             Realtime Communication Nexus
           </p>
         </motion.div>
 
         {/* Nexora-specific Custom Orbit Progress Indicator */}
         <div className="w-64 sm:w-72 mt-10">
-          <div className="relative h-1.5 w-full bg-slate-900/80 rounded-full overflow-hidden border border-white/5">
+          <div className="relative h-1.5 w-full bg-[var(--surface-elevated)] rounded-full overflow-hidden border border-white/5">
             <motion.div
-              className="h-full bg-gradient-to-r from-cyan-400 via-indigo-500 to-violet-500 rounded-full shadow-glow-cyan"
+              className="h-full bg-[var(--accent)] rounded-full shadow-[0_0_12px_var(--accent-glow)]"
               initial={{ width: '0%' }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.35, ease: "easeInOut" }}
@@ -102,7 +102,7 @@ export default function StartupScreen({ onComplete }) {
                 {LOADING_STEPS[stepIndex].message}
               </motion.span>
             </AnimatePresence>
-            <span className="text-cyan-400 font-semibold ml-2">{progress}%</span>
+            <span className="text-[var(--accent)] font-semibold ml-2">{progress}%</span>
           </div>
         </div>
       </div>

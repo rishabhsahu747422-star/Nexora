@@ -54,7 +54,7 @@ export default function NexoraSymbol({ size = 32, className = '', animated = fal
         <circle cx="8" cy="15" r="2.2" fill="#00F0FF" />
 
         {/* Core Focal Point */}
-        <circle cx="24" cy="24" r="3.2" fill="#07080C" stroke="#FFFFFF" strokeWidth="1.8" />
+        <circle cx="24" cy="24" r="3.2" fill="var(--app-bg, #090909)" stroke="#FFFFFF" strokeWidth="1.8" />
       </svg>
     </div>
   );

@@ -26,11 +26,11 @@ export default function NexoraLogo({
     >
       <NexoraSymbol size={current.symbol} animated={size === 'xl'} />
       <div className="flex flex-col">
-        <span className={`font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-cyan-300 ${current.text} ${current.tracking} uppercase leading-none`}>
+        <span className={`font-display font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-100 to-slate-300 ${current.text} ${current.tracking} uppercase leading-none`}>
           Nexora
         </span>
         {showTagline && (
-          <span className="text-[10px] uppercase font-mono tracking-widest text-cyan-400/80 mt-1 font-semibold">
+          <span className="text-[10px] uppercase font-mono tracking-widest text-[var(--accent)] opacity-80 mt-1 font-semibold">
             Nexus Protocol
           </span>
         )}

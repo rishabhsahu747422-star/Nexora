@@ -126,12 +126,12 @@ export default function MessageItem({
         density === 'compact' ? 'py-1.5 px-3' : 'py-3 px-4'
       } ${
         isHighlighted
-          ? 'bg-cyan-500/15 ring-1 ring-cyan-500/40 shadow-glow-sm'
+          ? 'bg-[var(--accent-soft)] ring-1 ring-[var(--accent-border)] accent-glow-sm'
           : 'hover:bg-white/[0.03]'
-      } ${message.isPinned ? 'border-l-2 border-indigo-400' : ''}`}
+      } ${message.isPinned ? 'border-l-2 border-[var(--accent)]' : ''}`}
     >
       {/* Action Dock (Floating on hover) */}
-      <div className="absolute right-4 -top-3.5 hidden group-hover:flex items-center gap-0.5 bg-[#151A23] border border-white/10 rounded-xl px-1.5 py-1 shadow-xl shadow-black/80 z-20">
+      <div className="absolute right-4 -top-3.5 hidden group-hover:flex items-center gap-0.5 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] rounded-xl px-1.5 py-1 shadow-xl shadow-black/80 z-20">
         {/* Quick Emojis */}
         <div className="flex items-center gap-0.5 border-r border-white/10 pr-1 mr-1">
           {['🔥', '👍', '❤️'].map((em) => (
@@ -216,7 +216,7 @@ export default function MessageItem({
 
       {/* Emoji Picker Popover */}
       {showEmojiPicker && (
-        <div className="absolute right-4 top-6 z-30 bg-[#151A23] border border-white/10 rounded-xl p-2 shadow-2xl flex gap-1 animate-fadeIn">
+        <div className="absolute right-4 top-6 z-30 bg-[var(--surface-elevated)] border border-[var(--border-subtle)] rounded-xl p-2 shadow-2xl flex gap-1 animate-fadeIn">
           {POPULAR_EMOJIS.map((em) => (
             <button
               key={em}
@@ -236,9 +236,9 @@ export default function MessageItem({
       {message.replyTo && (
         <div
           onClick={() => onJumpToReply && onJumpToReply(message.replyTo.id)}
-          className="flex items-center gap-2 mb-1 text-[11px] text-slate-400 cursor-pointer hover:text-cyan-300 transition-colors pl-8 select-none"
+          className="flex items-center gap-2 mb-1 text-[11px] text-slate-400 cursor-pointer hover:text-[var(--accent)] transition-colors pl-8 select-none"
         >
-          <CornerDownRight className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+          <CornerDownRight className="w-3.5 h-3.5 text-[var(--accent)] flex-shrink-0" />
           <span className="font-semibold text-slate-300">
             @{message.replyTo.authorName}
           </span>
@@ -286,7 +286,7 @@ export default function MessageItem({
             )}
 
             {message.isPinned && (
-              <span className="text-[10px] font-mono text-indigo-400 flex items-center gap-1 bg-indigo-500/10 px-1.5 py-0.2 rounded">
+              <span className="text-[10px] font-mono text-[var(--accent)] flex items-center gap-1 bg-[var(--accent-soft)] px-1.5 py-0.2 rounded">
                 <Pin className="w-2.5 h-2.5" /> PINNED
               </span>
             )}
@@ -299,12 +299,12 @@ export default function MessageItem({
                 value={editText}
                 onChange={(e) => setEditText(e.target.value)}
                 rows={2}
-                className="w-full bg-[#0C0F15] border border-cyan-500/50 rounded-xl p-2.5 text-sm text-slate-100 focus:outline-none resize-none"
+                className="w-full bg-[var(--surface-secondary)] border border-[var(--accent-border)] rounded-xl p-2.5 text-sm text-slate-100 focus:outline-none resize-none"
               />
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleSaveEdit}
-                  className="px-3 py-1 bg-cyan-500 hover:bg-cyan-400 text-black text-xs font-semibold rounded-lg transition-colors"
+                  className="px-3 py-1 btn-accent-primary text-white text-xs font-semibold rounded-lg transition-colors"
                 >
                   Save
                 </button>
@@ -318,13 +318,13 @@ export default function MessageItem({
             </div>
           ) : (
             <p className="text-sm text-slate-200 mt-1 leading-relaxed break-words whitespace-pre-wrap">
-              {/* Highlight @mentions in electric cyan */}
+              {/* Highlight @mentions in electric accent */}
               {message.content.split(' ').map((word, i) => {
                 if (word.startsWith('@')) {
                   return (
                     <span
                       key={i}
-                      className="inline-block px-1.5 py-0.5 rounded bg-cyan-500/15 text-cyan-300 font-mono text-xs font-medium mr-1"
+                      className="inline-block px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-[var(--accent)] font-mono text-xs font-medium mr-1"
                     >
                       {word}
                     </span>
@@ -351,7 +351,7 @@ export default function MessageItem({
                           })
                         )
                       }
-                      className="group/img relative rounded-xl overflow-hidden border border-white/10 max-w-sm max-h-64 cursor-pointer hover:border-cyan-400/50 transition-colors"
+                      className="group/img relative rounded-xl overflow-hidden border border-white/10 max-w-sm max-h-64 cursor-pointer hover:border-[var(--accent-border)] transition-colors"
                     >
                       <img
                         src={att.url}
@@ -366,9 +366,9 @@ export default function MessageItem({
                 return (
                   <div
                     key={idx}
-                    className="flex items-center gap-3 bg-[#0C0F15] border border-white/10 p-3 rounded-xl max-w-xs"
+                    className="flex items-center gap-3 bg-[var(--surface-secondary)] border border-[var(--border-subtle)] p-3 rounded-xl max-w-xs"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-indigo-500/15 text-indigo-400 flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 rounded-lg bg-[var(--surface-elevated)] text-[var(--text-secondary)] flex items-center justify-center font-bold">
                       <FileText className="w-5 h-5" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -397,7 +397,7 @@ export default function MessageItem({
                     onClick={() => handleReactionClick(rxn.emoji)}
                     className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium transition-all ${
                       hasReacted
-                        ? 'bg-cyan-500/20 border border-cyan-500/50 text-cyan-200'
+                        ? 'bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--text-primary)]'
                         : 'bg-white/5 border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/10'
                     }`}
                   >

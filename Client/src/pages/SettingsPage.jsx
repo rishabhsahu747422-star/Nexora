@@ -9,7 +9,7 @@ export default function SettingsPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="h-screen w-screen flex flex-col bg-[#07080C] text-slate-100 overflow-hidden">
+    <div className="h-screen w-screen flex flex-col bg-[var(--app-bg)] text-slate-100 overflow-hidden">
       <GlobalHeader />
 
       <div className="flex-1 flex flex-col items-center justify-center p-4">

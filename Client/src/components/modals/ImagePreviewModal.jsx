@@ -10,7 +10,7 @@ export default function ImagePreviewModal({ isOpen, onClose, url, name }) {
       isOpen={isOpen}
       onClose={onClose}
       maxWidth="max-w-4xl"
-      className="p-2 bg-[#0C0F15]/90 border-white/10"
+      className="p-2 bg-[var(--surface-elevated)]/90 border-[var(--border-subtle)]"
       showClose={true}
     >
       <div className="flex flex-col items-center justify-center p-2">
@@ -28,7 +28,7 @@ export default function ImagePreviewModal({ isOpen, onClose, url, name }) {
               href={url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-cyan-400 hover:text-cyan-300 transition-colors"
+              className="flex items-center gap-1 text-[var(--accent)] hover:underline transition-colors"
             >
               <span>Full resolution</span>
               <ExternalLink className="w-3.5 h-3.5" />

@@ -8,13 +8,13 @@ export default function NotFound() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-[#07080C] text-slate-100 flex flex-col items-center justify-center p-6 text-center select-none relative overflow-hidden">
-      <div className="absolute top-1/3 w-96 h-96 bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
+    <div className="min-h-screen bg-[var(--app-bg)] text-slate-100 flex flex-col items-center justify-center p-6 text-center select-none relative overflow-hidden">
+      <div className="absolute top-1/3 w-96 h-96 bg-[var(--accent-glow)] opacity-10 rounded-full blur-[140px] pointer-events-none" />
 
       <NexoraLogo size="lg" showTagline onClick={() => navigate('/')} className="mb-8" />
 
       <div className="relative">
-        <span className="font-mono text-8xl sm:text-9xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-indigo-400 to-violet-500 opacity-40">
+        <span className="font-mono text-8xl sm:text-9xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[var(--accent)] via-slate-400 to-[var(--text-secondary)] opacity-40">
           404
         </span>
         <div className="absolute inset-0 flex items-center justify-center">
