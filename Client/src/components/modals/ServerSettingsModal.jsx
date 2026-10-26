@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import {
@@ -11,45 +11,102 @@ import {
   AlertTriangle,
   Save,
   Check,
+  Upload,
+  X,
 } from "lucide-react";
 import Modal from "../common/Modal";
 import Input from "../common/Input";
 import Button from "../common/Button";
 import Badge from "../common/Badge";
+import CommunityAvatar from "../common/CommunityAvatar";
 import { updateServer, deleteServer } from "../../redux/slices/serverSlice";
 import { addToast, closeModal } from "../../redux/slices/uiSlice";
 
 export default function ServerSettingsModal({ isOpen, onClose, server }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const fileInputRef = React.useRef(null);
 
   const [activeTab, setActiveTab] = useState("overview"); // 'overview' | 'roles' | 'members' | 'moderation' | 'danger'
   const [serverName, setServerName] = useState(server?.name || "");
   const [serverDesc, setServerDesc] = useState(server?.description || "");
   const [serverTag, setServerTag] = useState(server?.tag || "");
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   if (!server) return null;
 
   const sId = server._id || server.id;
 
-  const handleSaveOverview = (e) => {
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: "Please select an image file (PNG, JPG, WebP)",
+        }),
+      );
+      return;
+    }
+
+    setSelectedFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+  };
+
+  const handleClearImage = (e) => {
+    e.stopPropagation();
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleSaveOverview = async (e) => {
     e.preventDefault();
-    dispatch(
-      updateServer({
-        id: sId,
-        data: {
-          name: serverName.trim(),
-          description: serverDesc.trim(),
-          tag: serverTag.trim().toUpperCase(),
-        },
-      }),
-    );
-    dispatch(
-      addToast({
-        type: "success",
-        message: "Community parameters synchronized.",
-      }),
-    );
+    if (isSaving) return;
+    setIsSaving(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("name", serverName.trim());
+      formData.append("description", serverDesc.trim());
+      if (serverTag) formData.append("tag", serverTag.trim().toUpperCase());
+      if (selectedFile) {
+        formData.append("icon", selectedFile);
+      }
+
+      await dispatch(
+        updateServer({
+          id: sId,
+          data: formData,
+        }),
+      ).unwrap();
+
+      dispatch(
+        addToast({
+          type: "success",
+          message: "Community parameters synchronized.",
+        }),
+      );
+    } catch (err) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: err || "Failed to update community settings.",
+        }),
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDeleteServer = () => {
@@ -122,6 +179,51 @@ export default function ServerSettingsModal({ isOpen, onClose, server }) {
               <h3 className="font-display font-semibold text-base text-slate-100">
                 Community Overview
               </h3>
+
+              {/* Community Emblem Preview & Upload */}
+              <div className="flex items-center gap-4 p-3 bg-[#0C0F15] border border-white/10 rounded-2xl">
+                <div className="relative group flex-shrink-0">
+                  <CommunityAvatar
+                    src={previewUrl || server.icon}
+                    name={serverName || server.name}
+                    size="lg"
+                    shape="rounded-2xl"
+                  />
+                  {previewUrl && (
+                    <button
+                      type="button"
+                      onClick={handleClearImage}
+                      className="absolute -top-1.5 -right-1.5 p-1 rounded-full bg-rose-500 hover:bg-rose-600 text-white shadow-md transition-all scale-90 hover:scale-100"
+                      title="Remove pending upload"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                    id="settings-emblem-upload"
+                  />
+                  <label
+                    htmlFor="settings-emblem-upload"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#151A23] hover:bg-[#1C2331] text-cyan-300 hover:text-cyan-200 border border-cyan-500/30 hover:border-cyan-500/50 rounded-xl text-xs font-medium cursor-pointer transition-all shadow-sm"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>{selectedFile ? "Replace Emblem" : "Change Community Emblem"}</span>
+                  </label>
+                  <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                    {selectedFile
+                      ? selectedFile.name
+                      : "PNG, JPG or WebP up to 5MB. Leave empty to keep existing or default."}
+                  </p>
+                </div>
+              </div>
 
               <Input
                 label="Community Name"

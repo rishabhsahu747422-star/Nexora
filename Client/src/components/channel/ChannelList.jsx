@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Dropdown from "../common/Dropdown";
 import Badge from "../common/Badge";
+import CommunityAvatar from "../common/CommunityAvatar";
 import { selectChannel } from "../../redux/slices/channelSlice";
 import { openModal, addToast } from "../../redux/slices/uiSlice";
 import {
@@ -166,13 +167,24 @@ export default function ChannelList({ onCloseMobile }) {
           className="w-full"
           trigger={({ isOpen }) => (
             <div className="flex items-center justify-between p-1.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors">
-              <div className="flex items-center gap-2 min-w-0">
-                <span className="font-display font-bold text-sm text-slate-100 truncate">
-                  {activeServer?.name}
-                </span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                  {activeServer?.tag}
-                </span>
+              <div className="flex items-center gap-2.5 min-w-0">
+                <CommunityAvatar
+                  src={activeServer?.icon}
+                  name={activeServer?.name || "Community"}
+                  size="sm"
+                  shape="rounded-lg"
+                  className="flex-shrink-0"
+                />
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="font-display font-bold text-sm text-slate-100 truncate">
+                    {activeServer?.name || "Community"}
+                  </span>
+                  {activeServer?.tag && (
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 flex-shrink-0">
+                      {activeServer.tag}
+                    </span>
+                  )}
+                </div>
               </div>
               <ChevronDown
                 className={`w-4 h-4 text-slate-400 transition-transform ${

@@ -12,8 +12,8 @@ export const getServer = async (serverId) => {
   return response.data.data;
 };
 
-export const updateServer = async (serverId) =>
-  data(await api.patch(`/server/${serverId}`));
+export const updateServer = async (serverId, payload) =>
+  data(await api.patch(`/server/${serverId}`, payload));
 
 export const deleteServer = async (serverId) =>
   data(await api.delete(`/server/${serverId}`));

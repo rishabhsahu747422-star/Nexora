@@ -25,6 +25,7 @@ import {
 import NexoraLogo from "../../assets/logo/NexoraLogo";
 import NexoraSymbol from "../../assets/logo/NexoraSymbol";
 import Avatar from "../common/Avatar";
+import CommunityAvatar from "../common/CommunityAvatar";
 import Badge from "../common/Badge";
 import Dropdown from "../common/Dropdown";
 import Tooltip from "../common/Tooltip";
@@ -117,13 +118,14 @@ export default function GlobalHeader() {
           align="left"
           trigger={({ isOpen }) => (
             <div className="flex items-center gap-2 bg-[#151A23] hover:bg-[#1C2331] border border-white/10 px-2.5 py-1.5 rounded-xl transition-all">
-              <img
+              <CommunityAvatar
                 src={activeServer?.icon}
-                alt={activeServer?.name}
-                className="w-5 h-5 rounded-lg object-cover"
+                name={activeServer?.name || "Community"}
+                size="xs"
+                shape="rounded-lg"
               />
               <span className="text-xs font-semibold text-slate-200 max-w-[120px] sm:max-w-[150px] truncate">
-                {activeServer?.name}
+                {activeServer?.name || "Select Community"}
               </span>
               <ChevronDown
                 className={`w-3.5 h-3.5 text-slate-400 transition-transform ${
@@ -151,15 +153,17 @@ export default function GlobalHeader() {
                   }`}
                 >
                   <div className="flex items-center gap-2.5 min-w-0">
-                    <img
+                    <CommunityAvatar
                       src={srv.icon}
-                      alt={srv.name}
-                      className="w-6 h-6 rounded-md object-cover flex-shrink-0"
+                      name={srv.name}
+                      size="sm"
+                      shape="rounded-md"
+                      className="flex-shrink-0"
                     />
                     <div className="min-w-0 text-left">
                       <p className="text-xs truncate">{srv.name}</p>
                       <p className="text-[10px] text-slate-400">
-                        {srv.memberCount} members
+                        {srv.memberCount || 1} members
                       </p>
                     </div>
                   </div>

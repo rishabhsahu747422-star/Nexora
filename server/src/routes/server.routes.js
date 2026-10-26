@@ -42,7 +42,15 @@ router.post(
 router.get("/", authMiddleware, getAllServer);
 // router.post("/",authMiddleware,upload.fields([{name:"icon",maxCount:1},{name:"banner",maxCount:1}]),createServer)
 router.get("/:serverId", authMiddleware, getSingleServer);
-router.patch("/:serverId", authMiddleware, updateServer);
+router.patch(
+  "/:serverId",
+  authMiddleware,
+  upload.fields([
+    { name: "icon", maxCount: 1 },
+    { name: "banner", maxCount: 1 },
+  ]),
+  updateServer,
+);
 router.delete("/:serverId", authMiddleware, deleteServer);
 router.post("/:serverId/invite", authMiddleware, createInvite);
 router.delete("/:serverId/leave", authMiddleware, leaveServer);

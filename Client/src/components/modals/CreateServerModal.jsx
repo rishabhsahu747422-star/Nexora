@@ -1,33 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Server, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Sparkles, Upload, X } from "lucide-react";
 import Modal from "../common/Modal";
 import Input from "../common/Input";
 import Button from "../common/Button";
+import CommunityAvatar from "../common/CommunityAvatar";
 import { createServerAsync } from "../../redux/slices/serverSlice";
 import { closeModal, addToast } from "../../redux/slices/uiSlice";
 
-const DEFAULT_SERVER_ICONS = [
-  "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=150&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=150&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=150&auto=format&fit=crop&q=80",
-  "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=150&auto=format&fit=crop&q=80",
-];
-
 export default function CreateServerModal({ isOpen, onClose }) {
-  const { servers } = useSelector((state) => state.server);
-  console.log(servers);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [selectedIcon, setSelectedIcon] = useState(DEFAULT_SERVER_ICONS[0]);
+  const fileInputRef = useRef(null);
+
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
+    watch,
     reset,
     formState: { errors },
   } = useForm({
@@ -38,18 +33,77 @@ export default function CreateServerModal({ isOpen, onClose }) {
     },
   });
 
-  const onSubmit = async (data) => {
-    const formData = new FormData();
+  const communityName = watch("name") || "";
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: "Please select a valid image file (PNG, JPG, WebP)",
+        }),
+      );
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: "Emblem size must be under 5MB",
+        }),
+      );
+      return;
+    }
+
+    setSelectedFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+  };
+
+  const handleClearImage = (e) => {
+    e.stopPropagation();
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleClose = () => {
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    reset();
+    onClose();
+  };
+
+  const onSubmit = async (data) => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    const formData = new FormData();
     formData.append("name", data.name.trim());
-    formData.append("description", data.description.trim());
+    formData.append("description", (data.description || "").trim());
     formData.append("isPublic", "true");
+
+    if (selectedFile) {
+      formData.append("icon", selectedFile);
+    }
 
     try {
       const newServer = await dispatch(createServerAsync(formData)).unwrap();
 
+      handleClose();
       dispatch(closeModal());
-      reset();
 
       dispatch(
         addToast({
@@ -58,45 +112,80 @@ export default function CreateServerModal({ isOpen, onClose }) {
         }),
       );
 
-      navigate(`/app/server/${newServer._id}`);
+      const createdId = newServer._id || newServer.id;
+      if (createdId) {
+        navigate(`/app/server/${createdId}`);
+      }
     } catch (error) {
       dispatch(
         addToast({
           type: "error",
-          message: error || "Unable to create server",
+          message: error || "Unable to create community",
         }),
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <Modal
       isOpen={isOpen}
-      onClose={onClose}
+      onClose={handleClose}
       title="Create Community"
       subtitle="Establish a new decentralized nexus for your project or collective"
       maxWidth="max-w-md"
     >
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Icon Selection */}
+        {/* Emblem Preview & Upload Area */}
         <div>
           <label className="text-xs font-medium text-slate-300 block mb-2">
-            Select Community Emblem
+            Community Emblem
           </label>
-          <div className="flex items-center gap-3">
-            {DEFAULT_SERVER_ICONS.map((icon, idx) => (
-              <img
-                key={idx}
-                src={icon}
-                alt="Emblem"
-                onClick={() => setSelectedIcon(icon)}
-                className={`w-11 h-11 rounded-xl object-cover cursor-pointer transition-all ${
-                  selectedIcon === icon
-                    ? "ring-2 ring-cyan-400 scale-105"
-                    : "opacity-60 hover:opacity-100"
-                }`}
+          <div className="flex items-center gap-4 p-3 bg-[#0C0F15] border border-white/10 rounded-2xl">
+            {/* Live Community Avatar or Uploaded Preview */}
+            <div className="relative group flex-shrink-0">
+              <CommunityAvatar
+                src={previewUrl}
+                name={communityName || "New Community"}
+                size="lg"
+                shape="rounded-2xl"
               />
-            ))}
+              {previewUrl && (
+                <button
+                  type="button"
+                  onClick={handleClearImage}
+                  className="absolute -top-1.5 -right-1.5 p-1 rounded-full bg-rose-500 hover:bg-rose-600 text-white shadow-md transition-all scale-90 hover:scale-100"
+                  title="Remove uploaded image"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Upload Button & Guidance */}
+            <div className="flex-1 min-w-0">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+                id="community-emblem-upload"
+              />
+              <label
+                htmlFor="community-emblem-upload"
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#151A23] hover:bg-[#1C2331] text-cyan-300 hover:text-cyan-200 border border-cyan-500/30 hover:border-cyan-500/50 rounded-xl text-xs font-medium cursor-pointer transition-all shadow-sm"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span>{selectedFile ? "Replace Image" : "Upload Image"}</span>
+              </label>
+              <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                {selectedFile
+                  ? selectedFile.name
+                  : "Optional. A distinct geometric emblem is generated automatically if skipped."}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -136,11 +225,23 @@ export default function CreateServerModal({ isOpen, onClose }) {
         </div>
 
         <div className="pt-2 flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleClose}
+            disabled={isSubmitting}
+          >
             Cancel
           </Button>
-          <Button type="submit" variant="primary" size="sm" icon={Sparkles}>
-            Establish Community
+          <Button
+            type="submit"
+            variant="primary"
+            size="sm"
+            icon={Sparkles}
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Establishing..." : "Establish Community"}
           </Button>
         </div>
       </form>

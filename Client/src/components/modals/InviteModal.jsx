@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { Copy, RefreshCw, Check, Link as LinkIcon, Shield } from "lucide-react";
 import Modal from "../common/Modal";
 import Button from "../common/Button";
+import CommunityAvatar from "../common/CommunityAvatar";
 import { regenerateInvite } from "../../redux/slices/serverSlice";
 import { addToast } from "../../redux/slices/uiSlice";
 
@@ -49,6 +50,24 @@ export default function InviteModal({ isOpen, onClose, server }) {
       maxWidth="max-w-md"
     >
       <div className="space-y-4">
+        {/* Community Info Header */}
+        <div className="flex items-center gap-3 p-3 bg-[#0C0F15] border border-white/10 rounded-2xl">
+          <CommunityAvatar
+            src={server.icon}
+            name={server.name}
+            size="md"
+            shape="rounded-xl"
+          />
+          <div className="min-w-0">
+            <h4 className="font-display font-semibold text-sm text-slate-100 truncate">
+              {server.name}
+            </h4>
+            <p className="text-[11px] text-slate-400 font-mono">
+              {server.tag || "NEXUS"} • {server.memberCount || 1} members
+            </p>
+          </div>
+        </div>
+
         {/* Link box */}
         <div>
           <label className="text-xs font-medium text-slate-300 block mb-1.5">

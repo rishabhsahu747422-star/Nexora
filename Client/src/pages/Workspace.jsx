@@ -10,6 +10,7 @@ import {
   Plus,
   ArrowRight,
   Sparkles,
+  Server,
 } from "lucide-react";
 import GlobalHeader from "../components/layout/GlobalHeader";
 import MobileNav from "../components/layout/MobileNav";
@@ -22,6 +23,7 @@ import DmConversation from "../components/dm/DmConversation";
 import FriendsHub from "../components/friends/FriendsHub";
 import Button from "../components/common/Button";
 import Avatar from "../components/common/Avatar";
+import CommunityAvatar from "../components/common/CommunityAvatar";
 import Badge from "../components/common/Badge";
 import { fetchServers, selectServer } from "../redux/slices/serverSlice";
 import { selectDm } from "../redux/slices/dmSlice";
@@ -211,45 +213,71 @@ export default function Workspace() {
                   </Button>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {servers.map((srv) => (
-                    <div
-                      key={srv._id}
-                      onClick={() => {
-                        dispatch(selectServer(srv._id));
-                        navigate(`/app/server/${srv._id}`);
-                      }}
-                      className="group bg-[#10141C] hover:bg-[#151A23] border border-white/10 hover:border-cyan-500/40 rounded-2xl p-5 cursor-pointer transition-all duration-300 shadow-xl flex flex-col justify-between"
-                    >
-                      <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <img
-                            src={srv.icon}
-                            alt={srv.name}
-                            className="w-12 h-12 rounded-xl object-cover ring-1 ring-white/10"
-                          />
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
-                            {srv.tag}
-                          </span>
-                        </div>
-                        <h3 className="font-display font-bold text-base text-white group-hover:text-cyan-300 transition-colors">
-                          {srv.name}
-                        </h3>
-                        <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-                          {srv.description}
-                        </p>
-                      </div>
-
-                      <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
-                        <span>{srv.memberCount} Members</span>
-                        <div className="flex items-center gap-1 text-cyan-400 group-hover:translate-x-1 transition-transform">
-                          <span>Enter</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
-                        </div>
-                      </div>
+                {servers.length === 0 ? (
+                  <div className="bg-[#10141C] border border-white/10 rounded-3xl p-8 text-center max-w-md mx-auto space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center mx-auto text-cyan-400">
+                      <Server className="w-6 h-6" />
                     </div>
-                  ))}
-                </div>
+                    <h3 className="font-display font-semibold text-base text-white">
+                      No Communities Joined Yet
+                    </h3>
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      Establish a new collective or ask a peer for an invite link to jump into real-time voice and transmission channels.
+                    </p>
+                    <div className="pt-2">
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        icon={Plus}
+                        onClick={() => dispatch(openModal({ type: "CREATE_SERVER" }))}
+                      >
+                        Establish Your First Community
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {servers.map((srv) => (
+                      <div
+                        key={srv._id}
+                        onClick={() => {
+                          dispatch(selectServer(srv._id));
+                          navigate(`/app/server/${srv._id}`);
+                        }}
+                        className="group bg-[#10141C] hover:bg-[#151A23] border border-white/10 hover:border-cyan-500/40 rounded-2xl p-5 cursor-pointer transition-all duration-300 shadow-xl flex flex-col justify-between"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between mb-3">
+                            <CommunityAvatar
+                              src={srv.icon}
+                              name={srv.name}
+                              size="lg"
+                              shape="rounded-xl"
+                              className="ring-1 ring-white/10 group-hover:scale-105 transition-transform"
+                            />
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                              {srv.tag || "NEXUS"}
+                            </span>
+                          </div>
+                          <h3 className="font-display font-bold text-base text-white group-hover:text-cyan-300 transition-colors">
+                            {srv.name}
+                          </h3>
+                          <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                            {srv.description || "Active Nexora node community"}
+                          </p>
+                        </div>
+
+                        <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                          <span>{srv.memberCount || 1} Members</span>
+                          <div className="flex items-center gap-1 text-cyan-400 group-hover:translate-x-1 transition-transform">
+                            <span>Enter</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Embedded Friends & Connections Hub */}

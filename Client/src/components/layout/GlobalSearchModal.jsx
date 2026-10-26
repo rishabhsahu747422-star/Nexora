@@ -16,6 +16,7 @@ import { selectServer } from "../../redux/slices/serverSlice";
 import { selectChannel } from "../../redux/slices/channelSlice";
 import { setHighlightedMessageId } from "../../redux/slices/messageSlice";
 import Avatar from "../common/Avatar";
+import CommunityAvatar from "../common/CommunityAvatar";
 
 export default function GlobalSearchModal() {
   const dispatch = useDispatch();
@@ -363,10 +364,12 @@ export default function GlobalSearchModal() {
                           className="flex items-center justify-between p-2.5 rounded-xl hover:bg-white/5 cursor-pointer transition-colors group"
                         >
                           <div className="flex items-center gap-3">
-                            <img
+                            <CommunityAvatar
                               src={srv.icon}
-                              alt={srv.name}
-                              className="w-7 h-7 rounded-lg object-cover"
+                              name={srv.name}
+                              size="sm"
+                              shape="rounded-lg"
+                              className="flex-shrink-0"
                             />
                             <div>
                               <p className="text-xs font-semibold text-slate-200">
