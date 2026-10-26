@@ -34,14 +34,23 @@ export default function MemberProfileModal({ isOpen, onClose, user }) {
     }
   };
 
-  const handleAddFriend = () => {
-    dispatch(sendFriendRequest(user));
-    dispatch(
-      addToast({
-        type: 'success',
-        message: `Connection request dispatched to @${user.username}.`,
-      })
-    );
+  const handleAddFriend = async () => {
+    try {
+      await dispatch(sendFriendRequest(user)).unwrap();
+      dispatch(
+        addToast({
+          type: 'success',
+          message: `Connection request dispatched to @${user.username}.`,
+        })
+      );
+    } catch (err) {
+      dispatch(
+        addToast({
+          type: 'error',
+          message: typeof err === 'string' ? err : 'Failed to send connection request.',
+        })
+      );
+    }
   };
 
   const handleCopyUsername = () => {

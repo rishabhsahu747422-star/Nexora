@@ -9,6 +9,7 @@ import serverMemberModel from "../models/serverMember.model.js";
 let io = null;
 const voiceRooms = new Map();
 const socketToVoiceRoom = new Map();
+const userSockets = new Map(); // userId -> Set of socketIds
 
 const handleVoiceLeave = (socket, channelId) => {
   if (!channelId) return;
@@ -44,7 +45,17 @@ export const socketIntialise = (server) => {
 
     // Join authenticated user's private room for direct notifications
     if (socket.user?._id) {
-      socket.join(`user:${socket.user._id.toString()}`);
+      const userId = socket.user._id.toString();
+      socket.join(`user:${userId}`);
+
+      if (!userSockets.has(userId)) {
+        userSockets.set(userId, new Set());
+      }
+      userSockets.get(userId).add(socket.id);
+
+      if (userSockets.get(userId).size === 1) {
+        io.emit("user:presence-change", { userId, status: "online" });
+      }
     }
 
     socket.on("join-channel", async (channelId) => {
@@ -238,6 +249,19 @@ export const socketIntialise = (server) => {
       if (voiceChannelId) {
         handleVoiceLeave(socket, voiceChannelId);
       }
+
+      if (socket.user?._id) {
+        const userId = socket.user._id.toString();
+        const sockets = userSockets.get(userId);
+        if (sockets) {
+          sockets.delete(socket.id);
+          if (sockets.size === 0) {
+            userSockets.delete(userId);
+            io.emit("user:presence-change", { userId, status: "offline" });
+          }
+        }
+      }
+
       console.log("disconnected", socket.id);
     });
   });
@@ -251,6 +275,22 @@ export const getIO = () => {
     return null;
   }
   return io;
+};
+
+export const isUserOnline = (userId) => {
+  if (!userId) return false;
+  const uid = userId._id ? userId._id.toString() : userId.toString();
+  return userSockets.has(uid) && userSockets.get(uid).size > 0;
+};
+
+export const getOnlineUserIds = () => {
+  return Array.from(userSockets.keys());
+};
+
+export const emitToUser = (userId, event, data) => {
+  if (!io || !userId) return;
+  const uid = userId._id ? userId._id.toString() : userId.toString();
+  io.to(`user:${uid}`).emit(event, data);
 };
 
 export const initSocket = socketIntialise;

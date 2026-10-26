@@ -17,6 +17,7 @@ import { errorMiddleware } from "../middlewares/error.middleware.js";
 import channelRoutes from "../routes/channel.routes.js";
 import paymentRoutes from "../routes/payment.routes.js";
 import conversationRoutes from "../routes/conversation.routes.js";
+import connectionRoutes from "../routes/connection.routes.js";
 
 import { expressCorsOptions } from "../config/cors.config.js";
 
@@ -51,6 +52,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/conversations", conversationRoutes);
+app.use("/api/connections", connectionRoutes);
 
 app.use(errorMiddleware);
 export default app;

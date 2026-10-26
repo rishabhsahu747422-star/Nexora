@@ -16,6 +16,14 @@ import {
 } from "../redux/slices/voiceSlice";
 import { addToast } from "../redux/slices/uiSlice";
 import webrtc from "../services/webrtc.service";
+import {
+  onConnectionRequestReceived,
+  onConnectionRequestAccepted,
+  onConnectionRequestDeclined,
+  onConnectionRequestCancelled,
+  onConnectionRemoved,
+  onUserPresenceChange,
+} from "../redux/slices/friendSlice";
 
 const SocketManager = () => {
   const dispatch = useDispatch();
@@ -122,6 +130,47 @@ const SocketManager = () => {
       dispatch(addToast({ type: "error", message }));
     };
 
+    // Connection & Presence event handlers
+    const handleConnectionRequestReceived = (req) => {
+      dispatch(onConnectionRequestReceived(req));
+      if (req?.name) {
+        dispatch(
+          addToast({
+            type: "info",
+            message: `New connection request from ${req.name} (@${req.username})`,
+          })
+        );
+      }
+    };
+
+    const handleConnectionRequestAccepted = (payload) => {
+      dispatch(onConnectionRequestAccepted(payload));
+      if (payload?.friend?.name) {
+        dispatch(
+          addToast({
+            type: "success",
+            message: `${payload.friend.name} accepted your connection request!`,
+          })
+        );
+      }
+    };
+
+    const handleConnectionRequestDeclined = (payload) => {
+      dispatch(onConnectionRequestDeclined(payload));
+    };
+
+    const handleConnectionRequestCancelled = (payload) => {
+      dispatch(onConnectionRequestCancelled(payload));
+    };
+
+    const handleConnectionRemoved = (payload) => {
+      dispatch(onConnectionRemoved(payload));
+    };
+
+    const handleUserPresenceChange = (payload) => {
+      dispatch(onUserPresenceChange(payload));
+    };
+
     socket.on("connect", socketConnectHandler);
     socket.on("connect_error", socketErrorHandler);
     socket.on("message:new", handleNewChannelMessage);
@@ -134,6 +183,13 @@ const SocketManager = () => {
     socket.on("voice:participant-updated", handleVoiceParticipantUpdated);
     socket.on("voice:signal", handleVoiceSignal);
     socket.on("voice:error", handleVoiceError);
+
+    socket.on("connection:request-received", handleConnectionRequestReceived);
+    socket.on("connection:request-accepted", handleConnectionRequestAccepted);
+    socket.on("connection:request-declined", handleConnectionRequestDeclined);
+    socket.on("connection:request-cancelled", handleConnectionRequestCancelled);
+    socket.on("connection:removed", handleConnectionRemoved);
+    socket.on("user:presence-change", handleUserPresenceChange);
 
     return () => {
       socket.off("connect", socketConnectHandler);
@@ -148,6 +204,13 @@ const SocketManager = () => {
       socket.off("voice:participant-updated", handleVoiceParticipantUpdated);
       socket.off("voice:signal", handleVoiceSignal);
       socket.off("voice:error", handleVoiceError);
+
+      socket.off("connection:request-received", handleConnectionRequestReceived);
+      socket.off("connection:request-accepted", handleConnectionRequestAccepted);
+      socket.off("connection:request-declined", handleConnectionRequestDeclined);
+      socket.off("connection:request-cancelled", handleConnectionRequestCancelled);
+      socket.off("connection:removed", handleConnectionRemoved);
+      socket.off("user:presence-change", handleUserPresenceChange);
 
       socket.disconnect();
     };
