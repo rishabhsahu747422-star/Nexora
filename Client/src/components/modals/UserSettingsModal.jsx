@@ -7,32 +7,23 @@ import {
   Bell,
   Lock,
   LogOut,
-  Laptop,
   Check,
   Save,
-  Moon,
-  Sun,
   LayoutGrid,
 } from "lucide-react";
 import Modal from "../common/Modal";
 import Input from "../common/Input";
 import Button from "../common/Button";
 import Avatar from "../common/Avatar";
+import AppearanceSettings from "../settings/AppearanceSettings";
 import { updateProfile } from "../../redux/slices/authSlice";
-import {
-  setTheme,
-  setMessageDensity,
-  addToast,
-  closeModal,
-} from "../../redux/slices/uiSlice";
+import { addToast, closeModal } from "../../redux/slices/uiSlice";
 
 export default function UserSettingsModal({ isOpen, onClose }) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const currentUser = useSelector((state) => state.auth.user);
-  const theme = useSelector((state) => state.ui.theme);
-  const messageDensity = useSelector((state) => state.ui.messageDensity);
 
   const [activeTab, setActiveTab] = useState("account"); // 'account' | 'appearance' | 'notifications' | 'privacy'
   const [name, setName] = useState(currentUser?.fullname || "");
@@ -65,26 +56,6 @@ export default function UserSettingsModal({ isOpen, onClose }) {
         }),
       );
     }
-  };
-
-  const handleThemeChange = (newTheme) => {
-    dispatch(setTheme(newTheme));
-    dispatch(
-      addToast({
-        type: "info",
-        message: `Visual theme switched to ${newTheme}.`,
-      }),
-    );
-  };
-
-  const handleDensityChange = (density) => {
-    dispatch(setMessageDensity(density));
-    dispatch(
-      addToast({
-        type: "info",
-        message: `Message density set to ${density}.`,
-      }),
-    );
   };
 
   const tabs = [
@@ -201,104 +172,7 @@ export default function UserSettingsModal({ isOpen, onClose }) {
             </form>
           )}
 
-          {activeTab === "appearance" && (
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-display font-semibold text-base text-slate-100 mb-1">
-                  Color Mode & Theme
-                </h3>
-                <p className="text-xs text-slate-400 mb-3">
-                  Select your preferred ambient lighting profile.
-                </p>
-
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    {
-                      id: "dark",
-                      label: "Dark Void",
-                      icon: Moon,
-                      desc: "Nexora signature",
-                    },
-                    {
-                      id: "light",
-                      label: "Luminescence",
-                      icon: Sun,
-                      desc: "High daylight",
-                    },
-                    {
-                      id: "system",
-                      label: "System Sync",
-                      icon: Laptop,
-                      desc: "Match OS",
-                    },
-                  ].map((t) => {
-                    const Icon = t.icon;
-                    const isSelected = theme === t.id;
-                    return (
-                      <div
-                        key={t.id}
-                        onClick={() => handleThemeChange(t.id)}
-                        className={`flex flex-col items-center text-center p-3 rounded-xl border cursor-pointer transition-all ${
-                          isSelected
-                            ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-300"
-                            : "bg-[#0C0F15] border-white/10 text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        <Icon className="w-5 h-5 mb-1.5" />
-                        <span className="text-xs font-semibold">{t.label}</span>
-                        <span className="text-[10px] opacity-70">{t.desc}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-white/5">
-                <h3 className="font-display font-semibold text-base text-slate-100 mb-1">
-                  Message Spacing & Density
-                </h3>
-                <p className="text-xs text-slate-400 mb-3">
-                  Control how information is compressed in the transmission
-                  stream.
-                </p>
-
-                <div className="grid grid-cols-2 gap-3">
-                  {[
-                    {
-                      id: "comfortable",
-                      label: "Comfortable",
-                      desc: "Generous avatars and spacing",
-                    },
-                    {
-                      id: "compact",
-                      label: "Compact",
-                      desc: "Maximum message density",
-                    },
-                  ].map((d) => {
-                    const isSelected = messageDensity === d.id;
-                    return (
-                      <div
-                        key={d.id}
-                        onClick={() => handleDensityChange(d.id)}
-                        className={`p-3 rounded-xl border cursor-pointer transition-all ${
-                          isSelected
-                            ? "bg-cyan-500/15 border-cyan-500/50 text-cyan-300"
-                            : "bg-[#0C0F15] border-white/10 text-slate-400 hover:text-white"
-                        }`}
-                      >
-                        <span className="text-xs font-semibold block">
-                          {d.label}
-                        </span>
-                        <span className="text-[11px] opacity-70 block mt-0.5">
-                          {d.desc}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          )}
+          {activeTab === "appearance" && <AppearanceSettings />}
 
           {activeTab === "notifications" && (
             <div className="space-y-4">

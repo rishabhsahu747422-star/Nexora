@@ -43,6 +43,31 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    appearance: {
+      theme: {
+        type: String,
+        enum: ["dark", "light", "system"],
+        default: "dark",
+      },
+      accentColor: {
+        type: String,
+        default: "#E10600",
+      },
+      accentName: {
+        type: String,
+        default: "Crimson",
+      },
+      surfaceStyle: {
+        type: String,
+        enum: ["midnight", "graphite", "oled"],
+        default: "midnight",
+      },
+      messageSpacing: {
+        type: String,
+        enum: ["compact", "comfortable"],
+        default: "compact",
+      },
+    },
     googleId: {
       type: String,
       unique: true,

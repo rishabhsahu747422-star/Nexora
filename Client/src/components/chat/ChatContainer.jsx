@@ -72,7 +72,8 @@ export default function ChatContainer({ channel }) {
       {/* Messages Stream */}
       <div
         ref={containerRef}
-        className="flex-1 overflow-y-auto px-2 py-4 space-y-1 divide-y divide-transparent"
+        className="flex-1 overflow-y-auto px-2 py-4 flex flex-col"
+        style={{ gap: "var(--message-gap, 4px)" }}
       >
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center p-8 select-none">

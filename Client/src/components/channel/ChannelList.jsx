@@ -319,7 +319,7 @@ export default function ChannelList({ onCloseMobile }) {
                       onClick={() => handleSelectChannel(chan)}
                       className={`group flex items-center justify-between px-2.5 py-1.5 rounded-xl cursor-pointer transition-all ${
                         isSelected
-                          ? "bg-gradient-to-r from-cyan-500/20 to-indigo-500/10 text-cyan-200 font-medium border border-cyan-500/30"
+                          ? "bg-[var(--accent-soft)] text-white font-medium border border-[var(--accent-border)] shadow-sm"
                           : "text-slate-400 hover:text-slate-200 hover:bg-white/5"
                       }`}
                     >
@@ -333,7 +333,10 @@ export default function ChannelList({ onCloseMobile }) {
 
                       <div className="flex items-center gap-1.5">
                         {chan.unread && (
-                          <span className="w-2 h-2 rounded-full bg-cyan-400 ring-2 ring-[#0C0F15]" />
+                          <span
+                            className="w-2 h-2 rounded-full ring-2 ring-[#0C0F15]"
+                            style={{ backgroundColor: "var(--accent)" }}
+                          />
                         )}
                         {chan.type === "voice" &&
                           chan.activeParticipants?.length > 0 && (

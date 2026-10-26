@@ -3,14 +3,107 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   NEXORA GLOBAL STYLES & TAILWIND EXTENSIONS
+   NEXORA GLOBAL THEME VARIABLES & CSS TOKENS
+   Default: Nexora Midnight (#0B0B0D) + Crimson Accent (#E10600)
    ========================================================================== */
 
 :root {
   color-scheme: dark;
+
+  /* Surfaces (Midnight Default) */
+  --app-bg: #0B0B0D;
+  --surface-primary: #141416;
+  --surface-secondary: #1B1B1F;
+  --surface-elevated: #252529;
+  --surface-hover: #303036;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A1A1AA;
+  --border-subtle: #303036;
+
+  /* Accent (Crimson Default) */
+  --accent: #E10600;
+  --accent-hover: #F01E1A;
+  --accent-soft: rgba(225, 6, 0, 0.15);
+  --accent-soft-hover: rgba(225, 6, 0, 0.25);
+  --accent-border: rgba(225, 6, 0, 0.35);
+  --accent-contrast: #FFFFFF;
+  --accent-glow: rgba(225, 6, 0, 0.35);
+  --accent-rgb: 225, 6, 0;
+
+  /* Message density */
+  --message-gap: 4px;
 }
 
-/* Custom sleek dark scrollbar for message feeds and decks */
+/* Surface Mode: Midnight */
+[data-surface="midnight"] {
+  --app-bg: #0B0B0D;
+  --surface-primary: #141416;
+  --surface-secondary: #1B1B1F;
+  --surface-elevated: #252529;
+  --surface-hover: #303036;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A1A1AA;
+  --border-subtle: #303036;
+}
+
+/* Surface Mode: Graphite */
+[data-surface="graphite"] {
+  --app-bg: #131417;
+  --surface-primary: #1B1C22;
+  --surface-secondary: #24252C;
+  --surface-elevated: #2D2F38;
+  --surface-hover: #383B46;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A6ABB8;
+  --border-subtle: #3B3D47;
+}
+
+/* Surface Mode: OLED */
+[data-surface="oled"] {
+  --app-bg: #000000;
+  --surface-primary: #0C0C0C;
+  --surface-secondary: #141414;
+  --surface-elevated: #1F1F1F;
+  --surface-hover: #2A2A2A;
+  --text-primary: #F5F5F5;
+  --text-secondary: #9CA3AF;
+  --border-subtle: #2A2A2A;
+}
+
+/* Theme Mode: Light */
+html[data-theme="light"],
+html.light {
+  color-scheme: light;
+  --app-bg: #F6F7FB;
+  --surface-primary: #FFFFFF;
+  --surface-secondary: #F0F2F6;
+  --surface-elevated: #E5E7EB;
+  --surface-hover: #EAECEF;
+  --text-primary: #111827;
+  --text-secondary: #4B5563;
+  --border-subtle: #E5E7EB;
+}
+
+/* Message Spacing */
+[data-spacing="compact"] {
+  --message-gap: 4px;
+}
+
+[data-spacing="comfortable"] {
+  --message-gap: 12px;
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom sleek dark scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -27,30 +120,38 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 240, 255, 0.4);
+  background: var(--accent-border, rgba(225, 6, 0, 0.4));
 }
 
-/* Custom glass / backdrop filter panel helpers */
+html[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Glass panel styling respecting theme surfaces */
 .glass-panel {
-  background: rgba(16, 20, 28, 0.75);
+  background: var(--surface-primary, rgba(16, 20, 28, 0.75));
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.08));
 }
 
 .glass-dropdown {
-  background: rgba(21, 26, 35, 0.95);
+  background: var(--surface-secondary, rgba(21, 26, 35, 0.95));
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-subtle, rgba(255, 255, 255, 0.1));
   box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
 /* Nexora ambient subtle gradient grid background for landing / startup */
 .nexora-mesh-bg {
-  background-color: #07080C;
+  background-color: var(--app-bg, #0B0B0D);
   background-image: 
-    radial-gradient(at 0% 0%, rgba(0, 240, 255, 0.08) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, var(--accent-soft, rgba(225, 6, 0, 0.08)) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.08) 0px, transparent 50%),
     radial-gradient(at 50% 50%, rgba(99, 102, 241, 0.04) 0px, transparent 60%);
 }
@@ -73,11 +174,36 @@
   border-color: #10B981 !important;
 }
 
-/* Subtle glow utility classes for Nexora branding */
-.text-glow-cyan {
-  text-shadow: 0 0 16px rgba(0, 240, 255, 0.6);
+/* Semantic dynamic accent classes */
+.btn-accent-primary {
+  background-color: var(--accent);
+  color: var(--accent-contrast);
+  box-shadow: 0 2px 12px var(--accent-glow);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.text-glow-violet {
-  text-shadow: 0 0 16px rgba(139, 92, 246, 0.6);
+.btn-accent-primary:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+  box-shadow: 0 4px 18px var(--accent-glow);
+  transform: translateY(-1px);
+}
+
+.btn-accent-primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.badge-accent {
+  background-color: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
+}
+
+.active-nav-pill {
+  background: linear-gradient(90deg, var(--accent-soft) 0%, transparent 100%);
+  border-left: 3px solid var(--accent);
+  color: var(--text-primary);
+}
+
+.accent-glow-sm {
+  box-shadow: 0 0 15px -3px var(--accent-glow);
 }

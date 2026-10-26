@@ -18,7 +18,7 @@ export const getMe = async (req, res, next) => {
 
 export const updateProfile = async (req, res, next) => {
   try {
-    const { username, fullname, mobile_no, bio, customStatus } = req.body;
+    const { username, fullname, mobile_no, bio, customStatus, appearance } = req.body;
     const updateData = {};
 
     if (username !== undefined) updateData.username = username;
@@ -26,6 +26,24 @@ export const updateProfile = async (req, res, next) => {
     if (mobile_no !== undefined) updateData.mobile_no = mobile_no;
     if (bio !== undefined) updateData.bio = bio;
     if (customStatus !== undefined) updateData.customStatus = customStatus;
+    if (appearance !== undefined && typeof appearance === "object" && appearance !== null) {
+      updateData.appearance = {};
+      if (["dark", "light", "system"].includes(appearance.theme)) {
+        updateData.appearance.theme = appearance.theme;
+      }
+      if (typeof appearance.accentColor === "string" && /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(appearance.accentColor)) {
+        updateData.appearance.accentColor = appearance.accentColor;
+      }
+      if (typeof appearance.accentName === "string") {
+        updateData.appearance.accentName = appearance.accentName.slice(0, 50);
+      }
+      if (["midnight", "graphite", "oled"].includes(appearance.surfaceStyle)) {
+        updateData.appearance.surfaceStyle = appearance.surfaceStyle;
+      }
+      if (["compact", "comfortable"].includes(appearance.messageSpacing)) {
+        updateData.appearance.messageSpacing = appearance.messageSpacing;
+      }
+    }
 
     const targetUserId = req.user?.id || req.user?._id;
     const updatedUser = await userModel

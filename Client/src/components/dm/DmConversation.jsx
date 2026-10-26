@@ -104,7 +104,10 @@ export default function DmConversation({ dmId }) {
       </div>
 
       {/* Messages Stream */}
-      <div className="flex-1 overflow-y-auto px-2 py-4 space-y-1">
+      <div
+        className="flex-1 overflow-y-auto px-2 py-4 flex flex-col"
+        style={{ gap: "var(--message-gap, 4px)" }}
+      >
         {/* DM Starter Card */}
         <div className="p-6 text-center border-b border-white/5 mb-4">
           <Avatar

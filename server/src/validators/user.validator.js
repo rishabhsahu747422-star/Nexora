@@ -32,6 +32,31 @@ export const updateProfileValidator = [
     .trim()
     .isLength({ max: 100 })
     .withMessage("Custom status cannot exceed 100 characters"),
+  body("appearance")
+    .optional()
+    .isObject()
+    .withMessage("Appearance must be an object"),
+  body("appearance.theme")
+    .optional()
+    .isIn(["dark", "light", "system"])
+    .withMessage("Invalid theme"),
+  body("appearance.accentColor")
+    .optional()
+    .matches(/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/)
+    .withMessage("Invalid accent color HEX"),
+  body("appearance.accentName")
+    .optional()
+    .isString()
+    .isLength({ max: 50 })
+    .withMessage("Invalid accent name"),
+  body("appearance.surfaceStyle")
+    .optional()
+    .isIn(["midnight", "graphite", "oled"])
+    .withMessage("Invalid surface style"),
+  body("appearance.messageSpacing")
+    .optional()
+    .isIn(["compact", "comfortable"])
+    .withMessage("Invalid message spacing"),
 ];
 
 export const usernameValidator = [

@@ -19,6 +19,8 @@ import ModalManager from "./components/modals/ModalManager";
 import GlobalSearchModal from "./components/layout/GlobalSearchModal";
 import SocketManager from "./socket/SocketManager";
 import { getMeAsync } from "./redux/slices/authSlice";
+import { syncAppearanceFromUser } from "./redux/slices/uiSlice";
+import { applyTheme } from "./utils/theme";
 
 function RootRedirect() {
   const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
@@ -32,27 +34,35 @@ export default function App() {
     return sessionStorage.getItem("nexora_booted") === "true";
   });
 
-  const theme = useSelector((state) => state.ui.theme);
+  const { theme, accentColor, surfaceStyle, messageSpacing } = useSelector(
+    (state) => state.ui
+  );
+  const currentUser = useSelector((state) => state.auth.user);
 
   useEffect(() => {
     dispatch(getMeAsync());
   }, [dispatch]);
 
+  // Sync authenticated user preferences when profile is loaded
   useEffect(() => {
-    const root = document.documentElement;
-    if (theme === "dark") {
-      root.classList.add("dark");
-    } else if (theme === "light") {
-      root.classList.remove("dark");
-    } else {
-      // System mode
-      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
-        root.classList.add("dark");
-      } else {
-        root.classList.remove("dark");
-      }
+    if (currentUser?.appearance) {
+      dispatch(syncAppearanceFromUser(currentUser.appearance));
     }
-  }, [theme]);
+  }, [currentUser?.appearance, dispatch]);
+
+  // Apply theme settings and react to OS color scheme changes if system mode
+  useEffect(() => {
+    applyTheme({ theme, accentColor, surfaceStyle, messageSpacing });
+
+    if (theme === "system" && typeof window !== "undefined" && window.matchMedia) {
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+      const handler = () => {
+        applyTheme({ theme, accentColor, surfaceStyle, messageSpacing });
+      };
+      media.addEventListener("change", handler);
+      return () => media.removeEventListener("change", handler);
+    }
+  }, [theme, accentColor, surfaceStyle, messageSpacing]);
 
   const handleStartupComplete = () => {
     sessionStorage.setItem("nexora_booted", "true");
