@@ -1,4 +1,5 @@
 import { Server } from "socket.io";
+import { socketCorsOptions } from "./cors.config.js";
 import { socketMiddleware } from "../middlewares/socket.middleware.js";
 import channelModel from "../models/channel.model.js";
 import conversationModel from "../models/conversation.model.js";
@@ -33,14 +34,7 @@ const handleVoiceLeave = (socket, channelId) => {
 
 export const socketIntialise = (server) => {
   io = new Server(server, {
-    cors: {
-      origin: [
-        "https://nexora-umber-nine.vercel.app",
-        "http://localhost:5173",
-        "http://localhost:3000",
-      ],
-      credentials: true,
-    },
+    cors: socketCorsOptions,
   });
 
   io.use(socketMiddleware);

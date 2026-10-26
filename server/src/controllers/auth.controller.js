@@ -8,6 +8,14 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { blocklistToken, isTokenBlocklisted } from "../services/tokenBlocklist.service.js";
 
+const isProduction = process.env.NODE_ENV === "production";
+const getAuthCookieOptions = (maxAge) => ({
+  httpOnly: true,
+  ...(maxAge ? { maxAge } : {}),
+  secure: isProduction || process.env.COOKIE_SECURE === "true",
+  sameSite: isProduction || process.env.COOKIE_SECURE === "true" ? "none" : "lax",
+});
+
 export const register = async (req, res, next) => {
   try {
     const { username, email, password, dob, fullname, mobile_no } = req.body;
@@ -39,19 +47,8 @@ export const register = async (req, res, next) => {
     const accessToken = await generateToken(user._id, "10min");
     const refreshToken = await generateToken(user._id, "1d");
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      maxAge: 10 * 60 * 1000,
-      secure: true,
-      sameSite: "strict",
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      secure: true,
-      sameSite: "strict",
-    });
+    res.cookie("accessToken", accessToken, getAuthCookieOptions(10 * 60 * 1000));
+    res.cookie("refreshToken", refreshToken, getAuthCookieOptions(24 * 60 * 60 * 1000));
 
     const userData = user.toObject();
     delete userData.password;
@@ -101,19 +98,8 @@ export const login = async (req, res, next) => {
     const accessToken = generateToken(user._id, "10min");
     const refreshToken = generateToken(user._id, "1d");
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      maxAge: 10 * 60 * 1000,
-      secure: true,
-      sameSite: "strict",
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      secure: true,
-      sameSite: "strict",
-    });
+    res.cookie("accessToken", accessToken, getAuthCookieOptions(10 * 60 * 1000));
+    res.cookie("refreshToken", refreshToken, getAuthCookieOptions(24 * 60 * 60 * 1000));
 
     const userData = user.toObject();
     delete userData.password;
@@ -142,17 +128,8 @@ export const googleAuth = async (req, res, next) => {
       const accessToken = await generateToken(user._id, "10min");
       const refreshToken = await generateToken(user._id, "1d");
 
-      res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        maxAge: 15 * 60 * 1000,
-        sameSite: "strict",
-      });
-
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: "strict",
-      });
+      res.cookie("accessToken", accessToken, getAuthCookieOptions(15 * 60 * 1000));
+      res.cookie("refreshToken", refreshToken, getAuthCookieOptions(24 * 60 * 60 * 1000));
 
       const clientUrl = process.env.CLIENT_URL || "https://nexora-umber-nine.vercel.app";
       return res.redirect(`${clientUrl}/app`);
@@ -171,17 +148,8 @@ export const googleAuth = async (req, res, next) => {
     const accessToken = await generateToken(newUser._id, "10min");
     const refreshToken = await generateToken(newUser._id, "1d");
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      maxAge: 15 * 60 * 1000,
-      sameSite: "strict",
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000,
-      sameSite: "strict",
-    });
+    res.cookie("accessToken", accessToken, getAuthCookieOptions(15 * 60 * 1000));
+    res.cookie("refreshToken", refreshToken, getAuthCookieOptions(24 * 60 * 60 * 1000));
 
     const clientUrl = process.env.CLIENT_URL || "https://nexora-umber-nine.vercel.app";
     return res.redirect(`${clientUrl}/app`);
@@ -196,8 +164,8 @@ export const logout = async (req, res, next) => {
     if (accessToken) await blocklistToken(accessToken, "accessToken", 3600);
     if (refreshToken) await blocklistToken(refreshToken, "refreshToken", 86400);
 
-    res.clearCookie("refreshToken");
-    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken", getAuthCookieOptions());
+    res.clearCookie("accessToken", getAuthCookieOptions());
 
     return res.status(200).json({
       success: true,
@@ -382,12 +350,7 @@ export const refreshToken = async (req, res) => {
 
     const accessToken = generateToken(user._id, "10m");
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      maxAge: 15 * 60 * 1000,
-      secure: false,
-      sameSite: "strict",
-    });
+    res.cookie("accessToken", accessToken, getAuthCookieOptions(15 * 60 * 1000));
 
     return res.status(200).json({
       success: true,

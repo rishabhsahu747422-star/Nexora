@@ -18,6 +18,8 @@ import channelRoutes from "../routes/channel.routes.js";
 import paymentRoutes from "../routes/payment.routes.js";
 import conversationRoutes from "../routes/conversation.routes.js";
 
+import { expressCorsOptions } from "../config/cors.config.js";
+
 const app = express();
 export const server = http.createServer(app);
 socketIntialise(server);
@@ -25,25 +27,7 @@ socketIntialise(server);
 app.use(passport.initialize());
 app.use(express.json());
 app.use(cookieParser());
-
-const allowedOrigins = [
-  "https://nexora-umber-nine.vercel.app",
-  "http://localhost:5173",
-  "http://localhost:3000",
-];
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(null, false);
-      }
-    },
-    credentials: true,
-  }),
-);
+app.use(cors(expressCorsOptions));
 
 passport.use(
   new GoogleStrategy(

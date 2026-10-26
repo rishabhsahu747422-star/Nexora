@@ -1,10 +1,12 @@
 import axios from "axios";
 
-const apiBaseURL =
+const rawApiUrl =
   import.meta.env.VITE_API_BASE_URL ||
   (typeof window !== "undefined" && window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
     : "https://nexora-ikwc.onrender.com/api");
+
+const apiBaseURL = typeof rawApiUrl === "string" ? rawApiUrl.trim().replace(/\/+$/, "") : rawApiUrl;
 
 const api = axios.create({
   baseURL: apiBaseURL,
