@@ -28,6 +28,12 @@ const messageSchema = new mongoose.Schema(
         },
       },
     ],
+    reactions: [
+      {
+        emoji: { type: String, required: true },
+        users: [{ type: mongoose.Schema.Types.ObjectId, ref: "users" }],
+      },
+    ],
   },
   { timestamps: true },
 );

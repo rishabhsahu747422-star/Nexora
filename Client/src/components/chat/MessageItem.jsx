@@ -17,12 +17,13 @@ import {
 import Avatar from '../common/Avatar';
 import Badge from '../common/Badge';
 import {
-  toggleReaction,
+  toggleChannelReactionAsync,
   togglePinMessage,
   setReplyTarget,
   deleteMessage,
   editMessage,
 } from '../../redux/slices/messageSlice';
+import { toggleDmReactionAsync } from '../../redux/slices/dmSlice';
 import { openModal, addToast } from '../../redux/slices/uiSlice';
 
 const POPULAR_EMOJIS = ['🔥', '🚀', '❤️', '👍', '🧠', '✨'];
@@ -48,10 +49,17 @@ export default function MessageItem({
     message.authorAvatar;
   const authorId =
     message.author_id?._id ||
+    message.author_id?.id ||
     message.author_id ||
-    message.authorId;
+    message.sender?._id ||
+    message.sender?.id ||
+    message.sender ||
+    message.authorId ||
+    message.senderId;
+
+  const currentUserId = currentUser?._id || currentUser?.id;
   const isAuthor =
-    Boolean(currentUser && authorId && String(currentUser._id || currentUser.id) === String(authorId));
+    Boolean(currentUserId && authorId && String(currentUserId) === String(authorId));
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(message.content);
@@ -101,14 +109,24 @@ export default function MessageItem({
   };
 
   const handleReactionClick = (emoji) => {
-    dispatch(
-      toggleReaction({
-        contextId,
-        messageId: msgId,
-        emoji,
-        userId: currentUser?._id || currentUser?.id,
-      })
-    );
+    const isDm = Boolean(message.conversation_id !== undefined || message.conversation_id);
+    if (isDm) {
+      dispatch(
+        toggleDmReactionAsync({
+          conversationId: message.conversation_id || contextId,
+          messageId: msgId,
+          emoji,
+        })
+      );
+    } else {
+      dispatch(
+        toggleChannelReactionAsync({
+          channelId: message.channel_id || contextId,
+          messageId: msgId,
+          emoji,
+        })
+      );
+    }
   };
 
   // Format time
@@ -127,7 +145,9 @@ export default function MessageItem({
       } ${
         isHighlighted
           ? 'bg-[var(--accent-soft)] ring-1 ring-[var(--accent-border)] accent-glow-sm'
-          : 'hover:bg-white/[0.03]'
+          : isAuthor
+            ? 'bg-white/[0.025] border border-white/[0.06] hover:bg-white/[0.04]'
+            : 'hover:bg-white/[0.03]'
       } ${message.isPinned ? 'border-l-2 border-[var(--accent)]' : ''}`}
     >
       {/* Action Dock (Floating on hover) */}
@@ -260,9 +280,20 @@ export default function MessageItem({
         <div className="flex-1 min-w-0">
           {/* Header: Author + Role Pill + Timestamp + Pinned Badge */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-display font-semibold text-sm text-slate-100 hover:underline cursor-pointer">
-              {authorName}
-            </span>
+            {isAuthor ? (
+              <div className="flex items-center gap-1.5">
+                <span className="font-display font-semibold text-sm text-[var(--accent, #38bdf8)]">
+                  You
+                </span>
+                <span className="text-[9px] font-mono font-medium px-1.5 py-0.2 rounded-md bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)]">
+                  YOU
+                </span>
+              </div>
+            ) : (
+              <span className="font-display font-semibold text-sm text-slate-100 hover:underline cursor-pointer">
+                {authorName}
+              </span>
+            )}
 
             {message.authorRole && (
               <span
@@ -389,20 +420,24 @@ export default function MessageItem({
           {message.reactions?.length > 0 && (
             <div className="mt-2.5 flex flex-wrap gap-1.5">
               {message.reactions.map((rxn, idx) => {
-                const hasReacted = rxn.users.includes(currentUser?.id);
+                const myId = String(currentUser?._id || currentUser?.id || '');
+                const hasReacted = (rxn.users || []).some(
+                  (u) => String(u?._id || u?.id || u) === myId
+                );
+                const rxnCount = rxn.count ?? rxn.users?.length ?? 1;
 
                 return (
                   <button
                     key={idx}
                     onClick={() => handleReactionClick(rxn.emoji)}
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-medium transition-all ${
+                    className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-lg text-xs font-medium transition-all ${
                       hasReacted
-                        ? 'bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--text-primary)]'
+                        ? 'bg-[var(--accent-soft)] border border-[var(--accent-border)] text-[var(--accent)] font-semibold shadow-sm'
                         : 'bg-white/5 border border-white/10 text-slate-400 hover:text-slate-200 hover:bg-white/10'
                     }`}
                   >
                     <span>{rxn.emoji}</span>
-                    <span className="font-mono text-[11px]">{rxn.count}</span>
+                    <span className="font-mono text-[11px]">{rxnCount}</span>
                   </button>
                 );
               })}

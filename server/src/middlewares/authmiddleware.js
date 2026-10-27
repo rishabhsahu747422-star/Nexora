@@ -36,3 +36,29 @@ export const authMiddleware = async (req, res, next) => {
     next(error);
   }
 };
+
+export const optionalAuthMiddleware = async (req, res, next) => {
+  try {
+    const token =
+      req.cookies?.accessToken ||
+      req.headers.authorization?.replace(/^Bearer\s+/i, "");
+
+    if (!token) {
+      return next();
+    }
+
+    const revoked = await isTokenBlocklisted(token, "accessToken").catch(() => false);
+    if (revoked) {
+      return next();
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || process.env.JWT_SECRET_KEY);
+    const user = await userModel.findById(decoded.id).select("-password");
+    if (user) {
+      req.user = user;
+    }
+    next();
+  } catch {
+    next();
+  }
+};

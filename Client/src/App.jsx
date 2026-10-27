@@ -10,6 +10,7 @@ import Workspace from "./pages/Workspace";
 import Profile from "./pages/Profile";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
+import InvitePage from "./pages/InvitePage";
 
 // Layout & Global Overlays
 import ProtectedRoute from "./components/layout/ProtectedRoute";
@@ -18,6 +19,8 @@ import ToastContainer from "./components/common/ToastContainer";
 import ModalManager from "./components/modals/ModalManager";
 import GlobalSearchModal from "./components/layout/GlobalSearchModal";
 import SocketManager from "./socket/SocketManager";
+import IncomingCallModal from "./components/voice/IncomingCallModal";
+import DirectCallStage from "./components/voice/DirectCallStage";
 import { getMeAsync } from "./redux/slices/authSlice";
 import { syncAppearanceFromUser } from "./redux/slices/uiSlice";
 import { applyTheme } from "./utils/theme";
@@ -82,6 +85,7 @@ export default function App() {
         <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/invite/:inviteCode" element={<InvitePage />} />
 
         {/* Protected Workspace Routes */}
         <Route
@@ -198,10 +202,12 @@ export default function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      {/* Global Modals, Search & Toasts */}
+      {/* Global Modals, Search, Direct Calls & Toasts */}
       <SocketManager />
       <ModalManager />
       <GlobalSearchModal />
+      <IncomingCallModal />
+      <DirectCallStage />
       <ToastContainer />
     </div>
   );

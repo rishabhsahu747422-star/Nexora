@@ -10,6 +10,7 @@ import {
   deleteServer,
   createInvite,
   getServerMembers,
+  getInviteDetails,
 } from "../../services/server.service.js";
 
 const getErrorMessage = (error) => {
@@ -106,11 +107,22 @@ export const deleteServerAsync = createAsyncThunk(
   },
 );
 
+export const resolveInviteAsync = createAsyncThunk(
+  "server/resolveInvite",
+  async (inviteCode, { rejectWithValue }) => {
+    try {
+      return await getInviteDetails(inviteCode.trim());
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  },
+);
+
 export const regenerateInvite = createAsyncThunk(
   "server/regenerateInvite",
   async (serverId, { rejectWithValue }) => {
     try {
-      return await createInvite(serverId);
+      return await createInvite(serverId, { regenerate: true });
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));
     }
@@ -204,13 +216,28 @@ const serverSlice = createSlice({
 
       // JOIN SERVER
       .addCase(joinServerAsync.fulfilled, (state, action) => {
-        state.servers.push(action.payload);
-        state.selectedServer = action.payload;
+        const joined = action.payload;
+        if (joined) {
+          const exists = state.servers.some(
+            (s) => String(s._id || s.id) === String(joined._id || joined.id)
+          );
+          if (!exists) {
+            state.servers.push(joined);
+          }
+          state.selectedServer = joined;
+        }
         state.error = null;
       })
 
       .addCase(joinServerAsync.rejected, (state, action) => {
         state.error = action.payload;
+      })
+
+      // REGENERATE INVITE
+      .addCase(regenerateInvite.fulfilled, (state, action) => {
+        if (state.selectedServer && action.payload?.inviteCode) {
+          state.selectedServer.inviteCode = action.payload.inviteCode;
+        }
       })
 
       // LEAVE SERVER

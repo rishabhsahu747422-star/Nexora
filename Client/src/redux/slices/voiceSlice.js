@@ -13,6 +13,8 @@ const initialState = {
   isSpeaking: false,
   participants: [], // array of { socketId, userId, user: { _id, username, fullname, profile_pic }, muted, deafened, video, isSpeaking }
   error: null,
+  incomingCall: null, // { callId, caller, conversationId, isVideo, callerSocketId }
+  activeDirectCall: null, // { callId, conversationId, peer, isVideo, isCaller, status: 'ringing' | 'connected' }
 };
 
 export const voiceSlice = createSlice({
@@ -123,6 +125,33 @@ export const voiceSlice = createSlice({
       state.error = action.payload;
       state.isConnecting = false;
     },
+
+    setIncomingCall: (state, action) => {
+      state.incomingCall = action.payload;
+    },
+
+    clearIncomingCall: (state) => {
+      state.incomingCall = null;
+    },
+
+    startDirectCall: (state, action) => {
+      state.activeDirectCall = action.payload;
+      state.incomingCall = null;
+    },
+
+    setDirectCallConnected: (state, action) => {
+      if (state.activeDirectCall) {
+        state.activeDirectCall.status = "connected";
+        if (action.payload?.peer) {
+          state.activeDirectCall.peer = action.payload.peer;
+        }
+      }
+    },
+
+    endDirectCall: (state) => {
+      state.activeDirectCall = null;
+      state.incomingCall = null;
+    },
   },
 });
 
@@ -140,6 +169,11 @@ export const {
   toggleScreenShare,
   setUserSpeaking,
   setVoiceError,
+  setIncomingCall,
+  clearIncomingCall,
+  startDirectCall,
+  setDirectCallConnected,
+  endDirectCall,
 } = voiceSlice.actions;
 
 // Compatibility alias for existing components

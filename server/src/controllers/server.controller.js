@@ -217,14 +217,61 @@ export const getAllServer = async (req, res) => {
     });
   }
 };
-export const joinServer = async (req, res) => {
+export const getInviteDetails = async (req, res, next) => {
+  try {
+    const inviteCode = req.params.inviteCode?.trim();
+    if (!inviteCode) {
+      throw new ApiError(400, "Invite code is required");
+    }
+
+    const server = await serverModel.findOne({ inviteCode });
+    if (!server) {
+      throw new ApiError(404, "Invalid or expired invite code");
+    }
+
+    const memberCount = await serverMemberModel.countDocuments({
+      server: server._id,
+    });
+
+    let isMember = false;
+    if (req.user?._id) {
+      isMember = await serverMemberModel.exists({
+        server: server._id,
+        user: req.user._id,
+      });
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          _id: server._id,
+          id: server._id,
+          name: server.name,
+          description: server.description,
+          icon: server.icon,
+          banner: server.banner,
+          inviteCode: server.inviteCode,
+          isPublic: server.isPublic,
+          memberCount: memberCount || 1,
+          isMember: Boolean(isMember),
+        },
+        "Invite details retrieved successfully"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const joinServer = async (req, res, next) => {
   try {
     const inviteCode = req.params.inviteCode?.trim();
 
     const server = await serverModel.findOne({ inviteCode });
 
     if (!server) {
-      throw new ApiError(404, "Invalid Invite Code");
+      throw new ApiError(404, "Invalid or expired invite code");
     }
 
     const user = await userModel.findById(req.user._id);
@@ -237,7 +284,16 @@ export const joinServer = async (req, res) => {
     });
 
     if (alreadyExists) {
-      throw new ApiError(400, "You are already a member of this server");
+      await userModel.findByIdAndUpdate(req.user._id, {
+        $addToSet: { server: server._id },
+      });
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          { ...server.toObject(), id: server._id, alreadyMember: true },
+          "You are already a member of this community"
+        )
+      );
     }
 
     let memberRole = await roleModel.findOne({
@@ -260,18 +316,18 @@ export const joinServer = async (req, res) => {
       $addToSet: { server: server._id },
     });
 
-    return res
-      .status(200)
-      .json(new ApiResponse(200, server, "Joined server successfully"));
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { ...server.toObject(), id: server._id, alreadyMember: false },
+        "Joined community successfully"
+      )
+    );
   } catch (error) {
-    console.log(error.message);
-    return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };
-export const leaveServer = async (req, res) => {
+export const leaveServer = async (req, res, next) => {
   try {
     const { serverId } = req.params;
 
@@ -308,37 +364,36 @@ export const leaveServer = async (req, res) => {
     });
   }
 };
-export const createInvite = async (req, res) => {
+export const createInvite = async (req, res, next) => {
   try {
     const { serverId } = req.params;
+    const { regenerate } = req.body || {};
     const server = await serverModel.findById(serverId);
     if (!server) {
       throw new ApiError(404, "Server not found");
     }
 
-    if (
-      !(await serverMemberModel.exists({
-        server: server._id,
-        user: req.user._id,
-      }))
-    ) {
+    const isMember = await serverMemberModel.exists({
+      server: server._id,
+      user: req.user._id,
+    });
+    if (!isMember) {
       throw new ApiError(403, "You are not a member of this server");
     }
 
-    return res
-      .status(200)
-      .json(
-        new ApiResponse(
-          200,
-          { inviteCode: server.inviteCode },
-          "Invite created successfully",
-        ),
-      );
+    if (regenerate || !server.inviteCode) {
+      server.inviteCode = generateInviteCode();
+      await server.save();
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { inviteCode: server.inviteCode },
+        "Invite created successfully"
+      )
+    );
   } catch (error) {
-    console.log(error.message);
-    return res.status(error.statusCode || 500).json({
-      success: false,
-      message: error.message,
-    });
+    next(error);
   }
 };

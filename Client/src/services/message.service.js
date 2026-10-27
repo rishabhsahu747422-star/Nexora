@@ -33,3 +33,6 @@ export const updateMessage = async ({ channelId, messageId, ...payload }) =>
 
 export const deleteMessage = async ({ channelId, messageId }) =>
   data(await api.delete(`/messages/${channelId}/messages/${messageId}`));
+
+export const toggleChannelReaction = async ({ channelId, messageId, emoji }) =>
+  data(await api.post(`/messages/${channelId}/messages/${messageId}/reactions`, { emoji }));

@@ -172,3 +172,81 @@ export const deleteMessage = async (req, res, next) => {
     next(error);
   }
 };
+
+export const toggleChannelMessageReaction = async (req, res, next) => {
+  try {
+    const { channelId, messageId } = req.params;
+    const { emoji } = req.body;
+    const currentUserId = (req.user._id || req.user.id).toString();
+
+    if (!emoji || typeof emoji !== "string") {
+      throw new ApiError(400, "Emoji is required");
+    }
+
+    const channel = await channelModel.findById(channelId);
+    if (!channel) throw new ApiError(404, "Channel not found");
+
+    const member = await serverMemberModel.findOne({
+      server: channel.server,
+      user: req.user._id,
+    });
+    if (!member) throw new ApiError(403, "You are not a member of the server");
+
+    const message = await messageModel.findOne({
+      _id: messageId,
+      channel_id: channelId,
+    });
+    if (!message) throw new ApiError(404, "Message not found");
+
+    if (!message.reactions) {
+      message.reactions = [];
+    }
+
+    const existingReaction = message.reactions.find((r) => r.emoji === emoji);
+    if (existingReaction) {
+      const userIndex = existingReaction.users.findIndex(
+        (u) => u.toString() === currentUserId
+      );
+      if (userIndex > -1) {
+        existingReaction.users.splice(userIndex, 1);
+        if (existingReaction.users.length === 0) {
+          message.reactions = message.reactions.filter((r) => r.emoji !== emoji);
+        }
+      } else {
+        existingReaction.users.push(req.user._id);
+      }
+    } else {
+      message.reactions.push({
+        emoji,
+        users: [req.user._id],
+      });
+    }
+
+    await message.save();
+
+    const formattedReactions = message.reactions.map((r) => ({
+      emoji: r.emoji,
+      users: r.users.map((u) => u.toString()),
+      count: r.users.length,
+    }));
+
+    const io = getIO();
+    if (io) {
+      io.to(`channel:${channelId}`).emit("channel:reaction", {
+        channelId,
+        messageId,
+        reactions: formattedReactions,
+      });
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        { messageId, channelId, reactions: formattedReactions },
+        "Reaction updated successfully"
+      )
+    );
+  } catch (error) {
+    next(error);
+  }
+};

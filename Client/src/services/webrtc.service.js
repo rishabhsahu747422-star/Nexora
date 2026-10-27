@@ -17,6 +17,8 @@ class WebRTCService {
     this.speakingInterval = null;
     this.onSpeakingChange = null;
     this.onRemoteStreamUpdate = null;
+    this.isDirectCall = false;
+    this.currentCallId = null;
   }
 
   async startLocalMedia({ audio = true, video = false }) {
@@ -107,12 +109,14 @@ class WebRTCService {
 
     pc.onicecandidate = (event) => {
       if (event.candidate && socket.connected) {
-        socket.emit("voice:signal", {
+        const eventName = this.isDirectCall ? "direct-call:signal" : "voice:signal";
+        socket.emit(eventName, {
           targetSocketId,
           signal: {
             type: "candidate",
             candidate: event.candidate,
           },
+          callId: this.currentCallId,
         });
       }
     };
@@ -130,13 +134,14 @@ class WebRTCService {
     pc.oniceconnectionstatechange = () => {
       console.log(`[WebRTC] ICE state with ${targetSocketId}:`, pc.iceConnectionState);
       if (pc.iceConnectionState === "failed" || pc.iceConnectionState === "disconnected") {
-        // Attempt ICE restart if initiator
         if (isInitiator && pc.iceConnectionState === "failed") {
           pc.createOffer({ iceRestart: true }).then((offer) => {
             pc.setLocalDescription(offer);
-            socket.emit("voice:signal", {
+            const eventName = this.isDirectCall ? "direct-call:signal" : "voice:signal";
+            socket.emit(eventName, {
               targetSocketId,
               signal: { type: "offer", sdp: pc.localDescription },
+              callId: this.currentCallId,
             });
           }).catch(console.error);
         }
@@ -149,12 +154,14 @@ class WebRTCService {
       pc.createOffer()
         .then((offer) => pc.setLocalDescription(offer))
         .then(() => {
-          socket.emit("voice:signal", {
+          const eventName = this.isDirectCall ? "direct-call:signal" : "voice:signal";
+          socket.emit(eventName, {
             targetSocketId,
             signal: {
               type: "offer",
               sdp: pc.localDescription,
             },
+            callId: this.currentCallId,
           });
         })
         .catch((err) => console.error("[WebRTC] Offer error:", err));
@@ -163,8 +170,12 @@ class WebRTCService {
     return pc;
   }
 
-  async handleSignal(senderSocketId, signal, senderUser) {
+  async handleSignal(senderSocketId, signal, senderUser, callId = null) {
     let peer = this.peers.get(senderSocketId);
+
+    if (callId) {
+      this.currentCallId = callId;
+    }
 
     if (signal.type === "offer") {
       const pc = this.createPeerConnection(senderSocketId, senderUser, false);
@@ -172,12 +183,14 @@ class WebRTCService {
       const answer = await pc.createAnswer();
       await pc.setLocalDescription(answer);
 
-      socket.emit("voice:signal", {
+      const eventName = this.isDirectCall ? "direct-call:signal" : "voice:signal";
+      socket.emit(eventName, {
         targetSocketId: senderSocketId,
         signal: {
           type: "answer",
           sdp: pc.localDescription,
         },
+        callId: this.currentCallId,
       });
     } else if (signal.type === "answer") {
       if (peer && peer.pc) {
@@ -279,6 +292,8 @@ class WebRTCService {
       }
     });
     this.peers.clear();
+    this.isDirectCall = false;
+    this.currentCallId = null;
   }
 }
 

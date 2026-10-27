@@ -1,37 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { createMessage, getMessages } from "../../services/message.service";
+import { createMessage, getMessages, toggleChannelReaction } from "../../services/message.service";
 
 const STORAGE_KEY = "nexora_messages_state";
-
-// const loadPersistedMessages = () => {
-//   try {
-//     const serialized = localStorage.getItem(STORAGE_KEY);
-//     if (serialized) {
-//       return JSON.parse(serialized);
-//     }
-//   } catch (err) {
-//     console.error('Failed to load messages from localStorage:', err);
-//   }
-//   return {
-//     ...MOCK_MESSAGES,
-//     ...MOCK_DM_MESSAGES,
-//   };
-// };
-
-// const initialState = {
-//   messagesByContext: loadPersistedMessages(),
-//   replyTarget: null, // message object or null
-//   editingMessageId: null,
-//   highlightedMessageId: null,
-// };
-
-// const saveMessages = (state) => {
-//   try {
-//     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.messagesByContext));
-//   } catch (e) {
-//     console.error(e);
-//   }
-// };
 
 const errorMessage = (error) =>
   error.response?.data?.message || "Unable to load messages";
@@ -52,6 +22,17 @@ export const sendMessage = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       return await createMessage(payload);
+    } catch (error) {
+      return rejectWithValue(errorMessage(error));
+    }
+  },
+);
+
+export const toggleChannelReactionAsync = createAsyncThunk(
+  "message/toggleReaction",
+  async ({ channelId, messageId, emoji }, { rejectWithValue }) => {
+    try {
+      return await toggleChannelReaction({ channelId, messageId, emoji });
     } catch (error) {
       return rejectWithValue(errorMessage(error));
     }
@@ -96,6 +77,15 @@ export const messageSlice = createSlice({
     },
     setHighlightedMessageId: (state, action) => {
       state.highlightedMessageId = action.payload;
+    },
+    updateChannelReactions: (state, action) => {
+      const { messageId, reactions } = action.payload || {};
+      const msg = state.messages.find(
+        (m) => String(m._id || m.id) === String(messageId)
+      );
+      if (msg) {
+        msg.reactions = reactions;
+      }
     },
 
     //AI code
@@ -250,6 +240,15 @@ export const messageSlice = createSlice({
       })
       .addCase(sendMessage.rejected, (state, action) => {
         state.error = action.payload;
+      })
+      .addCase(toggleChannelReactionAsync.fulfilled, (state, action) => {
+        const { messageId, reactions } = action.payload || {};
+        const msg = state.messages.find(
+          (m) => String(m._id || m.id) === String(messageId)
+        );
+        if (msg) {
+          msg.reactions = reactions;
+        }
       });
   },
 });
@@ -259,6 +258,7 @@ export const {
   updateMessage,
   removeMessage,
   setHighlightedMessageId,
+  updateChannelReactions,
   //AI CODE
   // sendMessage,
   editMessage,

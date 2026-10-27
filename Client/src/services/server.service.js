@@ -18,8 +18,11 @@ export const updateServer = async (serverId, payload) =>
 export const deleteServer = async (serverId) =>
   data(await api.delete(`/server/${serverId}`));
 
-export const createInvite = async (serverId) =>
-  data(await api.post(`/server/${serverId}/invite`));
+export const createInvite = async (serverId, payload = {}) =>
+  data(await api.post(`/server/${serverId}/invite`, payload));
+
+export const getInviteDetails = async (inviteCode) =>
+  data(await api.get(`/server/invite/${inviteCode}`));
 
 export const joinServer = async (inviteCode) =>
   data(await api.post(`/server/join/${inviteCode}`));

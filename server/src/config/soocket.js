@@ -10,6 +10,8 @@ let io = null;
 const voiceRooms = new Map();
 const socketToVoiceRoom = new Map();
 const userSockets = new Map(); // userId -> Set of socketIds
+const activeDirectCalls = new Map(); // callId -> callData
+const socketToDirectCall = new Map(); // socketId -> callId
 
 const handleVoiceLeave = (socket, channelId) => {
   if (!channelId) return;
@@ -244,10 +246,142 @@ export const socketIntialise = (server) => {
       }
     });
 
+    // --- 1-on-1 Direct Messaging Audio & Video Call Handlers ---
+    socket.on("direct-call:initiate", async (data, callback) => {
+      try {
+        const { recipientId, conversationId, isVideo = false } = data || {};
+        if (!recipientId) throw new ApiError(400, "recipientId is required");
+
+        const callId = `call_${Date.now()}_${socket.id}`;
+        const callData = {
+          callId,
+          callerSocketId: socket.id,
+          callerUser: {
+            _id: socket.user._id.toString(),
+            username: socket.user.username,
+            fullname: socket.user.fullname,
+            profile_pic: socket.user.profile_pic,
+          },
+          recipientId: recipientId.toString(),
+          conversationId,
+          isVideo: Boolean(isVideo),
+          status: "ringing",
+        };
+
+        activeDirectCalls.set(callId, callData);
+        socketToDirectCall.set(socket.id, callId);
+        socket.join(`call:${callId}`);
+
+        socket.emit("direct-call:outgoing", { callId, recipientId, conversationId, isVideo });
+
+        if (typeof callback === "function") {
+          callback({ success: true, callId, callerUser: callData.callerUser });
+        }
+
+        // Route incoming call alert to recipient's private user room
+        if (io) {
+          io.to(`user:${recipientId.toString()}`).emit("direct-call:incoming", {
+            callId,
+            caller: callData.callerUser,
+            callerSocketId: socket.id,
+            conversationId,
+            isVideo: Boolean(isVideo),
+          });
+        }
+      } catch (err) {
+        if (typeof callback === "function") {
+          callback({ success: false, message: err.message });
+        }
+        socket.emit("direct-call:error", { message: err.message });
+      }
+    });
+
+    socket.on("direct-call:accept", (data) => {
+      try {
+        const { callId } = data || {};
+        const call = activeDirectCalls.get(callId);
+        if (!call) throw new ApiError(404, "Call not found or already ended");
+
+        call.status = "connected";
+        call.recipientSocketId = socket.id;
+        call.recipientUser = {
+          _id: socket.user._id.toString(),
+          username: socket.user.username,
+          fullname: socket.user.fullname,
+          profile_pic: socket.user.profile_pic,
+        };
+
+        socketToDirectCall.set(socket.id, callId);
+        socket.join(`call:${callId}`);
+
+        io.to(`call:${callId}`).emit("direct-call:accepted", {
+          callId,
+          callerSocketId: call.callerSocketId,
+          recipientSocketId: socket.id,
+          recipientUser: call.recipientUser,
+          callerUser: call.callerUser,
+          isVideo: call.isVideo,
+        });
+      } catch (err) {
+        socket.emit("direct-call:error", { message: err.message });
+      }
+    });
+
+    socket.on("direct-call:reject", (data) => {
+      const { callId, reason = "declined" } = data || {};
+      const call = activeDirectCalls.get(callId);
+      if (call) {
+        io.to(`call:${callId}`).emit("direct-call:rejected", { callId, reason });
+        socketToDirectCall.delete(call.callerSocketId);
+        if (call.recipientSocketId) socketToDirectCall.delete(call.recipientSocketId);
+        activeDirectCalls.delete(callId);
+      }
+    });
+
+    socket.on("direct-call:end", (data) => {
+      const { callId } = data || {};
+      const cId = callId || socketToDirectCall.get(socket.id);
+      if (cId && activeDirectCalls.has(cId)) {
+        const call = activeDirectCalls.get(cId);
+        io.to(`call:${cId}`).emit("direct-call:ended", { callId: cId });
+        socketToDirectCall.delete(call.callerSocketId);
+        if (call.recipientSocketId) socketToDirectCall.delete(call.recipientSocketId);
+        activeDirectCalls.delete(cId);
+      }
+    });
+
+    socket.on("direct-call:signal", (data) => {
+      try {
+        const { targetSocketId, signal, callId } = data || {};
+        if (!targetSocketId || !signal) return;
+
+        io.to(targetSocketId).emit("direct-call:signal", {
+          senderSocketId: socket.id,
+          senderUser: socket.user,
+          signal,
+          callId,
+        });
+      } catch (err) {
+        console.error("Direct call signal error:", err);
+      }
+    });
+
     socket.on("disconnect", () => {
       const voiceChannelId = socketToVoiceRoom.get(socket.id);
       if (voiceChannelId) {
         handleVoiceLeave(socket, voiceChannelId);
+      }
+
+      const directCallId = socketToDirectCall.get(socket.id);
+      if (directCallId && activeDirectCalls.has(directCallId)) {
+        const call = activeDirectCalls.get(directCallId);
+        io.to(`call:${directCallId}`).emit("direct-call:ended", {
+          callId: directCallId,
+          reason: "peer-disconnected",
+        });
+        socketToDirectCall.delete(call.callerSocketId);
+        if (call.recipientSocketId) socketToDirectCall.delete(call.recipientSocketId);
+        activeDirectCalls.delete(directCallId);
       }
 
       if (socket.user?._id) {

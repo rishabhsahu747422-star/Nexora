@@ -15,8 +15,9 @@ export default function InviteModal({ isOpen, onClose, server }) {
 
   if (!server) return null;
 
-  const inviteCode = server.inviteCode || "nx-synth-ai";
-  const inviteUrl = `https://nexora.io/invite/${inviteCode}`;
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const inviteCode = server.inviteCode || "";
+  const inviteUrl = `${origin}/invite/${inviteCode}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(inviteUrl);

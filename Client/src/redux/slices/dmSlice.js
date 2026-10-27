@@ -5,6 +5,7 @@ import {
   getConversationMessages,
   sendDirectMessage,
   deleteDirectMessage,
+  toggleDirectMessageReaction,
 } from "../../services/conversation.service.js";
 
 const getErrorMessage = (error) =>
@@ -68,6 +69,17 @@ export const deleteDmMessage = createAsyncThunk(
     try {
       await deleteDirectMessage({ conversationId, messageId });
       return messageId;
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
+  }
+);
+
+export const toggleDmReactionAsync = createAsyncThunk(
+  "dms/toggleReaction",
+  async ({ conversationId, messageId, emoji }, { rejectWithValue }) => {
+    try {
+      return await toggleDirectMessageReaction({ conversationId, messageId, emoji });
     } catch (error) {
       return rejectWithValue(getErrorMessage(error));
     }
@@ -153,6 +165,15 @@ export const dmSlice = createSlice({
         state.conversations[convIndex].updatedAt = lastMessage?.createdAt || new Date().toISOString();
       } else if (conversation) {
         state.conversations.unshift(conversation);
+      }
+    },
+    updateDmReactions: (state, action) => {
+      const { messageId, reactions } = action.payload || {};
+      const msg = state.messages.find(
+        (m) => String(m._id || m.id) === String(messageId)
+      );
+      if (msg) {
+        msg.reactions = reactions;
       }
     },
     clearDms: (state) => {
@@ -243,6 +264,17 @@ export const dmSlice = createSlice({
         state.messages = state.messages.filter(
           (m) => String(m._id || m.id) !== deletedId
         );
+      })
+
+      // Toggle DM Reaction
+      .addCase(toggleDmReactionAsync.fulfilled, (state, action) => {
+        const { messageId, reactions } = action.payload || {};
+        const msg = state.messages.find(
+          (m) => String(m._id || m.id) === String(messageId)
+        );
+        if (msg) {
+          msg.reactions = reactions;
+        }
       });
   },
 });
@@ -253,6 +285,7 @@ export const {
   addDmMessage,
   removeDmMessage,
   updateConversationLastMessage,
+  updateDmReactions,
   clearDms,
 } = dmSlice.actions;
 

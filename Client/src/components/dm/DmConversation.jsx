@@ -1,11 +1,14 @@
 import React, { useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Shield, Loader2 } from "lucide-react";
+import { Shield, Loader2, Phone, Video } from "lucide-react";
 import Avatar from "../common/Avatar";
 import MessageItem from "../chat/MessageItem";
 import MessageComposer from "../chat/MessageComposer";
-import { openModal } from "../../redux/slices/uiSlice";
+import { openModal, addToast } from "../../redux/slices/uiSlice";
 import { fetchDmMessages, sendDm, fetchConversations } from "../../redux/slices/dmSlice";
+import { startDirectCall } from "../../redux/slices/voiceSlice";
+import socket from "../../socket/socket.js";
+import webrtc from "../../services/webrtc.service.js";
 
 export default function DmConversation({ dmId }) {
   const dispatch = useDispatch();
@@ -53,6 +56,40 @@ export default function DmConversation({ dmId }) {
         files: payload.files,
       })
     );
+  };
+
+  const handleStartCall = async (isVideoCall = false) => {
+    const recipientId = otherUser._id || otherUser.id;
+    if (!recipientId) return;
+
+    try {
+      webrtc.isDirectCall = true;
+      await webrtc.startLocalMedia({ audio: true, video: isVideoCall });
+
+      socket.emit("direct-call:initiate", {
+        recipientId,
+        conversationId: dmId,
+        isVideo: isVideoCall,
+      });
+
+      dispatch(
+        startDirectCall({
+          callId: `outgoing_${Date.now()}`,
+          conversationId: dmId,
+          peer: otherUser,
+          isVideo: isVideoCall,
+          isCaller: true,
+          status: "ringing",
+        })
+      );
+    } catch (err) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: err.message || "Failed to access microphone/camera",
+        })
+      );
+    }
   };
 
   if (!dmId) {
@@ -103,6 +140,24 @@ export default function DmConversation({ dmId }) {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Start Audio Call */}
+          <button
+            onClick={() => handleStartCall(false)}
+            className="p-2 rounded-xl text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors"
+            title="Start Voice Call"
+          >
+            <Phone className="w-4 h-4" />
+          </button>
+
+          {/* Start Video Call */}
+          <button
+            onClick={() => handleStartCall(true)}
+            className="p-2 rounded-xl text-slate-400 hover:text-[var(--accent)] hover:bg-[var(--accent-soft)] transition-colors"
+            title="Start Video Call"
+          >
+            <Video className="w-4 h-4" />
+          </button>
+
           <div className="flex items-center gap-1 text-[11px] font-mono text-slate-400 bg-white/5 px-2.5 py-1 rounded-lg">
             <Shield className="w-3.5 h-3.5 text-[var(--accent)]" />
             <span className="hidden sm:inline">P2P Encrypted</span>

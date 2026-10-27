@@ -25,3 +25,6 @@ export const sendDirectMessage = async (conversationId, payload) => {
 
 export const deleteDirectMessage = async ({ conversationId, messageId }) =>
   data(await api.delete(`/conversations/${conversationId}/messages/${messageId}`));
+
+export const toggleDirectMessageReaction = async ({ conversationId, messageId, emoji }) =>
+  data(await api.post(`/conversations/${conversationId}/messages/${messageId}/reactions`, { emoji }));

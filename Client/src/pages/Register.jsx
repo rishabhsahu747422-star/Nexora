@@ -43,8 +43,10 @@ export default function Register() {
   });
 
   if (!loading && isAuthenticated) {
-    const destination = location.state?.from?.pathname || "/app";
-    const search = location.state?.from?.search || "";
+    const params = new URLSearchParams(location.search);
+    const redirectParam = params.get("redirect");
+    const destination = redirectParam || location.state?.from?.pathname || "/app";
+    const search = redirectParam ? "" : location.state?.from?.search || "";
     return <Navigate to={`${destination}${search}`} replace />;
   }
 

@@ -2,12 +2,13 @@ import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "./socket.js";
 import api from "../config/api.js";
-import { addMessage } from "../redux/slices/messageSlice";
+import { addMessage, updateChannelReactions } from "../redux/slices/messageSlice";
 import {
   addDmMessage,
   removeDmMessage,
   addConversation,
   updateConversationLastMessage,
+  updateDmReactions,
 } from "../redux/slices/dmSlice";
 import {
   connectedVoiceChannel,
@@ -16,6 +17,10 @@ import {
   updateVoiceParticipant,
   setVoiceError,
   setUserSpeaking,
+  setIncomingCall,
+  clearIncomingCall,
+  setDirectCallConnected,
+  endDirectCall,
 } from "../redux/slices/voiceSlice";
 import { addToast } from "../redux/slices/uiSlice";
 import webrtc from "../services/webrtc.service";
@@ -109,6 +114,18 @@ const SocketManager = () => {
       }
     };
 
+    const handleDirectMessageReaction = (payload) => {
+      if (payload) {
+        dispatch(updateDmReactions(payload));
+      }
+    };
+
+    const handleChannelReaction = (payload) => {
+      if (payload) {
+        dispatch(updateChannelReactions(payload));
+      }
+    };
+
     // Voice signaling handlers
     const handleVoiceJoined = ({ channelId, participants }) => {
       console.log("[Voice] Joined voice channel:", channelId, "Participants:", participants);
@@ -193,11 +210,57 @@ const SocketManager = () => {
       dispatch(onUserPresenceChange(payload));
     };
 
+    // Direct Call event handlers
+    const handleDirectCallIncoming = ({ callId, caller, isVideo, conversationId }) => {
+      console.log("[DirectCall] Incoming call:", callId, caller);
+      dispatch(setIncomingCall({ callId, caller, isVideo, conversationId }));
+    };
+
+    const handleDirectCallAccepted = ({ callId, recipient, recipientSocketId, caller, callerSocketId }) => {
+      console.log("[DirectCall] Call accepted:", callId);
+      dispatch(setDirectCallConnected());
+      if (recipientSocketId) {
+        // Initiator creates peer connection and sends offer
+        webrtc.createPeerConnection(recipientSocketId, recipient, true);
+      }
+    };
+
+    const handleDirectCallRejected = ({ reason }) => {
+      console.log("[DirectCall] Call rejected:", reason);
+      webrtc.cleanup();
+      dispatch(endDirectCall());
+      dispatch(clearIncomingCall());
+      dispatch(
+        addToast({
+          type: "info",
+          message: reason === "declined" ? "Call declined" : "Call unavailable",
+        })
+      );
+    };
+
+    const handleDirectCallEnded = () => {
+      console.log("[DirectCall] Call ended");
+      webrtc.cleanup();
+      dispatch(endDirectCall());
+      dispatch(clearIncomingCall());
+      dispatch(addToast({ type: "info", message: "Transmission ended" }));
+    };
+
+    const handleDirectCallSignal = async ({ senderSocketId, senderUser, signal, callId }) => {
+      try {
+        await webrtc.handleSignal(senderSocketId, signal, senderUser, callId);
+      } catch (err) {
+        console.error("[DirectCall] Error handling signal:", err);
+      }
+    };
+
     socket.on("connect", socketConnectHandler);
     socket.on("connect_error", socketErrorHandler);
     socket.on("message:new", handleNewChannelMessage);
+    socket.on("channel:reaction", handleChannelReaction);
     socket.on("direct-message:new", handleNewDirectMessage);
     socket.on("direct-message:delete", handleDirectMessageDelete);
+    socket.on("direct-message:reaction", handleDirectMessageReaction);
     socket.on("conversation:created", handleConversationCreated);
     socket.on("conversation:update", handleConversationUpdate);
 
@@ -207,6 +270,12 @@ const SocketManager = () => {
     socket.on("voice:participant-updated", handleVoiceParticipantUpdated);
     socket.on("voice:signal", handleVoiceSignal);
     socket.on("voice:error", handleVoiceError);
+
+    socket.on("direct-call:incoming", handleDirectCallIncoming);
+    socket.on("direct-call:accepted", handleDirectCallAccepted);
+    socket.on("direct-call:rejected", handleDirectCallRejected);
+    socket.on("direct-call:ended", handleDirectCallEnded);
+    socket.on("direct-call:signal", handleDirectCallSignal);
 
     socket.on("connection:request-received", handleConnectionRequestReceived);
     socket.on("connection:request-accepted", handleConnectionRequestAccepted);
@@ -225,8 +294,10 @@ const SocketManager = () => {
       socket.off("connect", socketConnectHandler);
       socket.off("connect_error", socketErrorHandler);
       socket.off("message:new", handleNewChannelMessage);
+      socket.off("channel:reaction", handleChannelReaction);
       socket.off("direct-message:new", handleNewDirectMessage);
       socket.off("direct-message:delete", handleDirectMessageDelete);
+      socket.off("direct-message:reaction", handleDirectMessageReaction);
       socket.off("conversation:created", handleConversationCreated);
       socket.off("conversation:update", handleConversationUpdate);
 
@@ -236,6 +307,12 @@ const SocketManager = () => {
       socket.off("voice:participant-updated", handleVoiceParticipantUpdated);
       socket.off("voice:signal", handleVoiceSignal);
       socket.off("voice:error", handleVoiceError);
+
+      socket.off("direct-call:incoming", handleDirectCallIncoming);
+      socket.off("direct-call:accepted", handleDirectCallAccepted);
+      socket.off("direct-call:rejected", handleDirectCallRejected);
+      socket.off("direct-call:ended", handleDirectCallEnded);
+      socket.off("direct-call:signal", handleDirectCallSignal);
 
       socket.off("connection:request-received", handleConnectionRequestReceived);
       socket.off("connection:request-accepted", handleConnectionRequestAccepted);

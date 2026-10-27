@@ -5,12 +5,13 @@ import {
   deleteServer,
   getAllServer,
   getSingleServer,
+  getInviteDetails,
   joinServer,
   leaveServer,
   updateServer,
 } from "../controllers/server.controller.js";
 import upload from "../config/multer.config.js";
-import { authMiddleware } from "../middlewares/authmiddleware.js";
+import { authMiddleware, optionalAuthMiddleware } from "../middlewares/authmiddleware.js";
 import {
   createServerValidator,
   inviteCodeValidator,
@@ -18,6 +19,14 @@ import {
 import { validate } from "../middlewares/validatte.middleware.js";
 
 const router = express.Router();
+
+router.get(
+  "/invite/:inviteCode",
+  optionalAuthMiddleware,
+  inviteCodeValidator,
+  validate,
+  getInviteDetails,
+);
 
 router.post(
   "/create",
@@ -40,7 +49,17 @@ router.post(
 );
 
 router.get("/", authMiddleware, getAllServer);
-// router.post("/",authMiddleware,upload.fields([{name:"icon",maxCount:1},{name:"banner",maxCount:1}]),createServer)
+router.post(
+  "/",
+  authMiddleware,
+  upload.fields([
+    { name: "icon", maxCount: 1 },
+    { name: "banner", maxCount: 1 },
+  ]),
+  createServerValidator,
+  validate,
+  createServer,
+);
 router.get("/:serverId", authMiddleware, getSingleServer);
 router.patch(
   "/:serverId",
