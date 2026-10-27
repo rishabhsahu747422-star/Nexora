@@ -51,7 +51,7 @@ export default function MessageItem({
     message.author_id ||
     message.authorId;
   const isAuthor =
-    Boolean(currentUser && (currentUser._id === authorId || currentUser.id === authorId));
+    Boolean(currentUser && authorId && String(currentUser._id || currentUser.id) === String(authorId));
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(message.content);
@@ -72,7 +72,7 @@ export default function MessageItem({
     dispatch(
       editMessage({
         contextId,
-        messageId: message.id,
+        messageId: msgId,
         newContent: editText.trim(),
       })
     );
@@ -87,7 +87,7 @@ export default function MessageItem({
           title: 'Delete Transmission',
           message: 'Are you sure you want to permanently purge this transmission?',
           onConfirm: () => {
-            dispatch(deleteMessage({ contextId, messageId: message.id }));
+            dispatch(deleteMessage({ contextId, messageId: msgId }));
             dispatch(
               addToast({
                 type: 'info',
@@ -104,9 +104,9 @@ export default function MessageItem({
     dispatch(
       toggleReaction({
         contextId,
-        messageId: message.id,
+        messageId: msgId,
         emoji,
-        userId: currentUser?.id,
+        userId: currentUser?._id || currentUser?.id,
       })
     );
   };

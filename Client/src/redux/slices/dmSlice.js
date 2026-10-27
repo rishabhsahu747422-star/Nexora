@@ -88,18 +88,29 @@ export const dmSlice = createSlice({
   initialState,
   reducers: {
     selectDm: (state, action) => {
-      state.activeDmId = action.payload;
+      state.activeDmId = action.payload ? String(action.payload) : null;
+    },
+    addConversation: (state, action) => {
+      const conv = action.payload;
+      if (!conv) return;
+      const convId = String(conv._id || conv.id);
+      const exists = state.conversations.some(
+        (c) => String(c._id || c.id) === convId
+      );
+      if (!exists) {
+        state.conversations.unshift(conv);
+      }
     },
     addDmMessage: (state, action) => {
       const msg = action.payload;
       if (!msg) return;
 
-      const msgId = msg._id || msg.id;
-      const convId = msg.conversation_id;
+      const msgId = String(msg._id || msg.id);
+      const convId = String(msg.conversation_id?._id || msg.conversation_id || "");
 
       // Update conversation lastMessage
       const conv = state.conversations.find(
-        (c) => (c._id || c.id) === (convId?._id || convId)
+        (c) => String(c._id || c.id) === convId
       );
       if (conv) {
         conv.lastMessage = {
@@ -113,10 +124,10 @@ export const dmSlice = createSlice({
       // If active conversation matches, append message if not already present
       if (
         state.activeDmId &&
-        (convId === state.activeDmId || convId?._id === state.activeDmId)
+        String(state.activeDmId) === convId
       ) {
         const exists = state.messages.some(
-          (m) => (m._id || m.id) === msgId
+          (m) => String(m._id || m.id) === msgId
         );
         if (!exists) {
           state.messages.push(msg);
@@ -124,19 +135,24 @@ export const dmSlice = createSlice({
       }
     },
     removeDmMessage: (state, action) => {
-      const deletedId = action.payload;
+      const deletedId = String(action.payload);
       state.messages = state.messages.filter(
-        (m) => (m._id || m.id) !== deletedId
+        (m) => String(m._id || m.id) !== deletedId
       );
     },
     updateConversationLastMessage: (state, action) => {
-      const { conversationId, lastMessage } = action.payload;
-      const conv = state.conversations.find(
-        (c) => (c._id || c.id) === conversationId
+      const { conversationId, lastMessage, conversation } = action.payload || {};
+      const targetId = String(conversationId || conversation?._id || conversation?.id || "");
+      const convIndex = state.conversations.findIndex(
+        (c) => String(c._id || c.id) === targetId
       );
-      if (conv) {
-        conv.lastMessage = lastMessage;
-        conv.updatedAt = lastMessage?.createdAt || new Date().toISOString();
+      if (convIndex !== -1) {
+        if (lastMessage) {
+          state.conversations[convIndex].lastMessage = lastMessage;
+        }
+        state.conversations[convIndex].updatedAt = lastMessage?.createdAt || new Date().toISOString();
+      } else if (conversation) {
+        state.conversations.unshift(conversation);
       }
     },
     clearDms: (state) => {
@@ -223,9 +239,9 @@ export const dmSlice = createSlice({
 
       // Delete DM
       .addCase(deleteDmMessage.fulfilled, (state, action) => {
-        const deletedId = action.payload;
+        const deletedId = String(action.payload);
         state.messages = state.messages.filter(
-          (m) => (m._id || m.id) !== deletedId
+          (m) => String(m._id || m.id) !== deletedId
         );
       });
   },
@@ -233,18 +249,27 @@ export const dmSlice = createSlice({
 
 export const {
   selectDm,
+  addConversation,
   addDmMessage,
   removeDmMessage,
   updateConversationLastMessage,
   clearDms,
 } = dmSlice.actions;
 
-// Compatibility alias for existing UI components
-export const openOrCreateDm = (user) => async (dispatch) => {
-  const recipientId = user.id || user._id;
-  if (recipientId) {
-    return await dispatch(startConversation(recipientId)).unwrap();
+export const openOrCreateDm = createAsyncThunk(
+  "dms/openOrCreateDm",
+  async (target, { dispatch, rejectWithValue }) => {
+    try {
+      const recipientId =
+        typeof target === "string"
+          ? target
+          : target?._id || target?.id || target?.userId;
+      if (!recipientId) throw new Error("Recipient ID is required");
+      return await dispatch(startConversation(recipientId)).unwrap();
+    } catch (error) {
+      return rejectWithValue(getErrorMessage(error));
+    }
   }
-};
+);
 
 export default dmSlice.reducer;

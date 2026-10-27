@@ -4,7 +4,7 @@ import userModel from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponse from "../utils/ApiResponse.js";
 import sendFiles from "../services/storage.service.js";
-import { getIO } from "../config/soocket.js";
+import { getIO, emitToUser } from "../config/soocket.js";
 
 export const getOrCreateConversation = async (req, res, next) => {
   try {
@@ -46,6 +46,9 @@ export const getOrCreateConversation = async (req, res, next) => {
         .findById(conversation._id)
         .populate("participants", "fullname username profile_pic");
       isNew = true;
+
+      // Real-time notification to recipient about the newly initiated conversation
+      emitToUser(recipientId, "conversation:created", conversation);
     }
 
     return res
@@ -208,15 +211,26 @@ export const sendDirectMessage = async (req, res, next) => {
     };
     await conversation.save();
 
+    const populatedConv = await conversationModel
+      .findById(conversationId)
+      .populate("participants", "fullname username profile_pic");
+
     // Socket.IO real-time emission
     const io = getIO();
     if (io) {
-      io.to(`conversation:${conversationId}`).emit("direct-message:new", populatedMessage);
-
-      // Notify recipient personal rooms for unread indicators
+      const targetRooms = [`conversation:${conversationId}`];
       conversation.participants.forEach((pId) => {
-        io.to(`user:${pId.toString()}`).emit("conversation:update", {
+        targetRooms.push(`user:${pId.toString()}`);
+      });
+
+      // Emitting to array of rooms automatically deduplicates recipients in Socket.IO
+      io.to(targetRooms).emit("direct-message:new", populatedMessage);
+
+      conversation.participants.forEach((pId) => {
+        const uid = pId.toString();
+        io.to(`user:${uid}`).emit("conversation:update", {
           conversationId,
+          conversation: populatedConv,
           lastMessage: conversation.lastMessage,
         });
       });
@@ -256,6 +270,16 @@ export const deleteDirectMessage = async (req, res, next) => {
         messageId,
         conversationId,
       });
+
+      const conversation = await conversationModel.findById(conversationId);
+      if (conversation?.participants) {
+        conversation.participants.forEach((pId) => {
+          io.to(`user:${pId.toString()}`).emit("direct-message:delete", {
+            messageId,
+            conversationId,
+          });
+        });
+      }
     }
 
     return res

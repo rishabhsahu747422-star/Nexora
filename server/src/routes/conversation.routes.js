@@ -15,6 +15,7 @@ const router = express.Router();
 router.use(authMiddleware);
 
 router.post("/", getOrCreateConversation);
+router.post("/dm", getOrCreateConversation);
 router.get("/", getUserConversations);
 router.get("/:conversationId", getConversationById);
 router.get("/:conversationId/messages", getConversationMessages);

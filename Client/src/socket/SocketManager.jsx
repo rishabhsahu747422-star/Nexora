@@ -1,9 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import socket from "./socket.js";
+import api from "../config/api.js";
 import { addMessage } from "../redux/slices/messageSlice";
 import {
   addDmMessage,
+  removeDmMessage,
+  addConversation,
   updateConversationLastMessage,
 } from "../redux/slices/dmSlice";
 import {
@@ -51,10 +54,6 @@ const SocketManager = () => {
       return;
     }
 
-    if (!socket.connected) {
-      socket.connect();
-    }
-
     const socketConnectHandler = () => {
       console.log("Socket connected:", socket.id);
       if (currentChannelRef.current) {
@@ -65,8 +64,19 @@ const SocketManager = () => {
       }
     };
 
-    const socketErrorHandler = (error) => {
-      console.log("Socket connection error:", error);
+    const socketErrorHandler = async (error) => {
+      console.warn("Socket connection error:", error?.message || error);
+      // Attempt refreshing session if rejected due to token expiry
+      if (error?.message && /auth/i.test(error.message)) {
+        try {
+          await api.post("/auth/refresh");
+          if (!socket.connected) {
+            socket.connect();
+          }
+        } catch {
+          // Refresh endpoint failed
+        }
+      }
     };
 
     const handleNewChannelMessage = (message) => {
@@ -78,6 +88,18 @@ const SocketManager = () => {
     const handleNewDirectMessage = (message) => {
       if (message) {
         dispatch(addDmMessage(message));
+      }
+    };
+
+    const handleDirectMessageDelete = (payload) => {
+      if (payload?.messageId) {
+        dispatch(removeDmMessage(payload.messageId));
+      }
+    };
+
+    const handleConversationCreated = (conversation) => {
+      if (conversation) {
+        dispatch(addConversation(conversation));
       }
     };
 
@@ -175,6 +197,8 @@ const SocketManager = () => {
     socket.on("connect_error", socketErrorHandler);
     socket.on("message:new", handleNewChannelMessage);
     socket.on("direct-message:new", handleNewDirectMessage);
+    socket.on("direct-message:delete", handleDirectMessageDelete);
+    socket.on("conversation:created", handleConversationCreated);
     socket.on("conversation:update", handleConversationUpdate);
 
     socket.on("voice:joined", handleVoiceJoined);
@@ -191,11 +215,19 @@ const SocketManager = () => {
     socket.on("connection:removed", handleConnectionRemoved);
     socket.on("user:presence-change", handleUserPresenceChange);
 
+    if (!socket.connected) {
+      socket.connect();
+    } else {
+      socketConnectHandler();
+    }
+
     return () => {
       socket.off("connect", socketConnectHandler);
       socket.off("connect_error", socketErrorHandler);
       socket.off("message:new", handleNewChannelMessage);
       socket.off("direct-message:new", handleNewDirectMessage);
+      socket.off("direct-message:delete", handleDirectMessageDelete);
+      socket.off("conversation:created", handleConversationCreated);
       socket.off("conversation:update", handleConversationUpdate);
 
       socket.off("voice:joined", handleVoiceJoined);

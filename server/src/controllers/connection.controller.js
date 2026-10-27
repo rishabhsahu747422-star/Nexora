@@ -58,12 +58,12 @@ export const getConnectionOverview = async (req, res, next) => {
       connectionRequestModel
         .find({ recipient: currentUserId, status: "pending" })
         .populate("sender", "_id fullname username profile_pic bio customStatus")
-        .sort({ createdAt: -1 })
+        .sort({ updatedAt: -1, createdAt: -1 })
         .lean(),
       connectionRequestModel
         .find({ sender: currentUserId, status: "pending" })
         .populate("recipient", "_id fullname username profile_pic bio customStatus")
-        .sort({ createdAt: -1 })
+        .sort({ updatedAt: -1, createdAt: -1 })
         .lean(),
     ]);
 
@@ -79,7 +79,8 @@ export const getConnectionOverview = async (req, res, next) => {
         status: isUserOnline(doc.sender._id) ? "online" : "offline",
         type: "incoming",
         createdAt: doc.createdAt,
-        time: formatRelativeTime(doc.createdAt),
+        updatedAt: doc.updatedAt,
+        time: formatRelativeTime(doc.updatedAt || doc.createdAt),
       }));
 
     const outgoingRequests = outgoingDocs
@@ -94,7 +95,8 @@ export const getConnectionOverview = async (req, res, next) => {
         status: isUserOnline(doc.recipient._id) ? "online" : "offline",
         type: "outgoing",
         createdAt: doc.createdAt,
-        time: formatRelativeTime(doc.createdAt),
+        updatedAt: doc.updatedAt,
+        time: formatRelativeTime(doc.updatedAt || doc.createdAt),
       }));
 
     const allRequests = [...incomingRequests, ...outgoingRequests];
@@ -328,7 +330,7 @@ export const sendConnectionRequest = async (req, res, next) => {
     // Upsert or create new connection request
     const newRequest = await connectionRequestModel.findOneAndUpdate(
       { sender: currentUserId, recipient: targetUserId },
-      { status: "pending" },
+      { status: "pending", updatedAt: new Date() },
       { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
     );
 

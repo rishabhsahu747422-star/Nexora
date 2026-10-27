@@ -41,15 +41,17 @@ export const sendFriendRequest = createAsyncThunk(
     try {
       let payload = {};
       if (typeof target === 'string') {
-        payload = target.startsWith('@') || !target.match(/^[0-9a-fA-F]{24}$/)
-          ? { username: target }
-          : { recipientId: target };
+        const clean = target.trim();
+        payload = clean.startsWith('@') || !clean.match(/^[0-9a-fA-F]{24}$/)
+          ? { username: clean.replace(/^@/, '') }
+          : { recipientId: clean };
       } else if (target && typeof target === 'object') {
         const id = target._id || target.id || target.userId;
-        if (id && id.match(/^[0-9a-fA-F]{24}$/)) {
-          payload = { recipientId: id };
+        const idStr = id ? String(id).trim() : '';
+        if (idStr && idStr.match(/^[0-9a-fA-F]{24}$/)) {
+          payload = { recipientId: idStr };
         } else if (target.username) {
-          payload = { username: target.username };
+          payload = { username: String(target.username).trim().replace(/^@/, '') };
         }
       }
       const data = await friendService.sendConnectionRequest(payload);
@@ -167,36 +169,41 @@ export const friendSlice = createSlice({
     // Realtime Socket Handlers
     onConnectionRequestReceived: (state, action) => {
       const req = action.payload;
-      if (!req || !req.id) return;
+      if (!req || (!req.id && !req.requestId)) return;
+      const reqId = String(req.id || req.requestId);
       const exists = (state.incomingRequests || []).some(
-        (r) => r.id === req.id || r.requestId === req.id
+        (r) => String(r.id || r.requestId) === reqId
       );
       if (!exists) {
         state.incomingRequests.unshift(req);
         // remove from suggestions if present
-        state.suggestions = (state.suggestions || []).filter(
-          (s) => s.id !== req.userId && s.userId !== req.userId
-        );
+        const senderUserId = String(req.userId || req.sender?._id || '');
+        if (senderUserId) {
+          state.suggestions = (state.suggestions || []).filter(
+            (s) => String(s.id || s.userId) !== senderUserId
+          );
+        }
         recalcCounts(state);
       }
     },
     onConnectionRequestAccepted: (state, action) => {
       const { requestId, friend } = action.payload || {};
       if (requestId) {
+        const rId = String(requestId);
         state.outgoingRequests = (state.outgoingRequests || []).filter(
-          (r) => r.id !== requestId && r.requestId !== requestId
+          (r) => String(r.id || r.requestId) !== rId
         );
       }
       if (friend) {
-        const friendId = friend.id || friend.userId;
+        const friendId = String(friend.id || friend.userId || friend._id || '');
         const exists = (state.friends || []).some(
-          (f) => f.id === friendId || f.userId === friendId
+          (f) => String(f.id || f.userId || f._id) === friendId
         );
         if (!exists) {
-          state.friends.push(friend);
+          state.friends.unshift(friend);
         }
         state.suggestions = (state.suggestions || []).filter(
-          (s) => s.id !== friendId && s.userId !== friendId
+          (s) => String(s.id || s.userId) !== friendId
         );
       }
       recalcCounts(state);
@@ -204,8 +211,9 @@ export const friendSlice = createSlice({
     onConnectionRequestDeclined: (state, action) => {
       const { requestId } = action.payload || {};
       if (requestId) {
+        const rId = String(requestId);
         state.outgoingRequests = (state.outgoingRequests || []).filter(
-          (r) => r.id !== requestId && r.requestId !== requestId
+          (r) => String(r.id || r.requestId) !== rId
         );
         recalcCounts(state);
       }
@@ -213,8 +221,9 @@ export const friendSlice = createSlice({
     onConnectionRequestCancelled: (state, action) => {
       const { requestId } = action.payload || {};
       if (requestId) {
+        const rId = String(requestId);
         state.incomingRequests = (state.incomingRequests || []).filter(
-          (r) => r.id !== requestId && r.requestId !== requestId
+          (r) => String(r.id || r.requestId) !== rId
         );
         recalcCounts(state);
       }
@@ -222,8 +231,9 @@ export const friendSlice = createSlice({
     onConnectionRemoved: (state, action) => {
       const { userId } = action.payload || {};
       if (userId) {
+        const uid = String(userId);
         state.friends = (state.friends || []).filter(
-          (f) => f.id !== userId && f.userId !== userId
+          (f) => String(f.id || f.userId || f._id) !== uid
         );
         recalcCounts(state);
       }
@@ -231,9 +241,10 @@ export const friendSlice = createSlice({
     onUserPresenceChange: (state, action) => {
       const { userId, status } = action.payload || {};
       if (!userId) return;
+      const uid = String(userId);
 
       const updateItemStatus = (item) => {
-        if (item && (item.id === userId || item.userId === userId)) {
+        if (item && (String(item.id || item.userId) === uid)) {
           item.status = status;
         }
       };
@@ -337,20 +348,20 @@ export const friendSlice = createSlice({
         state.actionLoading[action.meta.arg] = true;
       })
       .addCase(acceptFriendRequest.fulfilled, (state, action) => {
-        const requestId = action.payload?.requestId || action.meta.arg;
-        delete state.actionLoading[requestId];
+        const requestId = String(action.payload?.requestId || action.meta.arg);
+        delete state.actionLoading[action.meta.arg];
 
         state.incomingRequests = state.incomingRequests.filter(
-          (r) => r.id !== requestId && r.requestId !== requestId
+          (r) => String(r.id || r.requestId) !== requestId
         );
 
         if (action.payload?.friend) {
-          const fid = action.payload.friend.id || action.payload.friend.userId;
-          if (!state.friends.some((f) => f.id === fid || f.userId === fid)) {
-            state.friends.push(action.payload.friend);
+          const fid = String(action.payload.friend.id || action.payload.friend.userId || action.payload.friend._id);
+          if (!state.friends.some((f) => String(f.id || f.userId || f._id) === fid)) {
+            state.friends.unshift(action.payload.friend);
           }
           state.suggestions = state.suggestions.filter(
-            (s) => s.id !== fid && s.userId !== fid
+            (s) => String(s.id || s.userId || s._id) !== fid
           );
         }
 
@@ -366,11 +377,11 @@ export const friendSlice = createSlice({
         state.actionLoading[action.meta.arg] = true;
       })
       .addCase(rejectFriendRequest.fulfilled, (state, action) => {
-        const requestId = action.payload?.requestId || action.meta.arg;
-        delete state.actionLoading[requestId];
+        const requestId = String(action.payload?.requestId || action.meta.arg);
+        delete state.actionLoading[action.meta.arg];
 
         state.incomingRequests = state.incomingRequests.filter(
-          (r) => r.id !== requestId && r.requestId !== requestId
+          (r) => String(r.id || r.requestId) !== requestId
         );
         recalcCounts(state);
       })
@@ -384,11 +395,11 @@ export const friendSlice = createSlice({
         state.actionLoading[action.meta.arg] = true;
       })
       .addCase(cancelFriendRequest.fulfilled, (state, action) => {
-        const requestId = action.payload?.requestId || action.meta.arg;
-        delete state.actionLoading[requestId];
+        const requestId = String(action.payload?.requestId || action.meta.arg);
+        delete state.actionLoading[action.meta.arg];
 
         state.outgoingRequests = state.outgoingRequests.filter(
-          (r) => r.id !== requestId && r.requestId !== requestId
+          (r) => String(r.id || r.requestId) !== requestId
         );
         recalcCounts(state);
       })
@@ -402,11 +413,11 @@ export const friendSlice = createSlice({
         state.actionLoading[action.meta.arg] = true;
       })
       .addCase(removeFriend.fulfilled, (state, action) => {
-        const friendId = action.payload?.friendId || action.meta.arg;
-        delete state.actionLoading[friendId];
+        const friendId = String(action.payload?.friendId || action.meta.arg);
+        delete state.actionLoading[action.meta.arg];
 
         state.friends = state.friends.filter(
-          (f) => f.id !== friendId && f.userId !== friendId
+          (f) => String(f.id || f.userId || f._id) !== friendId
         );
         recalcCounts(state);
       })

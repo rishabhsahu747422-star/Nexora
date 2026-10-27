@@ -36,9 +36,15 @@ export default function Login() {
   const handleGoogleLogin = () => {
     setGoogleLoading(true);
 
+    const isLocalHost =
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" ||
+       window.location.hostname === "127.0.0.1" ||
+       window.location.hostname.endsWith(".localhost"));
+
     const rawApiUrl =
       import.meta.env.VITE_API_BASE_URL ||
-      (typeof window !== "undefined" && window.location.hostname === "localhost"
+      (isLocalHost
         ? "http://localhost:5000/api"
         : "https://nexora-ikwc.onrender.com/api");
     const apiBase = typeof rawApiUrl === "string" ? rawApiUrl.trim().replace(/\/+$/, "") : rawApiUrl;

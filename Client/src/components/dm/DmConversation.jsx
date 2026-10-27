@@ -5,19 +5,26 @@ import Avatar from "../common/Avatar";
 import MessageItem from "../chat/MessageItem";
 import MessageComposer from "../chat/MessageComposer";
 import { openModal } from "../../redux/slices/uiSlice";
-import { fetchDmMessages, sendDm } from "../../redux/slices/dmSlice";
+import { fetchDmMessages, sendDm, fetchConversations } from "../../redux/slices/dmSlice";
 
 export default function DmConversation({ dmId }) {
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
 
   const currentUser = useSelector((state) => state.auth.user);
-  const conversation = useSelector((state) =>
-    state.dms.conversations.find((c) => (c._id || c.id) === dmId)
+  const conversations = useSelector((state) => state.dms.conversations || []);
+  const conversation = conversations.find(
+    (c) => String(c._id || c.id) === String(dmId)
   );
   const messages = useSelector((state) => state.dms.messages || []);
   const messagesLoading = useSelector((state) => state.dms.messagesLoading);
   const density = useSelector((state) => state.ui.messageDensity);
+
+  useEffect(() => {
+    if (conversations.length === 0) {
+      dispatch(fetchConversations());
+    }
+  }, [conversations.length, dispatch]);
 
   useEffect(() => {
     if (dmId) {
