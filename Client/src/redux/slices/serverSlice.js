@@ -144,9 +144,11 @@ const serverSlice = createSlice({
 
   reducers: {
     selectServer: (state, action) => {
-      const server = state.servers.find(
-        (item) => item._id === action.payload || item.id === action.payload,
-      );
+      const targetId = action.payload?._id || action.payload?.id || action.payload;
+      const server =
+        state.servers.find(
+          (item) => String(item._id || item.id) === String(targetId),
+        ) || (typeof action.payload === "object" && action.payload ? action.payload : null);
 
       if (state.selectedServer?._id !== server?._id) {
         state.members = [];
@@ -177,7 +179,15 @@ const serverSlice = createSlice({
         state.loading = false;
         state.servers = action.payload || [];
 
-        if (!state.selectedServer && state.servers.length > 0) {
+        if (state.selectedServer) {
+          const currentId = state.selectedServer._id || state.selectedServer.id;
+          const matched = state.servers.find(
+            (s) => String(s._id || s.id) === String(currentId),
+          );
+          if (matched) {
+            state.selectedServer = matched;
+          }
+        } else if (state.servers.length > 0) {
           state.selectedServer = state.servers[0];
         }
       })
@@ -235,8 +245,20 @@ const serverSlice = createSlice({
 
       // REGENERATE INVITE
       .addCase(regenerateInvite.fulfilled, (state, action) => {
-        if (state.selectedServer && action.payload?.inviteCode) {
-          state.selectedServer.inviteCode = action.payload.inviteCode;
+        const newCode = action.payload?.inviteCode;
+        if (newCode) {
+          if (state.selectedServer) {
+            state.selectedServer.inviteCode = newCode;
+          }
+          const sId = action.meta?.arg;
+          if (sId) {
+            const server = state.servers.find(
+              (s) => String(s._id || s.id) === String(sId),
+            );
+            if (server) {
+              server.inviteCode = newCode;
+            }
+          }
         }
       })
 

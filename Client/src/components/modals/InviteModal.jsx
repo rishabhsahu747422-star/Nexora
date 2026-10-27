@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { Copy, RefreshCw, Check, Link as LinkIcon, Shield } from "lucide-react";
+import { Copy, RefreshCw, Check, Link as LinkIcon, Shield, Loader2 } from "lucide-react";
 import Modal from "../common/Modal";
 import Button from "../common/Button";
 import CommunityAvatar from "../common/CommunityAvatar";
 import { regenerateInvite } from "../../redux/slices/serverSlice";
+import { createInvite } from "../../services/server.service";
 import { addToast } from "../../redux/slices/uiSlice";
 
 export default function InviteModal({ isOpen, onClose, server }) {
@@ -12,14 +13,41 @@ export default function InviteModal({ isOpen, onClose, server }) {
   const [copied, setCopied] = useState(false);
   const [expiry, setExpiry] = useState("7 days");
   const [maxUses, setMaxUses] = useState("No limit");
+  const [inviteCode, setInviteCode] = useState(server?.inviteCode || "");
+  const [isLoadingCode, setIsLoadingCode] = useState(!server?.inviteCode);
+
+  useEffect(() => {
+    const sId = server?._id || server?.id;
+    if (!sId) return;
+
+    if (server.inviteCode) {
+      setInviteCode(server.inviteCode);
+      setIsLoadingCode(false);
+    } else {
+      setIsLoadingCode(true);
+      createInvite(sId)
+        .then((res) => {
+          if (res?.inviteCode) {
+            setInviteCode(res.inviteCode);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to load invite code:", err);
+        })
+        .finally(() => {
+          setIsLoadingCode(false);
+        });
+    }
+  }, [server]);
 
   if (!server) return null;
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const inviteCode = server.inviteCode || "";
-  const inviteUrl = `${origin}/invite/${inviteCode}`;
+  const appBaseUrl = import.meta.env.VITE_APP_URL || origin;
+  const inviteUrl = inviteCode ? `${appBaseUrl}/invite/${inviteCode}` : "";
 
   const handleCopy = () => {
+    if (!inviteUrl) return;
     navigator.clipboard.writeText(inviteUrl);
     setCopied(true);
     dispatch(
@@ -31,15 +59,30 @@ export default function InviteModal({ isOpen, onClose, server }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleRegenerate = () => {
+  const handleRegenerate = async () => {
     const sId = server._id || server.id;
-    dispatch(regenerateInvite(sId));
-    dispatch(
-      addToast({
-        type: "info",
-        message: "New invite token generated.",
-      }),
-    );
+    setIsLoadingCode(true);
+    try {
+      const res = await dispatch(regenerateInvite(sId)).unwrap();
+      if (res?.inviteCode) {
+        setInviteCode(res.inviteCode);
+      }
+      dispatch(
+        addToast({
+          type: "info",
+          message: "New invite token generated.",
+        }),
+      );
+    } catch (err) {
+      dispatch(
+        addToast({
+          type: "error",
+          message: "Failed to generate new invite token.",
+        }),
+      );
+    } finally {
+      setIsLoadingCode(false);
+    }
   };
 
   return (
@@ -75,18 +118,20 @@ export default function InviteModal({ isOpen, onClose, server }) {
             Community Invite Link
           </label>
           <div className="flex items-center gap-2 bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl p-2">
-            <LinkIcon className="w-4 h-4 text-[var(--accent)] ml-1.5 flex-shrink-0" />
             <input
               type="text"
               readOnly
-              value={inviteUrl}
-              className="bg-transparent text-xs font-mono text-slate-200 flex-1 focus:outline-none select-all"
+              value={isLoadingCode ? "Generating encrypted access link..." : inviteUrl}
+              className={`bg-transparent text-xs font-mono flex-1 focus:outline-none select-all ${
+                isLoadingCode ? "text-slate-500 italic" : "text-slate-200"
+              }`}
             />
             <Button
               variant={copied ? "secondary" : "primary"}
               size="sm"
               icon={copied ? Check : Copy}
               onClick={handleCopy}
+              disabled={isLoadingCode || !inviteUrl}
             >
               {copied ? "Copied" : "Copy"}
             </Button>
@@ -133,10 +178,11 @@ export default function InviteModal({ isOpen, onClose, server }) {
           <span>Need a fresh token?</span>
           <button
             onClick={handleRegenerate}
-            className="flex items-center gap-1.5 text-[var(--accent)] hover:underline transition-colors font-medium"
+            disabled={isLoadingCode}
+            className="flex items-center gap-1.5 text-[var(--accent)] hover:underline transition-colors font-medium disabled:opacity-50"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>Generate New Link</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoadingCode ? "animate-spin" : ""}`} />
+            <span>{isLoadingCode ? "Generating..." : "Generate New Link"}</span>
           </button>
         </div>
       </div>

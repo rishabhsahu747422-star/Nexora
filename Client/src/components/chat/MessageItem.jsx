@@ -39,14 +39,6 @@ export default function MessageItem({
   const currentUser = useSelector((state) => state.auth.user);
 
   const msgId = message._id || message.id;
-  const authorName =
-    message.author_id?.fullname ||
-    message.author_id?.username ||
-    message.authorName ||
-    "Operative";
-  const authorAvatar =
-    message.author_id?.profile_pic ||
-    message.authorAvatar;
   const authorId =
     message.author_id?._id ||
     message.author_id?.id ||
@@ -60,6 +52,20 @@ export default function MessageItem({
   const currentUserId = currentUser?._id || currentUser?.id;
   const isAuthor =
     Boolean(currentUserId && authorId && String(currentUserId) === String(authorId));
+
+  const authorName =
+    message.author_id?.fullname ||
+    message.author_id?.username ||
+    message.authorName ||
+    message.sender?.fullname ||
+    message.sender?.username ||
+    (isAuthor ? (currentUser?.fullname || currentUser?.username) : null) ||
+    "Operative";
+  const authorAvatar =
+    message.author_id?.profile_pic ||
+    message.authorAvatar ||
+    message.sender?.profile_pic ||
+    (isAuthor ? currentUser?.profile_pic : "");
 
   const [isEditing, setIsEditing] = useState(false);
   const [editText, setEditText] = useState(message.content);
@@ -280,20 +286,16 @@ export default function MessageItem({
         <div className="flex-1 min-w-0">
           {/* Header: Author + Role Pill + Timestamp + Pinned Badge */}
           <div className="flex items-center gap-2 flex-wrap">
-            {isAuthor ? (
-              <div className="flex items-center gap-1.5">
-                <span className="font-display font-semibold text-sm text-[var(--accent, #38bdf8)]">
-                  You
-                </span>
-                <span className="text-[9px] font-mono font-medium px-1.5 py-0.2 rounded-md bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)]">
-                  YOU
-                </span>
-              </div>
-            ) : (
+            <div className="flex items-center gap-1.5">
               <span className="font-display font-semibold text-sm text-slate-100 hover:underline cursor-pointer">
                 {authorName}
               </span>
-            )}
+              {isAuthor && (
+                <span className="text-[9px] font-mono font-medium px-1.5 py-0.2 rounded-md bg-[var(--accent-soft)] text-[var(--accent)] border border-[var(--accent-border)]">
+                  YOU
+                </span>
+              )}
+            </div>
 
             {message.authorRole && (
               <span

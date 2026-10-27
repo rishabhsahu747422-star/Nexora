@@ -1,4 +1,5 @@
 import { log } from "console";
+import mongoose from "mongoose";
 import serverModel from "../models/server.model.js";
 import userModel from "../models/user.model.js";
 import sendFiles from "../services/storage.service.js";
@@ -63,9 +64,15 @@ export const createServer = async (req, res) => {
     });
 
     const defaultChannels = await channelModel.create([
-      { name: "#general-chat", server: server._id, position: 1 },
       {
-        name: "announcement",
+        name: "#general-chat",
+        type: "text",
+        server: server._id,
+        position: 1,
+      },
+      {
+        name: "Voice",
+        type: "voice",
         server: server._id,
         position: 2,
       },
@@ -219,14 +226,30 @@ export const getAllServer = async (req, res) => {
 };
 export const getInviteDetails = async (req, res, next) => {
   try {
-    const inviteCode = req.params.inviteCode?.trim();
-    if (!inviteCode) {
+    const rawInviteCode = req.params.inviteCode;
+    if (!rawInviteCode) {
       throw new ApiError(400, "Invite code is required");
     }
 
-    const server = await serverModel.findOne({ inviteCode });
+    const cleanCode = rawInviteCode.replace(/[/?#].*$/, "").trim();
+    const isObjectId = mongoose.isValidObjectId(cleanCode);
+
+    const server = await serverModel.findOne({
+      $or: [
+        { inviteCode: cleanCode },
+        { inviteCode: cleanCode.toLowerCase() },
+        { inviteCode: new RegExp(`^${cleanCode}$`, "i") },
+        ...(isObjectId ? [{ _id: cleanCode }] : []),
+      ],
+    });
+
     if (!server) {
       throw new ApiError(404, "Invalid or expired invite code");
+    }
+
+    if (!server.inviteCode) {
+      server.inviteCode = generateInviteCode();
+      await server.save();
     }
 
     const memberCount = await serverMemberModel.countDocuments({
@@ -266,12 +289,30 @@ export const getInviteDetails = async (req, res, next) => {
 
 export const joinServer = async (req, res, next) => {
   try {
-    const inviteCode = req.params.inviteCode?.trim();
+    const rawInviteCode = req.params.inviteCode;
+    if (!rawInviteCode) {
+      throw new ApiError(400, "Invite code is required");
+    }
 
-    const server = await serverModel.findOne({ inviteCode });
+    const cleanCode = rawInviteCode.replace(/[/?#].*$/, "").trim();
+    const isObjectId = mongoose.isValidObjectId(cleanCode);
+
+    const server = await serverModel.findOne({
+      $or: [
+        { inviteCode: cleanCode },
+        { inviteCode: cleanCode.toLowerCase() },
+        { inviteCode: new RegExp(`^${cleanCode}$`, "i") },
+        ...(isObjectId ? [{ _id: cleanCode }] : []),
+      ],
+    });
 
     if (!server) {
       throw new ApiError(404, "Invalid or expired invite code");
+    }
+
+    if (!server.inviteCode) {
+      server.inviteCode = generateInviteCode();
+      await server.save();
     }
 
     const user = await userModel.findById(req.user._id);
