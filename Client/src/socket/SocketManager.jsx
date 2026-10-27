@@ -19,6 +19,7 @@ import {
   setUserSpeaking,
   setIncomingCall,
   clearIncomingCall,
+  updateDirectCallId,
   setDirectCallConnected,
   endDirectCall,
 } from "../redux/slices/voiceSlice";
@@ -216,12 +217,34 @@ const SocketManager = () => {
       dispatch(setIncomingCall({ callId, caller, isVideo, conversationId }));
     };
 
-    const handleDirectCallAccepted = ({ callId, recipient, recipientSocketId, caller, callerSocketId }) => {
-      console.log("[DirectCall] Call accepted:", callId);
-      dispatch(setDirectCallConnected());
-      if (recipientSocketId) {
-        // Initiator creates peer connection and sends offer
-        webrtc.createPeerConnection(recipientSocketId, recipient, true);
+    const handleDirectCallOutgoing = ({ callId }) => {
+      console.log("[DirectCall] Outgoing call acknowledged with ID:", callId);
+      if (callId) {
+        webrtc.currentCallId = callId;
+        dispatch(updateDirectCallId({ callId }));
+      }
+    };
+
+    const handleDirectCallAccepted = ({
+      callId,
+      recipientUser,
+      recipientSocketId,
+      callerUser,
+      callerSocketId,
+    }) => {
+      console.log("[DirectCall] Call accepted for callId:", callId);
+      if (callId) {
+        webrtc.currentCallId = callId;
+      }
+
+      const isCaller = socket.id === callerSocketId;
+      const peer = isCaller ? recipientUser : callerUser;
+      dispatch(setDirectCallConnected({ callId, peer }));
+
+      // Only the caller initiates the WebRTC offer to recipient
+      if (isCaller && recipientSocketId) {
+        console.log(`[DirectCall] Caller creating initiator peer connection to recipient ${recipientSocketId}`);
+        webrtc.createPeerConnection(recipientSocketId, recipientUser, true);
       }
     };
 
@@ -272,6 +295,7 @@ const SocketManager = () => {
     socket.on("voice:error", handleVoiceError);
 
     socket.on("direct-call:incoming", handleDirectCallIncoming);
+    socket.on("direct-call:outgoing", handleDirectCallOutgoing);
     socket.on("direct-call:accepted", handleDirectCallAccepted);
     socket.on("direct-call:rejected", handleDirectCallRejected);
     socket.on("direct-call:ended", handleDirectCallEnded);
@@ -309,6 +333,7 @@ const SocketManager = () => {
       socket.off("voice:error", handleVoiceError);
 
       socket.off("direct-call:incoming", handleDirectCallIncoming);
+      socket.off("direct-call:outgoing", handleDirectCallOutgoing);
       socket.off("direct-call:accepted", handleDirectCallAccepted);
       socket.off("direct-call:rejected", handleDirectCallRejected);
       socket.off("direct-call:ended", handleDirectCallEnded);

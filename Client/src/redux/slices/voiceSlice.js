@@ -117,6 +117,10 @@ export const voiceSlice = createSlice({
       state.isScreenSharing = !state.isScreenSharing;
     },
 
+    setScreenSharing: (state, action) => {
+      state.isScreenSharing = Boolean(action.payload);
+    },
+
     setUserSpeaking: (state, action) => {
       state.isSpeaking = action.payload;
     },
@@ -139,9 +143,18 @@ export const voiceSlice = createSlice({
       state.incomingCall = null;
     },
 
+    updateDirectCallId: (state, action) => {
+      if (state.activeDirectCall && action.payload?.callId) {
+        state.activeDirectCall.callId = action.payload.callId;
+      }
+    },
+
     setDirectCallConnected: (state, action) => {
       if (state.activeDirectCall) {
         state.activeDirectCall.status = "connected";
+        if (action.payload?.callId) {
+          state.activeDirectCall.callId = action.payload.callId;
+        }
         if (action.payload?.peer) {
           state.activeDirectCall.peer = action.payload.peer;
         }
@@ -151,6 +164,9 @@ export const voiceSlice = createSlice({
     endDirectCall: (state) => {
       state.activeDirectCall = null;
       state.incomingCall = null;
+      state.isScreenSharing = false;
+      state.isVideo = false;
+      state.isMuted = false;
     },
   },
 });
@@ -167,11 +183,13 @@ export const {
   toggleDeafen,
   toggleVideo,
   toggleScreenShare,
+  setScreenSharing,
   setUserSpeaking,
   setVoiceError,
   setIncomingCall,
   clearIncomingCall,
   startDirectCall,
+  updateDirectCallId,
   setDirectCallConnected,
   endDirectCall,
 } = voiceSlice.actions;

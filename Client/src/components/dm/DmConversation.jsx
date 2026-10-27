@@ -6,7 +6,7 @@ import MessageItem from "../chat/MessageItem";
 import MessageComposer from "../chat/MessageComposer";
 import { openModal, addToast } from "../../redux/slices/uiSlice";
 import { fetchDmMessages, sendDm, fetchConversations } from "../../redux/slices/dmSlice";
-import { startDirectCall } from "../../redux/slices/voiceSlice";
+import { startDirectCall, updateDirectCallId } from "../../redux/slices/voiceSlice";
 import socket from "../../socket/socket.js";
 import webrtc from "../../services/webrtc.service.js";
 
@@ -66,15 +66,27 @@ export default function DmConversation({ dmId }) {
       webrtc.isDirectCall = true;
       await webrtc.startLocalMedia({ audio: true, video: isVideoCall });
 
-      socket.emit("direct-call:initiate", {
-        recipientId,
-        conversationId: dmId,
-        isVideo: isVideoCall,
-      });
+      const tempCallId = `outgoing_${Date.now()}`;
+      webrtc.currentCallId = tempCallId;
+
+      socket.emit(
+        "direct-call:initiate",
+        {
+          recipientId,
+          conversationId: dmId,
+          isVideo: isVideoCall,
+        },
+        (response) => {
+          if (response?.success && response.callId) {
+            webrtc.currentCallId = response.callId;
+            dispatch(updateDirectCallId({ callId: response.callId }));
+          }
+        }
+      );
 
       dispatch(
         startDirectCall({
-          callId: `outgoing_${Date.now()}`,
+          callId: tempCallId,
           conversationId: dmId,
           peer: otherUser,
           isVideo: isVideoCall,
